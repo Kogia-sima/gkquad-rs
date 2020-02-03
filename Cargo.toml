@@ -1,0 +1,7 @@
+[workspace]
+members = [
+  "gkquad"
+]
+
+[profile.release]
+overflow-checks = false
