@@ -23,5 +23,5 @@ pub fn integrate_with_config<F: Integrand, I: Into<Interval>>(
     interval: I,
     config: &IntegrationConfig,
 ) -> IntegrationResult {
-    QAGS::new().integrate(&mut f, &interval.into(), config)
+    AUTO::new().integrate(&mut f, &interval.into(), config)
 }
