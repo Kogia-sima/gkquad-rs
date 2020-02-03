@@ -2,7 +2,7 @@
 name = "gkquad"
 version = "0.0.1"
 authors = ["Kogia-sima <orcinus4627@gmail.com>"]
-license = "GPL-3.0-or-later"
+license = "MIT"
 homepage = "https://github.com/Kogia-sima/gkquad-rs"
 repository = "https://github.com/Kogia-sima/gkquad-rs"
 readme = "../README.md"
