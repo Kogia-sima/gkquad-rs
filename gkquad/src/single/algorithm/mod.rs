@@ -53,6 +53,10 @@ where F: Integrand + Any + 'static {
     pub fn downcast_mut<T: Algorithm<F>>(&mut self) -> Option<&mut T> {
         Downcast::as_any_mut(self).downcast_mut::<T>()
     }
+
+    pub fn is<T: Algorithm<F>>(&self) -> bool {
+        Downcast::as_any(self).is::<T>()
+    }
 }
 
 mod qag;
