@@ -4,7 +4,7 @@ use std::ops::{Bound, RangeBounds};
 
 use crate::Tolerance;
 
-pub type Points = SmallVec::<[f64; 8]>;
+pub type Points = SmallVec<[f64; 8]>;
 
 /// Represent the interval for which the integral is estimated.
 ///
@@ -96,5 +96,33 @@ pub trait Integrand {
 impl<F: FnMut(f64) -> f64> Integrand for F {
     fn apply(&mut self, x: f64) -> f64 {
         (*self)(x)
+    }
+}
+
+/// This struct is used in order to allow integration over infinite interval
+pub struct IntegrationWrapper<F: Integrand> {
+    pub inner: F,
+    pub transform: bool,
+}
+
+impl<F: Integrand> Integrand for IntegrationWrapper<F> {
+    #[inline]
+    fn apply(&mut self, x: f64) -> f64 {
+        if self.transform {
+            let coef = 1. / (1. - x.abs());
+            let x2 = x * coef;
+            self.inner.apply(x2) * coef * coef
+        } else {
+            self.inner.apply(x)
+        }
+    }
+
+    #[inline]
+    fn apply_to_slice(&mut self, s: &mut [f64]) {
+        if self.transform {
+            s.iter_mut().for_each(|x| *x = self.apply(*x))
+        } else {
+            self.inner.apply_to_slice(s)
+        }
     }
 }
