@@ -53,6 +53,14 @@ impl<F: Integrand> Algorithm<F> for QAGS {
 
         let result0 = qk21(f, &interval);
 
+        if result0.estimate.is_nan() {
+            return IntegrationResult::new(
+                result0.estimate,
+                result0.delta,
+                Some(NanValueEncountered)
+            )
+        }
+
         ws.push(SubIntervalInfo::new(
             interval.clone(),
             result0.estimate,
@@ -96,6 +104,11 @@ impl<F: Integrand> Algorithm<F> for QAGS {
             // 各部分区間でGauss-Kronrod積分
             let result1 = qk21(f, &il1);
             let result2 = qk21(f, &il2);
+
+            if result1.estimate.is_nan() || result2.estimate.is_nan() {
+                error = Some(NanValueEncountered);
+                break;
+            }
 
             let area12 = result1.estimate + result2.estimate;
             let error12 = result1.delta + result2.delta;
