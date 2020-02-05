@@ -55,3 +55,16 @@ pub fn bisect(interval: &Interval) -> (Interval, Interval) {
         )
     }
 }
+
+// apply inverse transformation for the parameter
+#[inline]
+pub fn transform_param(x: f64) -> f64 {
+    if x == std::f64::NEG_INFINITY {
+        -1.0
+    } else if x == std::f64::INFINITY {
+        1.0
+    } else {
+        x / (1.0 + x.abs())
+    }
+}
+

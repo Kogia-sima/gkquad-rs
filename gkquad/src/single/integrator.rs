@@ -3,7 +3,8 @@ use alloc::boxed::Box;
 use std::fmt::{self, Debug};
 
 use super::algorithm::*;
-use super::common::{Integrand, IntegrationConfig, Interval, Points};
+use super::common::{Integrand, IntegrationConfig, IntegrationWrapper, Interval, Points};
+use super::util::transform_param;
 
 use crate::{IntegrationResult, Tolerance};
 
@@ -27,7 +28,7 @@ use crate::{IntegrationResult, Tolerance};
 /// }
 /// ```
 pub struct Integrator<F: Integrand> {
-    integrand: F,
+    integrand: IntegrationWrapper<F>,
     algorithm: Box<dyn Algorithm<F>>,
     config: IntegrationConfig,
 }
@@ -36,24 +37,18 @@ impl<F: Integrand> Integrator<F> {
     #[inline]
     pub fn new(f: F) -> Integrator<F> {
         Self {
-            integrand: f,
+            integrand: IntegrationWrapper {
+                inner: f,
+                transform: false,
+            },
             algorithm: Box::new(AUTO::new()),
             config: IntegrationConfig::default(),
         }
     }
 
-    #[inline]
-    pub fn with_config(f: F, config: IntegrationConfig) -> Integrator<F> {
-        Self {
-            integrand: f,
-            algorithm: Box::new(AUTO::new()),
-            config,
-        }
-    }
-
     /// Set integration algorithm
     #[inline]
-    pub fn algorithm<T: Algorithm<F> + 'static>(mut self, algorithm: T) -> Self {
+    pub fn algorithm<A: Algorithm<F> + 'static>(mut self, algorithm: A) -> Self {
         self.algorithm = Box::new(algorithm);
         self
     }
@@ -94,35 +89,50 @@ impl<F: Integrand> Integrator<F> {
         self
     }
 
-    #[doc(hidden)]
-    pub fn config(mut self, config: IntegrationConfig) -> Self {
-        self.config = config;
-        self
-    }
-
     #[inline]
     pub fn get_algorithm(&self) -> &dyn Algorithm<F> {
         self.algorithm.as_ref()
     }
 
-    #[inline]
-    pub fn into_integrand(self) -> F {
-        self.integrand
-    }
-
     pub fn run<T: Into<Interval>>(&mut self, interval: T) -> IntegrationResult {
-        // TODO: support infinite range
-        let interval = interval.into();
+        let mut interval = interval.into();
 
-        self.algorithm
-            .integrate(&mut self.integrand, &interval.into(), &self.config)
+        // transform interval
+        if !interval.begin.is_finite() || !interval.end.is_finite() {
+            self.integrand.transform = true;
+            interval.begin = transform_param(interval.begin);
+            interval.end = transform_param(interval.end);
+
+            // transform singular points
+            let old_points = Some(self.config.points.clone());
+            self.config
+                .points
+                .iter_mut()
+                .for_each(|x| *x = transform_param(*x));
+
+            let result =
+                self.algorithm
+                    .integrate(&mut self.integrand, &interval.into(), &self.config);
+
+            // reset state
+            self.integrand.transform = false;
+            self.config.points = old_points.unwrap();
+
+            result
+        } else {
+            // compiler hint
+            self.integrand.transform = false;
+
+            self.algorithm
+                .integrate(&mut self.integrand, &interval.into(), &self.config)
+        }
     }
 }
 
 impl<F: Integrand + Debug> Debug for Integrator<F> {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         fmt.debug_struct("Integrator")
-            .field("integrand", &self.integrand)
+            .field("integrand", &self.integrand.inner)
             .field("config", &self.config)
             .finish()
     }
