@@ -17,6 +17,7 @@ pub struct SubIntervalInfo {
 }
 
 impl SubIntervalInfo {
+    #[inline]
     pub fn new(interval: Interval, estimate: f64, delta: f64, level: usize) -> Self {
         Self {interval, estimate, delta, level}
     }

@@ -26,7 +26,6 @@ use super::util::rescale_error;
 /// # TODO
 ///
 /// - SIMD implementation
-#[inline]
 pub unsafe fn qk<F, K, G>(
     f: &mut F,
     range: &Interval,
@@ -120,10 +119,12 @@ macro_rules! impl_array {
                 type Item = f64;
                 const CAPACITY: usize = $N;
 
+                #[inline]
                 fn as_slice(&self) -> &[f64] {
                     self.as_ref()
                 }
 
+                #[inline]
                 fn as_mut_slice(&mut self) -> &mut [f64] {
                     self.as_mut()
                 }

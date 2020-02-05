@@ -39,6 +39,7 @@ impl Tolerance {
 }
 
 impl Default for Tolerance {
+    #[inline]
     fn default() -> Self {
         Tolerance::AbsOrRel(1.49e-8, 1.49e-8)
     }

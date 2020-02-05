@@ -35,10 +35,12 @@ pub trait Downcast: Any {
 }
 
 impl<T: Any> Downcast for T {
+    #[inline]
     fn as_any(&self) -> &dyn Any {
         self
     }
 
+    #[inline]
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
@@ -46,14 +48,17 @@ impl<T: Any> Downcast for T {
 
 impl<F> dyn Algorithm<F>
 where F: Integrand + Any + 'static {
+    #[inline]
     pub fn downcast_ref<T: Algorithm<F>>(&self) -> Option<&T> {
         Downcast::as_any(self).downcast_ref::<T>()
     }
 
+    #[inline]
     pub fn downcast_mut<T: Algorithm<F>>(&mut self) -> Option<&mut T> {
         Downcast::as_any_mut(self).downcast_mut::<T>()
     }
 
+    #[inline]
     pub fn is<T: Algorithm<F>>(&self) -> bool {
         Downcast::as_any(self).is::<T>()
     }

@@ -46,6 +46,7 @@ impl<T: Borrow<QKResult>> AddAssign<T> for QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 15-point kronrod rule
+#[inline]
 pub fn qk15<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
     unsafe {
         let mut fv = MaybeUninit::<[f64; 15]>::uninit().assume_init();
@@ -54,6 +55,7 @@ pub fn qk15<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 21-point kronrod rule
+#[inline]
 pub fn qk21<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
     unsafe {
         let mut fv = MaybeUninit::<[f64; 21]>::uninit().assume_init();
@@ -62,6 +64,7 @@ pub fn qk21<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 31-point kronrod rule
+#[inline]
 pub fn qk31<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
     unsafe {
         let mut fv = MaybeUninit::<[f64; 31]>::uninit().assume_init();
@@ -70,6 +73,7 @@ pub fn qk31<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 41-point kronrod rule
+#[inline]
 pub fn qk41<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
     unsafe {
         let mut fv = MaybeUninit::<[f64; 41]>::uninit().assume_init();
@@ -78,6 +82,7 @@ pub fn qk41<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 51-point kronrod rule
+#[inline]
 pub fn qk51<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
     unsafe {
         let mut fv = MaybeUninit::<[f64; 51]>::uninit().assume_init();
@@ -86,6 +91,7 @@ pub fn qk51<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 61-point kronrod rule
+#[inline]
 pub fn qk61<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
     unsafe {
         let mut fv = MaybeUninit::<[f64; 61]>::uninit().assume_init();

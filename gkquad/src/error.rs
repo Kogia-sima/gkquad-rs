@@ -189,6 +189,7 @@ pub struct IntegrationResult {
 
 impl IntegrationResult {
     /// Create `IntegrationResult` object
+    #[inline]
     pub fn new(estimate: f64, delta: f64, error: Option<RuntimeError>) -> Self {
         Self {
             estimate,
@@ -200,6 +201,7 @@ impl IntegrationResult {
     /// Get the estimation of integral.
     ///
     /// Returns `Err` if integration error has occured.
+    #[inline]
     pub fn estimate(&self) -> Result<f64, RuntimeError> {
         match self.error {
             Some(error) => Err(error),
@@ -210,6 +212,7 @@ impl IntegrationResult {
     /// Get the estimated absolute error of integral.
     ///
     /// Returns `Err` if integration error has occured.
+    #[inline]
     pub fn delta(&self) -> Result<f64, RuntimeError> {
         match self.error {
             Some(error) => Err(error),
@@ -227,6 +230,7 @@ impl IntegrationResult {
     /// let result = qags(f, a, b, 0., 1e-5, 50, &mut workspace);
     /// let (estimate, delta) = result.estimate_delta().unwrap();
     /// ```
+    #[inline]
     pub fn estimate_delta(&self) -> Result<(f64, f64), RuntimeError> {
         match self.error {
             Some(error) => Err(error),
@@ -244,6 +248,7 @@ impl IntegrationResult {
     ///
     /// You should use this function **only if** you don't care about the
     /// estimation error.
+    #[inline]
     pub unsafe fn estimate_unchecked(&self) -> f64 {
         self.estimate
     }
@@ -256,6 +261,7 @@ impl IntegrationResult {
     /// will return the current estimation of integral anyway.
     /// In this case the estimation does not achieve the given tolerance, and
     /// the error estimation (delta) may not be reliable.
+    #[inline]
     pub unsafe fn delta_unchecked(&self) -> f64 {
         self.delta
     }
@@ -266,11 +272,13 @@ impl IntegrationResult {
     /// # Notes
     ///
     /// See notes of `estimate_unchecked` method and `delta_unchecked` method.
+    #[inline]
     pub unsafe fn estimate_delta_unchecked(&self) -> (f64, f64) {
         (self.estimate, self.delta)
     }
 
     /// Return true if integration error has occured.
+    #[inline]
     pub fn has_err(&self) -> bool {
         self.error.is_some()
     }
@@ -278,6 +286,7 @@ impl IntegrationResult {
     /// Get integration error.
     ///
     /// Return `None` if any integration error has not occured.
+    #[inline]
     pub fn err(&self) -> Option<RuntimeError> {
         self.error
     }

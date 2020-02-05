@@ -22,6 +22,7 @@ impl Interval {
     /// Create a new `Interval` object
     ///
     /// Return `None` if either begin or end is NaN.
+    #[inline]
     pub fn new(begin: f64, end: f64) -> Option<Interval> {
         if begin.is_nan() || end.is_nan() {
             None
@@ -31,6 +32,7 @@ impl Interval {
     }
 
     /// Create a new `Interval` object without NaN check
+    #[inline]
     pub unsafe fn new_unchecked(begin: f64, end: f64) -> Interval {
         Interval {
             begin,

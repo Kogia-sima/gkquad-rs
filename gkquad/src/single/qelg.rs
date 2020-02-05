@@ -324,6 +324,7 @@ impl ExtrapolationTable {
 }
 
 impl Default for ExtrapolationTable {
+    #[inline]
     fn default() -> Self {
         Self {
             n: 0,

@@ -7,6 +7,7 @@ use crate::single::common::Interval;
 ///
 /// 例えば、区間[1e20, 1e20 + 1]は浮動小数点の桁落ちにより台形公式による分割を
 /// 行ったときのxの値の誤差が大きくなるため、これ以上分割できない
+#[inline]
 pub fn subinterval_too_small(a1: f64, a2: f64, b2: f64) -> bool {
     let tmp = (1. + 100. * core::f64::EPSILON) * (a2.abs() + 1000. * core::f64::MIN_POSITIVE);
 
@@ -42,10 +43,12 @@ pub fn rescale_error(mut err: f64, result_abs: f64, result_asc: f64) -> f64 {
 
 /// Compare the integral of f(x) with the integral of |f(x)| to determine if
 /// f(x) covers both positive and negative values
+#[inline]
 pub fn test_positivity(result: f64, resabs: f64) -> bool {
     result.abs() >= (1.0 - 50.0 * core::f64::EPSILON) * resabs
 }
 
+#[inline]
 pub fn bisect(interval: &Interval) -> (Interval, Interval) {
     let center = (interval.begin + interval.end) * 0.5;
     unsafe {
