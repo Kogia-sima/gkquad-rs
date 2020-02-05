@@ -46,6 +46,18 @@ impl<F: Integrand> Integrator<F> {
         }
     }
 
+    #[inline]
+    pub(crate) fn with_config(f: F, config: IntegrationConfig) -> Integrator<F> {
+        Self {
+            integrand: IntegrationWrapper {
+                inner: f,
+                transform: false,
+            },
+            algorithm: Box::new(AUTO::new()),
+            config,
+        }
+    }
+
     /// Set integration algorithm
     #[inline]
     pub fn algorithm<A: Algorithm<F> + 'static>(mut self, algorithm: A) -> Self {
