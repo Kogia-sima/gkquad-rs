@@ -6,7 +6,7 @@ use crate::float::Float;
 
 use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
-use crate::single::common::{Integrand, IntegrationConfig, Interval};
+use crate::single::common::{Integrand, IntegrationConfig, Interval, IntegrationWrapper};
 use crate::single::qk::qk21;
 use crate::single::util::{bisect, subinterval_too_small};
 use crate::single::workspace::{SubIntervalInfo, WorkSpace};
@@ -35,7 +35,7 @@ impl Debug for QAG {
 impl<F: Integrand> Algorithm<F> for QAG {
     fn integrate(
         &self,
-        f: &mut F,
+        f: &mut IntegrationWrapper<F>,
         interval: &Interval,
         config: &IntegrationConfig,
     ) -> IntegrationResult {

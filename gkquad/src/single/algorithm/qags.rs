@@ -5,7 +5,7 @@ use std::cell::RefCell;
 
 use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
-use crate::single::common::{Integrand, IntegrationConfig, Interval};
+use crate::single::common::{Integrand, IntegrationConfig, Interval, IntegrationWrapper};
 use crate::single::qelg::ExtrapolationTable;
 use crate::single::qk::qk21;
 use crate::single::util::{bisect, subinterval_too_small, test_positivity};
@@ -29,7 +29,7 @@ impl QAGS {
 impl<F: Integrand> Algorithm<F> for QAGS {
     fn integrate(
         &self,
-        f: &mut F,
+        f: &mut IntegrationWrapper<F>,
         interval: &Interval,
         config: &IntegrationConfig,
     ) -> IntegrationResult {

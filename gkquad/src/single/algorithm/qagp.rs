@@ -5,7 +5,7 @@ use std::cell::RefCell;
 
 use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
-use crate::single::common::{Integrand, IntegrationConfig, Interval, Points};
+use crate::single::common::{Integrand, IntegrationConfig, IntegrationWrapper, Interval, Points};
 use crate::single::qelg::ExtrapolationTable;
 use crate::single::qk::{qk21, QKResult};
 use crate::single::util::{bisect, subinterval_too_small, test_positivity};
@@ -27,7 +27,12 @@ impl QAGP {
 }
 
 impl<F: Integrand> Algorithm<F> for QAGP {
-    fn integrate(&self, f: &mut F, interval: &Interval, config: &IntegrationConfig) -> IntegrationResult {
+    fn integrate(
+        &self,
+        f: &mut IntegrationWrapper<F>,
+        interval: &Interval,
+        config: &IntegrationConfig,
+    ) -> IntegrationResult {
         let pts = make_sorted_points(interval, &config.points);
         let nint = pts.len() - 1; // number of intervals
 
@@ -321,5 +326,5 @@ fn make_sorted_points(interval: &Interval, pts: &[f64]) -> Points {
     pts2.push(interval.end);
 
     pts2.retain(|&mut x| min <= x && x <= max);
-    return pts2
+    return pts2;
 }
