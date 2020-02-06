@@ -13,6 +13,7 @@ use crate::single::qk::qk21;
 use crate::single::util::{bisect, subinterval_too_small, test_positivity};
 use crate::single::workspace::{SubIntervalInfo, WorkSpace};
 
+/// QAGS algorithm over finite interval
 #[derive(Clone)]
 pub struct QAGS_FINITE {
     #[doc(hidden)]

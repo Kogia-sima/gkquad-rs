@@ -7,6 +7,7 @@ use crate::error::IntegrationResult;
 use crate::single::algorithm::*;
 use crate::single::common::{Integrand, IntegrationConfig, Interval};
 
+/// Automatically select algorithm based on configuration
 #[derive(Clone)]
 pub struct AUTO {
     // initialize lazily
