@@ -16,8 +16,7 @@ use crate::single::workspace::{SubIntervalInfo, WorkSpace};
 /// QAGP algorithm over finite interval
 #[derive(Clone)]
 pub struct QAGP_FINITE {
-    #[doc(hidden)]
-    pub workspace: RefCell<WorkSpace>,
+    workspace: RefCell<WorkSpace>,
 }
 
 impl QAGP_FINITE {

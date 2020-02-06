@@ -8,7 +8,6 @@ use crate::single::util::transform_interval;
 
 #[derive(Clone)]
 pub struct QAG {
-    #[doc(hidden)]
     inner: QAG_FINITE
 }
 

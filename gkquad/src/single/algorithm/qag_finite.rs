@@ -16,8 +16,7 @@ use crate::single::workspace::{SubIntervalInfo, WorkSpace};
 /// QAG algorithm over finite interval
 #[derive(Clone)]
 pub struct QAG_FINITE {
-    #[doc(hidden)]
-    pub workspace: RefCell<WorkSpace>
+    workspace: RefCell<WorkSpace>
 }
 
 impl QAG_FINITE {
