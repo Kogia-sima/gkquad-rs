@@ -36,6 +36,7 @@ impl Debug for QAG_FINITE {
 }
 
 impl Default for QAG_FINITE {
+    #[inline]
     fn default() -> Self {
         Self::new()
     }

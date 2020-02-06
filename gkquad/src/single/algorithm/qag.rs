@@ -22,6 +22,7 @@ impl QAG {
 }
 
 impl Default for QAG {
+    #[inline]
     fn default() -> Self {
         Self::new()
     }

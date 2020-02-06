@@ -26,6 +26,7 @@ impl AUTO {
 }
 
 impl Default for AUTO {
+    #[inline]
     fn default() -> Self {
         Self::new()
     }

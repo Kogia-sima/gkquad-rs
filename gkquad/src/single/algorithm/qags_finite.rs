@@ -30,6 +30,7 @@ impl QAGS_FINITE {
 }
 
 impl Default for QAGS_FINITE {
+    #[inline]
     fn default() -> Self {
         Self::new()
     }

@@ -100,6 +100,7 @@ impl<F: Integrand> Integrator<F> {
         self.algorithm.as_ref()
     }
 
+    #[inline]
     pub fn run<T: Into<Interval>>(&self, interval: T) -> IntegrationResult {
         self.algorithm.integrate(
             unsafe { &mut *self.integrand.get() },

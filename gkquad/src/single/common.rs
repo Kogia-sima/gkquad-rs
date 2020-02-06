@@ -93,12 +93,14 @@ pub trait Integrand {
     fn apply(&mut self, x: f64) -> f64;
 
     /// apply function to each of the elements of `s`.
+    #[inline]
     fn apply_to_slice(&mut self, s: &mut [f64]) {
         s.iter_mut().for_each(|x| *x = self.apply(*x));
     }
 }
 
 impl<F: FnMut(f64) -> f64> Integrand for F {
+    #[inline]
     fn apply(&mut self, x: f64) -> f64 {
         (*self)(x)
     }
