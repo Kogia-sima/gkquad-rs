@@ -1,5 +1,4 @@
-#[cfg(not(feature = "std"))]
-use alloc::vec::Vec;
+use smallvec::SmallVec;
 
 use super::Interval;
 
@@ -35,12 +34,12 @@ pub struct WorkSpace {
     pub maximum_level: usize,
     /// vector of dimension at least limit, the elements of which are the
     /// subintervals
-    pub subintervals: Vec<SubIntervalInfo>,
+    pub subintervals: SmallVec<[SubIntervalInfo; 64]>,
     /// vector of dimension at least limit, the first k elements of which are
     /// indices to the error estimates over the subintervals, such that
     /// `subintervals[order[0]].delta, ..., subintervals[order[n - 1]].delta`
     /// form a decreasing sequence
-    pub order: Vec<usize>,
+    pub order: SmallVec<[usize; 64]>,
 }
 
 impl WorkSpace {
@@ -55,8 +54,8 @@ impl WorkSpace {
             nrmax: 0,
             i: 0,
             maximum_level: 0,
-            subintervals: Vec::with_capacity(n),
-            order: Vec::with_capacity(n)
+            subintervals: SmallVec::with_capacity(n),
+            order: SmallVec::with_capacity(n)
         }
     }
 
