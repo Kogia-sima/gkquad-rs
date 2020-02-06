@@ -68,6 +68,9 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
         };
 
         for w in pts.windows(2) {
+            if 0.5 * (w[0] - w[1]).abs() == 0. {
+                continue;
+            }
             let interval = unsafe { Interval::new_unchecked(w[0], w[1]) };
             let result1 = qk21(f, &interval);
 
