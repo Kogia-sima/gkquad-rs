@@ -102,29 +102,18 @@ impl<F: FnMut(f64) -> f64> Integrand for F {
 }
 
 /// This struct is used in order to allow integration over infinite interval
-pub struct IntegrationWrapper<F: Integrand> {
-    pub inner: F,
-    pub transform: bool,
-}
+pub(crate) struct ITransform<'a, F: Integrand>(pub &'a mut F);
 
-impl<F: Integrand> Integrand for IntegrationWrapper<F> {
+impl<'a, F: Integrand> Integrand for ITransform<'a, F> {
     #[inline]
     fn apply(&mut self, x: f64) -> f64 {
-        if self.transform {
-            let coef = 1. / (1. - x.abs());
-            let x2 = x * coef;
-            self.inner.apply(x2) * coef * coef
-        } else {
-            self.inner.apply(x)
-        }
+        let coef = 1. / (1. - x.abs());
+        let x2 = x * coef;
+        self.0.apply(x2) * coef * coef
     }
 
     #[inline]
     fn apply_to_slice(&mut self, s: &mut [f64]) {
-        if self.transform {
-            s.iter_mut().for_each(|x| *x = self.apply(*x))
-        } else {
-            self.inner.apply_to_slice(s)
-        }
+        s.iter_mut().for_each(|x| *x = self.apply(*x))
     }
 }

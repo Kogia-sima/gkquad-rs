@@ -6,7 +6,7 @@
 
 use std::any::Any;
 
-use super::common::{Integrand, IntegrationConfig, Interval, IntegrationWrapper};
+use super::common::{Integrand, IntegrationConfig, Interval};
 use crate::error::IntegrationResult;
 
 /// 1-dimentional integration algorithm API
@@ -17,7 +17,7 @@ use crate::error::IntegrationResult;
 pub trait Algorithm<F: Integrand>: Downcast {
     fn integrate(
         &self,
-        f: &mut IntegrationWrapper<F>,
+        f: &mut F,
         interval: &Interval,
         config: &IntegrationConfig,
     ) -> IntegrationResult;
@@ -67,11 +67,20 @@ where F: Integrand + Any + 'static {
 mod qag;
 pub use qag::*;
 
+mod qag_finite;
+pub use qag_finite::*;
+
 mod qags;
 pub use qags::*;
 
+mod qags_finite;
+pub use qags_finite::*;
+
 mod qagp;
 pub use qagp::*;
+
+mod qagp_finite;
+pub use qagp_finite::*;
 
 mod auto;
 pub use auto::*;

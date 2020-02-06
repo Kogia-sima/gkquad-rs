@@ -1,6 +1,6 @@
 use crate::error::IntegrationResult;
 use crate::single::algorithm::*;
-use crate::single::common::{Integrand, IntegrationConfig, Interval, IntegrationWrapper};
+use crate::single::common::{Integrand, IntegrationConfig, Interval};
 
 #[derive(Clone)]
 pub struct AUTO;
@@ -13,10 +13,9 @@ impl AUTO {
 }
 
 impl<F: Integrand> Algorithm<F> for AUTO {
-    #[inline]
     fn integrate(
         &self,
-        f: &mut IntegrationWrapper<F>,
+        f: &mut F,
         interval: &Interval,
         config: &IntegrationConfig,
     ) -> IntegrationResult {

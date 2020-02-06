@@ -59,9 +59,8 @@ pub fn bisect(interval: &Interval) -> (Interval, Interval) {
     }
 }
 
-// apply inverse transformation for the parameter
 #[inline]
-pub fn transform_param(x: f64) -> f64 {
+pub fn transform_point(x: f64) -> f64 {
     if x == std::f64::NEG_INFINITY {
         -1.0
     } else if x == std::f64::INFINITY {
@@ -71,3 +70,17 @@ pub fn transform_param(x: f64) -> f64 {
     }
 }
 
+// transform infinite interval to finite
+#[inline]
+pub fn transform_interval(interval: &Interval) -> Interval {
+    Interval::new(
+        transform_point(interval.begin),
+        transform_point(interval.end),
+    )
+    .unwrap_or_else(|| {
+        panic!(format!(
+            "Failed to transform interval [{}, {}]",
+            interval.begin, interval.end
+        ));
+    })
+}
