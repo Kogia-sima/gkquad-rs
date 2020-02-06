@@ -21,11 +21,6 @@ pub trait Algorithm<F: Integrand>: Downcast {
         interval: &Interval,
         config: &IntegrationConfig,
     ) -> IntegrationResult;
-
-    #[doc(hidden)]
-    fn get_workspace(&self) -> Option<std::cell::Ref<super::workspace::WorkSpace>> {
-        None
-    }
 }
 
 #[doc(hidden)]

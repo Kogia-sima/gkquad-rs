@@ -316,11 +316,6 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
 
         return IntegrationResult::new(res_ext, err_ext, error);
     }
-
-    #[doc(hidden)]
-    fn get_workspace(&self) -> Option<std::cell::Ref<WorkSpace>> {
-        Some(self.workspace.borrow())
-    }
 }
 
 fn make_sorted_points(interval: &Interval, pts: &[f64]) -> Points {

@@ -43,9 +43,4 @@ impl<F: Integrand> Algorithm<F> for AUTO {
             qagp.integrate(f, interval, config)
         }
     }
-
-    #[doc(hidden)]
-    fn get_workspace(&self) -> Option<std::cell::Ref<WorkSpace>> {
-        Some(self.workspace.borrow())
-    }
 }

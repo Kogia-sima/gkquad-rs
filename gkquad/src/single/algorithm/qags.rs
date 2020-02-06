@@ -44,9 +44,4 @@ impl<F: Integrand> Algorithm<F> for QAGS {
             qags_finite.integrate(f, interval, config)
         }
     }
-
-    #[doc(hidden)]
-    fn get_workspace(&self) -> Option<std::cell::Ref<WorkSpace>> {
-        Some(self.workspace.borrow())
-    }
 }

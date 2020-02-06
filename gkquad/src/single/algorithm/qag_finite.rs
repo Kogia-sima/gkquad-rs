@@ -152,9 +152,4 @@ impl<F: Integrand> Algorithm<F> for QAG_FINITE {
         // 再度結果を足し合わせて正確な推定値を得る
         IntegrationResult::new(ws.sum_results(), deltasum, error)
     }
-
-    #[doc(hidden)]
-    fn get_workspace(&self) -> Option<std::cell::Ref<WorkSpace>> {
-        Some(self.workspace.borrow())
-    }
 }
