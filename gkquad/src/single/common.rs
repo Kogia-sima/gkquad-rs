@@ -2,6 +2,9 @@ use smallvec::SmallVec;
 use std::marker::PhantomData;
 use std::ops::{Bound, RangeBounds};
 
+#[cfg(not(feature = "std"))]
+use crate::float::Float;
+
 use crate::Tolerance;
 
 pub type Points = SmallVec<[f64; 8]>;
