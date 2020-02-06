@@ -2,6 +2,7 @@
 
 use std::cell::RefCell;
 use std::fmt::{self, Debug};
+use std::rc::Rc;
 
 #[cfg(not(feature = "std"))]
 use crate::float::Float;
@@ -16,14 +17,14 @@ use crate::single::workspace::{SubIntervalInfo, WorkSpace};
 #[derive(Clone)]
 pub struct QAG_FINITE {
     #[doc(hidden)]
-    pub workspace: RefCell<WorkSpace>
+    pub workspace: Rc<RefCell<WorkSpace>>
 }
 
 impl QAG_FINITE {
     #[inline]
     pub fn new() -> Self {
         Self {
-            workspace: RefCell::new(WorkSpace::new())
+            workspace: Rc::new(RefCell::new(WorkSpace::new()))
         }
     }
 }

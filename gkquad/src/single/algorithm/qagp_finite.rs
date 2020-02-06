@@ -4,6 +4,7 @@
 use crate::float::Float;
 
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
@@ -16,14 +17,14 @@ use crate::single::workspace::{SubIntervalInfo, WorkSpace};
 #[derive(Clone)]
 pub struct QAGP_FINITE {
     #[doc(hidden)]
-    pub workspace: RefCell<WorkSpace>,
+    pub workspace: Rc<RefCell<WorkSpace>>,
 }
 
 impl QAGP_FINITE {
     #[inline]
     pub fn new() -> Self {
         Self {
-            workspace: RefCell::new(WorkSpace::new()),
+            workspace: Rc::new(RefCell::new(WorkSpace::new())),
         }
     }
 }
