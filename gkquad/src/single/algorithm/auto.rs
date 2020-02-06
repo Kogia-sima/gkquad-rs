@@ -25,6 +25,12 @@ impl AUTO {
     }
 }
 
+impl Default for AUTO {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<F: Integrand> Algorithm<F> for AUTO {
     fn integrate(
         &self,

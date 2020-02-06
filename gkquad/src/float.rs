@@ -1,3 +1,5 @@
+#![allow(clippy::many_single_char_names)]
+
 pub trait Float: Copy {
     fn abs(self) -> Self;
     fn sqrt(self) -> Self;

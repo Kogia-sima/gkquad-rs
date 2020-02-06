@@ -20,6 +20,12 @@ impl QAGP {
     }
 }
 
+impl Default for QAGP {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<F: Integrand> Algorithm<F> for QAGP {
     fn integrate(
         &self,

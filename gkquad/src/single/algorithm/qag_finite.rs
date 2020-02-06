@@ -1,4 +1,4 @@
-#![allow(non_camel_case_types)]
+#![allow(non_camel_case_types, clippy::float_cmp)]
 
 use std::cell::RefCell;
 use std::fmt::{self, Debug};
@@ -32,6 +32,12 @@ impl QAG_FINITE {
 impl Debug for QAG_FINITE {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.write_str("QAG_FINITE")
+    }
+}
+
+impl Default for QAG_FINITE {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

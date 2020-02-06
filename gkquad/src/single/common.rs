@@ -50,12 +50,12 @@ impl Eq for Interval {}
 impl<R: RangeBounds<f64>> From<R> for Interval {
     fn from(r: R) -> Interval {
         let a = match r.start_bound() {
-            Bound::Excluded(&x) | Bound::Included(&x) => x.into(),
+            Bound::Excluded(&x) | Bound::Included(&x) => x,
             Bound::Unbounded => std::f64::NEG_INFINITY,
         };
 
         let b = match r.end_bound() {
-            Bound::Excluded(&x) | Bound::Included(&x) => x.into(),
+            Bound::Excluded(&x) | Bound::Included(&x) => x,
             Bound::Unbounded => std::f64::INFINITY,
         };
 

@@ -1,3 +1,9 @@
+#![allow(
+    clippy::excessive_precision,
+    clippy::unreadable_literal,
+    clippy::uninit_assumed_init
+)]
+
 use std::borrow::Borrow;
 use std::mem::MaybeUninit;
 use std::ops::{Add, AddAssign};

@@ -21,6 +21,12 @@ impl QAGS {
     }
 }
 
+impl Default for QAGS {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<F: Integrand> Algorithm<F> for QAGS {
     fn integrate(
         &self,

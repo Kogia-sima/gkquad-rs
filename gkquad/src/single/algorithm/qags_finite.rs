@@ -1,4 +1,4 @@
-#![allow(non_camel_case_types)]
+#![allow(non_camel_case_types, clippy::float_cmp)]
 
 #[cfg(not(feature = "std"))]
 use crate::float::Float;
@@ -26,6 +26,12 @@ impl QAGS_FINITE {
         Self {
             workspace: RefCell::new(WorkSpace::new()),
         }
+    }
+}
+
+impl Default for QAGS_FINITE {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -203,10 +209,8 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
             }
 
             // 大区間のみの誤差がまだ要求値を上回っている場合、大区間の分割を優先する
-            if error_over_large_intervals > ertest {
-                if ws.increase_nrmax() {
-                    continue;
-                }
+            if error_over_large_intervals > ertest && ws.increase_nrmax() {
+                continue;
             }
 
             // 今までの計算結果から収束値を推定する
@@ -282,6 +286,6 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
             error = Some(Divergent);
         }
 
-        return IntegrationResult::new(res_ext, err_ext, error);
+        IntegrationResult::new(res_ext, err_ext, error)
     }
 }

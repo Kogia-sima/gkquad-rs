@@ -1,4 +1,4 @@
-#![allow(non_camel_case_types)]
+#![allow(non_camel_case_types, clippy::float_cmp)]
 
 #[cfg(not(feature = "std"))]
 use crate::float::Float;
@@ -26,6 +26,12 @@ impl QAGP_FINITE {
         Self {
             workspace: RefCell::new(WorkSpace::new()),
         }
+    }
+}
+
+impl Default for QAGP_FINITE {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -232,10 +238,8 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
             // bisecting decrease the sum of the errors over the larger
             // intervals (error_over_large_intervals) and perform
             // extrapolation.
-            if error2 == 0 && error_over_large_intervals > ertest {
-                if ws.increase_nrmax() {
-                    continue;
-                }
+            if error2 == 0 && error_over_large_intervals > ertest && ws.increase_nrmax() {
+                continue;
             }
 
             // Perform extrapolation
@@ -314,7 +318,7 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
             error = Some(Divergent);
         }
 
-        return IntegrationResult::new(res_ext, err_ext, error);
+        IntegrationResult::new(res_ext, err_ext, error)
     }
 }
 
@@ -338,5 +342,5 @@ fn make_sorted_points(interval: &Interval, pts: &[f64]) -> Points {
     pts2.push(interval.end);
 
     pts2.retain(|&mut x| min <= x && x <= max);
-    return pts2;
+    pts2
 }
