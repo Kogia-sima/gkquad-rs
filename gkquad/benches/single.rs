@@ -11,7 +11,7 @@ use gkquad::single::algorithm::*;
 use gkquad::single::Integrator;
 
 fn square_qag(b: &mut Bencher) {
-    let mut integrator = Integrator::new(|x: f64| x * x).algorithm(QAG::new());
+    let integrator = Integrator::new(|x: f64| x * x).algorithm(QAG::new());
     b.iter(|| {
         let interval = black_box(0.0..1.0);
         let result = integrator.run(interval).estimate().unwrap();
@@ -20,7 +20,7 @@ fn square_qag(b: &mut Bencher) {
 }
 
 fn square_qags(b: &mut Bencher) {
-    let mut integrator = Integrator::new(|x: f64| x * x).algorithm(QAGS::new());
+    let integrator = Integrator::new(|x: f64| x * x).algorithm(QAGS::new());
     b.iter(|| {
         let interval = black_box(0.0..1.0);
         let result = integrator.run(interval).estimate().unwrap();
@@ -29,7 +29,7 @@ fn square_qags(b: &mut Bencher) {
 }
 
 fn normal_distribution_qags(b: &mut Bencher) {
-    let mut integrator = Integrator::new(|x: f64| (-0.5 * x * x).exp()).algorithm(QAGS::new());
+    let integrator = Integrator::new(|x: f64| (-0.5 * x * x).exp()).algorithm(QAGS::new());
 
     b.iter(|| {
         let interval = black_box(NEG_INFINITY..INFINITY);

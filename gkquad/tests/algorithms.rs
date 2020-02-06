@@ -22,7 +22,7 @@ fn test_algorithm<A: Algorithm<fn(f64) -> f64>>(
     tol: Tolerance,
     expect: Expect,
 ) {
-    let mut integrator = Integrator::new(f)
+    let integrator = Integrator::new(f)
         .algorithm(algorithm)
         .tolerance(tol)
         .points(pts);
