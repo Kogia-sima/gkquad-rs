@@ -24,7 +24,7 @@ use crate::{IntegrationResult, Tolerance};
 ///     result *= integrator.run(0.0..1.0).estimate().unwrap();
 ///     
 ///     // increment the exponent
-///     result.set(result.get() + 1);
+///     m.set(m.get() + 1);
 /// }
 /// ```
 pub struct Integrator<F: Integrand> {
