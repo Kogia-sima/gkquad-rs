@@ -2,7 +2,7 @@
 use crate::float::Float;
 
 use crate::error::IntegrationResult;
-use crate::single::algorithm::{Algorithm, QAGP_FINITE};
+use crate::single::algorithm::{Algorithm, qagp_finite::QAGP_FINITE};
 use crate::single::common::{ITransform, Integrand, IntegrationConfig, Interval, Points};
 use crate::single::util::{transform_interval, transform_point};
 

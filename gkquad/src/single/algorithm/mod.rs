@@ -63,19 +63,16 @@ mod qag;
 pub use qag::*;
 
 mod qag_finite;
-pub use qag_finite::*;
 
 mod qags;
 pub use qags::*;
 
 mod qags_finite;
-pub use qags_finite::*;
 
 mod qagp;
 pub use qagp::*;
 
 mod qagp_finite;
-pub use qagp_finite::*;
 
 mod auto;
 pub use auto::*;
