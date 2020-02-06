@@ -73,14 +73,10 @@ pub fn transform_point(x: f64) -> f64 {
 // transform infinite interval to finite
 #[inline]
 pub fn transform_interval(interval: &Interval) -> Interval {
-    Interval::new(
-        transform_point(interval.begin),
-        transform_point(interval.end),
-    )
-    .unwrap_or_else(|| {
-        panic!(format!(
-            "Failed to transform interval [{}, {}]",
-            interval.begin, interval.end
-        ));
-    })
+    unsafe {
+        Interval::new_unchecked(
+            transform_point(interval.begin),
+            transform_point(interval.end),
+        )
+    }
 }
