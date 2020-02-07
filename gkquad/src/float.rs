@@ -8,7 +8,7 @@ pub trait Float: Copy {
 impl Float for f64 {
     #[inline]
     fn abs(self: f64) -> f64 {
-        if self > 0. { self } else { -self }
+        f64::from_bits(self.to_bits() & (std::u64::MAX / 2))
     }
 
     fn sqrt(self: f64) -> f64 {
