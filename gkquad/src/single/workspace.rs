@@ -1,4 +1,5 @@
 use smallvec::SmallVec;
+use std::cell::UnsafeCell;
 
 use super::Interval;
 
@@ -269,5 +270,59 @@ impl WorkSpace {
 impl Default for WorkSpace {
     fn default() -> WorkSpace {
         WorkSpace::new()
+    }
+}
+
+#[cfg(feature = "std")]
+thread_local! {
+    static WORKSPACE: UnsafeCell<WorkSpace> = UnsafeCell::new(WorkSpace::new());
+}
+
+#[cfg(feature = "std")]
+#[derive(Clone)]
+pub struct WorkSpaceProvider;
+
+#[cfg(feature = "std")]
+impl WorkSpaceProvider {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub unsafe fn get_mut(&self) -> &mut WorkSpace {
+        let ptr = WORKSPACE.with(|v| v.get());
+        &mut *ptr
+    }
+}
+
+#[cfg(not(feature = "std"))]
+pub struct WorkSpaceProvider {
+    workspace: UnsafeCell<WorkSpace>
+}
+
+#[cfg(not(feature = "std"))]
+impl WorkSpaceProvider {
+    pub fn new() -> Self {
+        Self {
+            workspace: UnsafeCell::new(WorkSpace::new())
+        }
+    }
+
+    pub fn get_mut(&self) -> &mut WorkSpace {
+        let ptr = self.workspace.get();
+        unsafe {
+            &mut *ptr
+        }
+    }
+}
+
+#[cfg(not(feature = "std"))]
+impl Clone for WorkSpaceProvider {
+    fn clone(&self) -> Self {
+        let ptr = self.workspace.get();
+        unsafe {
+            Self {
+                workspace: UnsafeCell::new((*ptr).clone())
+            }
+        }
     }
 }
