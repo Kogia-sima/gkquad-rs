@@ -3,27 +3,25 @@
 #[cfg(not(feature = "std"))]
 use crate::float::Float;
 
-use std::cell::RefCell;
-
 use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
 use crate::single::common::{Integrand, IntegrationConfig, Interval, Points};
 use crate::single::qelg::ExtrapolationTable;
 use crate::single::qk::{qk21, QKResult};
 use crate::single::util::{bisect, subinterval_too_small, test_positivity};
-use crate::single::workspace::{SubIntervalInfo, WorkSpace};
+use crate::single::workspace::{SubIntervalInfo, WorkSpaceProvider};
 
 /// QAGP algorithm over finite interval
 #[derive(Clone)]
 pub struct QAGP_FINITE {
-    workspace: RefCell<WorkSpace>,
+    provider: WorkSpaceProvider,
 }
 
 impl QAGP_FINITE {
     #[inline]
     pub fn new() -> Self {
         Self {
-            workspace: RefCell::new(WorkSpace::new()),
+            provider: WorkSpaceProvider::new(),
         }
     }
 }
@@ -45,7 +43,7 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
         let pts = make_sorted_points(interval, &config.points);
         let nint = pts.len() - 1; // number of intervals
 
-        let mut ws = self.workspace.borrow_mut();
+        let mut ws = unsafe { self.provider.get_mut() };
         ws.clear();
         ws.reserve(usize::max(config.limit, pts.len()));
 

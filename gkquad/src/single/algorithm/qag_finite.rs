@@ -1,6 +1,5 @@
 #![allow(non_camel_case_types, clippy::float_cmp)]
 
-use std::cell::RefCell;
 use std::fmt::{self, Debug};
 
 #[cfg(not(feature = "std"))]
@@ -11,19 +10,19 @@ use crate::single::algorithm::Algorithm;
 use crate::single::common::{Integrand, IntegrationConfig, Interval};
 use crate::single::qk::qk21;
 use crate::single::util::{bisect, subinterval_too_small};
-use crate::single::workspace::{SubIntervalInfo, WorkSpace};
+use crate::single::workspace::{SubIntervalInfo, WorkSpaceProvider};
 
 /// QAG algorithm over finite interval
 #[derive(Clone)]
 pub struct QAG_FINITE {
-    workspace: RefCell<WorkSpace>
+    provider: WorkSpaceProvider,
 }
 
 impl QAG_FINITE {
     #[inline]
     pub fn new() -> Self {
         Self {
-            workspace: RefCell::new(WorkSpace::new())
+            provider: WorkSpaceProvider::new(),
         }
     }
 }
@@ -48,7 +47,7 @@ impl<F: Integrand> Algorithm<F> for QAG_FINITE {
         interval: &Interval,
         config: &IntegrationConfig,
     ) -> IntegrationResult {
-        let mut ws = self.workspace.borrow_mut();
+        let ws = unsafe { self.provider.get_mut() };
         ws.clear();
         ws.reserve(config.limit);
 

@@ -3,27 +3,25 @@
 #[cfg(not(feature = "std"))]
 use crate::float::Float;
 
-use std::cell::RefCell;
-
 use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
 use crate::single::common::{Integrand, IntegrationConfig, Interval};
 use crate::single::qelg::ExtrapolationTable;
 use crate::single::qk::qk21;
 use crate::single::util::{bisect, subinterval_too_small, test_positivity};
-use crate::single::workspace::{SubIntervalInfo, WorkSpace};
+use crate::single::workspace::{SubIntervalInfo, WorkSpaceProvider};
 
 /// QAGS algorithm over finite interval
 #[derive(Clone)]
 pub struct QAGS_FINITE {
-    workspace: RefCell<WorkSpace>,
+    provider: WorkSpaceProvider,
 }
 
 impl QAGS_FINITE {
     #[inline]
     pub fn new() -> Self {
         Self {
-            workspace: RefCell::new(WorkSpace::new()),
+            provider: WorkSpaceProvider::new(),
         }
     }
 }
@@ -42,7 +40,7 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
         interval: &Interval,
         config: &IntegrationConfig,
     ) -> IntegrationResult {
-        let mut ws = self.workspace.borrow_mut();
+        let mut ws = unsafe { self.provider.get_mut() };
         ws.clear();
         ws.reserve(config.limit);
 
