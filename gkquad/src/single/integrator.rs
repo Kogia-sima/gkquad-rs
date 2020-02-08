@@ -44,7 +44,7 @@ impl<F: Integrand> Integrator<F> {
     }
 
     #[inline]
-    pub(crate) fn with_config(f: F, config: IntegrationConfig) -> Integrator<F> {
+    pub fn with_config(f: F, config: IntegrationConfig) -> Integrator<F> {
         Self {
             integrand: UnsafeCell::new(f),
             algorithm: Box::new(AUTO::new()),
