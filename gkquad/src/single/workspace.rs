@@ -307,11 +307,9 @@ impl WorkSpaceProvider {
         }
     }
 
-    pub fn get_mut(&self) -> &mut WorkSpace {
+    pub unsafe fn get_mut(&self) -> &mut WorkSpace {
         let ptr = self.workspace.get();
-        unsafe {
-            &mut *ptr
-        }
+        &mut *ptr
     }
 }
 
