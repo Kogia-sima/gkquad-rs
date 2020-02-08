@@ -6,9 +6,6 @@
 //#     double res3la[3];
 //#   };
 
-#[cfg(not(feature = "std"))]
-use crate::float::Float;
-
 pub struct ExtrapolationTable {
     /// rlist2\[n\] contains the new element in the first
     /// column of the epsilon table

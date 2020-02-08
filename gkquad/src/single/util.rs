@@ -1,6 +1,3 @@
-#[cfg(not(feature = "std"))]
-use crate::float::Float;
-
 use crate::single::common::Interval;
 
 /// 区間幅が中央値の値に対して狭すぎる場合trueを返す

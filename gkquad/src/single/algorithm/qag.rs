@@ -1,6 +1,3 @@
-#[cfg(not(feature = "std"))]
-use crate::float::Float;
-
 use crate::error::IntegrationResult;
 use crate::single::algorithm::{Algorithm, qag_finite::QAG_FINITE};
 use crate::single::common::{ITransform, Integrand, IntegrationConfig, Interval};

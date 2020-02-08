@@ -2,9 +2,6 @@
 
 use std::fmt::{self, Debug};
 
-#[cfg(not(feature = "std"))]
-use crate::float::Float;
-
 use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
 use crate::single::common::{Integrand, IntegrationConfig, Interval};

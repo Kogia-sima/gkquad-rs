@@ -1,8 +1,5 @@
 #![allow(non_camel_case_types, clippy::float_cmp)]
 
-#[cfg(not(feature = "std"))]
-use crate::float::Float;
-
 use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
 use crate::single::common::{Integrand, IntegrationConfig, Interval};

@@ -1,8 +1,5 @@
 use std::cell::RefCell;
 
-#[cfg(not(feature = "std"))]
-use crate::float::Float;
-
 use crate::error::IntegrationResult;
 use crate::single::algorithm::*;
 use crate::single::common::{Integrand, IntegrationConfig, Interval};

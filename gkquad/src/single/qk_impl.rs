@@ -1,6 +1,3 @@
-#[cfg(not(feature = "std"))]
-use crate::float::Float;
-
 use super::common::{Integrand, Interval};
 use super::qk::QKResult;
 use super::util::rescale_error;
