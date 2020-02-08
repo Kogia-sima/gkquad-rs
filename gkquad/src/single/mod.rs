@@ -2,7 +2,7 @@
 
 pub mod algorithm;
 mod common;
-mod integrate;
+mod integral;
 mod integrator;
 mod workspace;
 mod util;
@@ -11,7 +11,7 @@ mod qk;
 mod qelg;
 
 pub use common::*;
-pub use integrate::*;
+pub use integral::*;
 pub use integrator::*;
 pub use qk::*;
 #[doc(hidden)]

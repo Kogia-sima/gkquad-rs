@@ -12,7 +12,7 @@ use crate::IntegrationResult;
 /// let result = integrate(|x| x.sqrt(), 1.0..2.0).estimate();
 /// ```
 #[inline]
-pub fn integrate<F: Integrand, I: Into<Interval>>(mut f: F, interval: I) -> IntegrationResult {
+pub fn integral<F: Integrand, I: Into<Interval>>(mut f: F, interval: I) -> IntegrationResult {
     QAGS::new().integrate(&mut f, &interval.into(), &IntegrationConfig::default())
 }
 
@@ -20,7 +20,7 @@ pub fn integrate<F: Integrand, I: Into<Interval>>(mut f: F, interval: I) -> Inte
 ///
 /// The algorithm will be automatically selected to achieve the greatest performance.
 #[inline]
-pub fn integrate_with_config<F: Integrand, I: Into<Interval>>(
+pub fn integral_with_config<F: Integrand, I: Into<Interval>>(
     mut f: F,
     interval: I,
     config: IntegrationConfig,
