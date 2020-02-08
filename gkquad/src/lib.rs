@@ -11,7 +11,6 @@ extern crate alloc;
 
 mod common;
 mod error;
-mod float;
 
 pub use common::*;
 pub use error::*;
