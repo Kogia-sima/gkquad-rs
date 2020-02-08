@@ -1,5 +1,5 @@
-use alloc::boxed::Box;
-
+use smallbox::{SmallBox, smallbox};
+use smallbox::space::S4;
 use std::cell::UnsafeCell;
 use std::fmt::{self, Debug};
 
@@ -29,7 +29,7 @@ use crate::{IntegrationResult, Tolerance};
 /// ```
 pub struct Integrator<F: Integrand> {
     integrand: UnsafeCell<F>,
-    algorithm: Box<dyn Algorithm<F>>,
+    algorithm: SmallBox<dyn Algorithm<F>, S4>,
     config: IntegrationConfig,
 }
 
@@ -38,7 +38,7 @@ impl<F: Integrand> Integrator<F> {
     pub fn new(f: F) -> Integrator<F> {
         Self {
             integrand: UnsafeCell::new(f),
-            algorithm: Box::new(AUTO::new()),
+            algorithm: smallbox!(AUTO::new()),
             config: IntegrationConfig::default(),
         }
     }
@@ -47,7 +47,7 @@ impl<F: Integrand> Integrator<F> {
     pub fn with_config(f: F, config: IntegrationConfig) -> Integrator<F> {
         Self {
             integrand: UnsafeCell::new(f),
-            algorithm: Box::new(AUTO::new()),
+            algorithm: smallbox!(AUTO::new()),
             config,
         }
     }
@@ -55,13 +55,13 @@ impl<F: Integrand> Integrator<F> {
     /// Set integration algorithm
     #[inline]
     pub fn algorithm<A: Algorithm<F> + 'static>(mut self, algorithm: A) -> Self {
-        self.algorithm = Box::new(algorithm);
+        self.algorithm = smallbox!(algorithm);
         self
     }
 
     /// Set integration algorithm
     #[inline]
-    pub fn boxed_algorithm(mut self, algorithm: Box<dyn Algorithm<F>>) -> Self {
+    pub fn boxed_algorithm(mut self, algorithm: SmallBox<dyn Algorithm<F>, S4>) -> Self {
         self.algorithm = algorithm;
         self
     }
@@ -96,8 +96,8 @@ impl<F: Integrand> Integrator<F> {
     }
 
     #[inline]
-    pub fn get_algorithm(&self) -> &dyn Algorithm<F> {
-        self.algorithm.as_ref()
+    pub fn get_algorithm(&self) -> &SmallBox<dyn Algorithm<F>, S4> {
+        &self.algorithm
     }
 
     #[inline]
