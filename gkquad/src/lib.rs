@@ -15,5 +15,8 @@ mod error;
 pub use common::*;
 pub use error::*;
 
+#[cfg(feature = "single")]
+#[cfg_attr(docsrs, doc(cfg(feature = "single")))]
 pub mod single;
+
 pub mod prelude;
