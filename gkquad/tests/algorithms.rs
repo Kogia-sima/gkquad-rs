@@ -154,9 +154,9 @@ fn qags_f4() {
 #[test]
 fn qagp_f5() {
     let expect = Expect {
-        value: 2.635960527469052E+02,
+        value: 2.63346535755973E+02,
         delta: 2.1000791359861604E-01,
-        order: &[5, 1, 0, 3, 2, 10, 7, 9, 11, 8, 6, 4],
+        order: &[0, 5, 1, 3, 2, 10, 7, 9, 8, 6, 4],
         error: None,
     };
     test_algorithm(f5, 0., 4., &[1., 2.], QAGP::new(), Relative(1e-3), expect);

@@ -48,12 +48,10 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
         let mut ktmin = 0;
         let (mut roundoff_type1, mut roundoff_type2, mut roundoff_type3) = (0, 0, 0);
         let mut error = None;
-        let mut error2 = 0;
+        let mut error2 = false;
 
         let mut extrapolate = false;
         let mut disallow_extrapolation = false;
-
-        let mut table = ExtrapolationTable::default();
 
         let mut result0 = QKResult {
             estimate: 0.,
@@ -63,9 +61,11 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
         };
 
         for w in pts.windows(2) {
-            if 0.5 * (w[0] - w[1]).abs() == 0. {
+            // ignore small interval
+            if (w[1] - w[0]).abs() < 100. * std::f64::MIN_POSITIVE {
                 continue;
             }
+
             let interval = unsafe { Interval::new_unchecked(w[0], w[1]) };
             let result1 = qk21(f, &interval);
 
@@ -127,6 +127,7 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
 
         // Initialization
 
+        let mut table = ExtrapolationTable::default();
         table.append(result0.estimate);
 
         let mut area = result0.estimate;
@@ -183,7 +184,7 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
             }
 
             if roundoff_type2 >= 5 {
-                error2 = 1;
+                error2 = true;
             }
 
             // set error flag in the case of bad integrand behaviour at
@@ -193,15 +194,19 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
                 error = Some(SubintervalTooSmall);
             }
 
+            if deltasum <= tolerance {
+                return IntegrationResult::new(
+                    ws.sum_results() + result1.estimate + result2.estimate,
+                    deltasum,
+                    error
+                );
+            }
+
             // append the newly-created intervals to the list
             ws.update(
                 SubIntervalInfo::new(il1, result1.estimate, result1.delta, current_level),
                 SubIntervalInfo::new(il2, result2.estimate, result2.delta, current_level),
             );
-
-            if deltasum <= tolerance {
-                return IntegrationResult::new(ws.sum_results(), deltasum, error);
-            }
 
             if error.is_some() {
                 break;
@@ -236,7 +241,7 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
             // bisecting decrease the sum of the errors over the larger
             // intervals (error_over_large_intervals) and perform
             // extrapolation.
-            if error2 == 0 && error_over_large_intervals > ertest && ws.increase_nrmax() {
+            if !error2 && error_over_large_intervals > ertest && ws.increase_nrmax() {
                 continue;
             }
 
@@ -286,8 +291,8 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
         if err_ext == std::f64::MAX {
             return IntegrationResult::new(ws.sum_results(), deltasum, error);
         }
-        if error.is_some() || error2 > 0 {
-            if error2 > 0 {
+        if error.is_some() || error2 {
+            if error2 {
                 err_ext += correc;
             }
 
