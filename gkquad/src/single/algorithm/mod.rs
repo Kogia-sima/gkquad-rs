@@ -42,7 +42,9 @@ impl<T: Any> Downcast for T {
 }
 
 impl<F> dyn Algorithm<F>
-where F: Integrand + Any + 'static {
+where
+    F: Integrand + Any + 'static,
+{
     #[inline]
     pub fn downcast_ref<T: Algorithm<F>>(&self) -> Option<&T> {
         Downcast::as_any(self).downcast_ref::<T>()
@@ -82,7 +84,7 @@ macro_rules! extra_traits {
         }
 
         impl Eq for $name {}
-    }
+    };
 }
 
 mod qag;

@@ -1,5 +1,5 @@
-use smallbox::{SmallBox, smallbox};
 use smallbox::space::S4;
+use smallbox::{smallbox, SmallBox};
 use std::cell::UnsafeCell;
 use std::fmt::{self, Debug};
 
@@ -129,7 +129,7 @@ impl<F: Integrand + Default> Default for Integrator<F> {
         Self {
             integrand: UnsafeCell::new(F::default()),
             algorithm: smallbox!(AUTO::new()),
-            config: IntegrationConfig::default()
+            config: IntegrationConfig::default(),
         }
     }
 }

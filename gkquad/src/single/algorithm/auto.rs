@@ -17,7 +17,7 @@ impl AUTO {
     pub fn new() -> Self {
         Self {
             qags: RefCell::new(None),
-            qagp: RefCell::new(None)
+            qagp: RefCell::new(None),
         }
     }
 }

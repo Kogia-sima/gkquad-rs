@@ -1,18 +1,18 @@
 use crate::error::IntegrationResult;
-use crate::single::algorithm::{Algorithm, qagp_finite::QAGP_FINITE};
+use crate::single::algorithm::{qagp_finite::QAGP_FINITE, Algorithm};
 use crate::single::common::{ITransform, Integrand, IntegrationConfig, Interval, Points};
 use crate::single::util::{transform_interval, transform_point};
 
 #[derive(Clone)]
 pub struct QAGP {
-    inner: QAGP_FINITE
+    inner: QAGP_FINITE,
 }
 
 impl QAGP {
     #[inline]
     pub fn new() -> Self {
         Self {
-            inner: QAGP_FINITE::new()
+            inner: QAGP_FINITE::new(),
         }
     }
 }

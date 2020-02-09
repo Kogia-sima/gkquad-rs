@@ -13,13 +13,18 @@ pub struct SubIntervalInfo {
     /// Absolute estimation error
     pub delta: f64,
     /// Recursion depth of subinterval
-    pub level: usize
+    pub level: usize,
 }
 
 impl SubIntervalInfo {
     #[inline]
     pub fn new(interval: Interval, estimate: f64, delta: f64, level: usize) -> Self {
-        Self {interval, estimate, delta, level}
+        Self {
+            interval,
+            estimate,
+            delta,
+            level,
+        }
     }
 }
 
@@ -56,7 +61,7 @@ impl WorkSpace {
             i: 0,
             maximum_level: 0,
             subintervals: Vec::with_capacity(n),
-            order: Vec::with_capacity(n)
+            order: Vec::with_capacity(n),
         }
     }
 
@@ -296,14 +301,14 @@ impl WorkSpaceProvider {
 
 #[cfg(not(feature = "std"))]
 pub struct WorkSpaceProvider {
-    workspace: UnsafeCell<WorkSpace>
+    workspace: UnsafeCell<WorkSpace>,
 }
 
 #[cfg(not(feature = "std"))]
 impl WorkSpaceProvider {
     pub fn new() -> Self {
         Self {
-            workspace: UnsafeCell::new(WorkSpace::new())
+            workspace: UnsafeCell::new(WorkSpace::new()),
         }
     }
 
@@ -319,7 +324,7 @@ impl Clone for WorkSpaceProvider {
         let ptr = self.workspace.get();
         unsafe {
             Self {
-                workspace: UnsafeCell::new((*ptr).clone())
+                workspace: UnsafeCell::new((*ptr).clone()),
             }
         }
     }

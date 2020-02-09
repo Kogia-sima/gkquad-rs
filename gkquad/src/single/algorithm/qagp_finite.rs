@@ -66,7 +66,7 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
                 return IntegrationResult::new(
                     result0.estimate,
                     result0.delta,
-                    Some(NanValueEncountered)
+                    Some(NanValueEncountered),
                 );
             }
 
@@ -191,7 +191,7 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
                 return IntegrationResult::new(
                     ws.sum_results() + result1.estimate + result2.estimate,
                     deltasum,
-                    error
+                    error,
                 );
             }
 

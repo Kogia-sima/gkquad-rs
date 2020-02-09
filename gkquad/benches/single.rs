@@ -4,8 +4,8 @@ extern crate bencher;
 extern crate gkquad;
 
 use bencher::{black_box, Bencher};
-use std::f64::{INFINITY, NEG_INFINITY};
 use std::f64::consts::PI;
+use std::f64::{INFINITY, NEG_INFINITY};
 
 use gkquad::single::algorithm::*;
 use gkquad::single::Integrator;
