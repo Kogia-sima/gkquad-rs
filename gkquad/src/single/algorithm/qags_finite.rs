@@ -4,7 +4,7 @@ use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
 use crate::single::common::{Integrand, IntegrationConfig, Interval};
 use crate::single::qelg::ExtrapolationTable;
-use crate::single::qk::qk21;
+use crate::single::qk::{qk15, qk21};
 use crate::single::util::{bisect, subinterval_too_small, test_positivity};
 use crate::single::workspace::{SubIntervalInfo, WorkSpaceProvider};
 
@@ -21,12 +21,74 @@ impl QAGS_FINITE {
             provider: WorkSpaceProvider::new(),
         }
     }
-}
 
-impl Default for QAGS_FINITE {
-    #[inline]
-    fn default() -> Self {
-        Self::new()
+    // initial integral
+    fn initial_integral<F: Integrand>(
+        &self,
+        f: &mut F,
+        interval: &Interval,
+        config: &IntegrationConfig,
+    ) -> (IntegrationResult, f64, bool) {
+        for i in 0..2 {
+            let result0 = if i == 0 {
+                qk15(f, &interval)
+            } else if i == 1 {
+                qk21(f, &interval)
+            } else {
+                unreachable!();
+            };
+
+            if result0.estimate.is_nan() {
+                return (
+                    IntegrationResult::new(
+                        result0.estimate,
+                        result0.delta,
+                        Some(NanValueEncountered),
+                    ),
+                    0.,
+                    true,
+                );
+            }
+
+            let tolerance = config.tolerance.to_abs(result0.estimate.abs());
+            if result0.delta <= tolerance && result0.delta != result0.asc || result0.delta == 0.0 {
+                return (
+                    IntegrationResult::new(result0.estimate, result0.delta, None),
+                    0.,
+                    true,
+                );
+            } else if config.limit == 1 {
+                return (
+                    IntegrationResult::new(
+                        result0.estimate,
+                        result0.delta,
+                        Some(InsufficientIteration),
+                    ),
+                    0.,
+                    true,
+                );
+            }
+
+            let round_off = 100. * std::f64::EPSILON * result0.absvalue;
+            if result0.delta <= round_off && result0.delta > tolerance {
+                // 精度の限界によりこれ以上誤差を減らすことは不可能
+                return (
+                    IntegrationResult::new(result0.estimate, result0.delta, Some(RoundoffError)),
+                    0.,
+                    true,
+                );
+            }
+
+            if i == 1 || result0.delta > tolerance * 1024. {
+                return (
+                    IntegrationResult::new(result0.estimate, result0.delta, None),
+                    result0.absvalue,
+                    false,
+                );
+            }
+        }
+
+        unreachable!();
     }
 }
 
@@ -55,14 +117,9 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
 
         let mut table = ExtrapolationTable::default();
 
-        let result0 = qk21(f, &interval);
-
-        if result0.estimate.is_nan() {
-            return IntegrationResult::new(
-                result0.estimate,
-                result0.delta,
-                Some(NanValueEncountered)
-            )
+        let (result0, absvalue, finished) = self.initial_integral(f, interval, config);
+        if finished {
+            return result0;
         }
 
         ws.push(SubIntervalInfo::new(
@@ -71,22 +128,6 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
             result0.delta,
             0,
         ));
-        let tolerance = config.tolerance.to_abs(result0.estimate.abs());
-
-        let round_off = 100. * std::f64::EPSILON * result0.absvalue;
-
-        if result0.delta <= round_off && result0.delta > tolerance {
-            return IntegrationResult::new(result0.estimate, result0.delta, Some(RoundoffError));
-        } else if result0.delta <= tolerance && result0.delta != result0.asc || result0.delta == 0.0
-        {
-            return IntegrationResult::new(result0.estimate, result0.delta, None);
-        } else if config.limit == 1 {
-            return IntegrationResult::new(
-                result0.estimate,
-                result0.delta,
-                Some(InsufficientIteration),
-            );
-        }
 
         // 計算結果を補外用の配列に加える
         table.append(result0.estimate);
@@ -121,6 +162,8 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
             // もとの区間での推定値を部分区間ごとの推定値の和で置き換え
             errsum += error12 - info.delta;
             area += area12 - info.estimate;
+
+            let tolerance = config.tolerance.to_abs(area.abs());
 
             // resascの値とerrorの値は理論上一致するはず
             // => しかし丸め誤差により異なる値になる場合がある
@@ -270,9 +313,9 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
         }
 
         //  Test on divergence.
-        let positive_integrand = test_positivity(result0.estimate, result0.absvalue);
+        let positive_integrand = test_positivity(result0.estimate, absvalue);
 
-        if !positive_integrand && f64::max(res_ext.abs(), area.abs()) < 0.01 * result0.absvalue {
+        if !positive_integrand && f64::max(res_ext.abs(), area.abs()) < 0.01 * absvalue {
             return IntegrationResult::new(res_ext, err_ext, error);
         }
 
@@ -282,5 +325,12 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
         }
 
         IntegrationResult::new(res_ext, err_ext, error)
+    }
+}
+
+impl Default for QAGS_FINITE {
+    #[inline]
+    fn default() -> Self {
+        Self::new()
     }
 }
