@@ -183,9 +183,9 @@ impl_error!(
 /// calculation.
 #[derive(Debug, Clone)]
 pub struct IntegrationResult {
-    estimate: f64,
-    delta: f64,
-    error: Option<RuntimeError>,
+    pub(crate) estimate: f64,
+    pub(crate) delta: f64,
+    pub(crate) error: Option<RuntimeError>,
 }
 
 impl IntegrationResult {

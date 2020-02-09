@@ -5,7 +5,7 @@ use std::fmt::{self, Debug};
 use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
 use crate::single::common::{Integrand, IntegrationConfig, Interval};
-use crate::single::qk::qk21;
+use crate::single::qk::{qk15, qk21};
 use crate::single::util::{bisect, subinterval_too_small};
 use crate::single::workspace::{SubIntervalInfo, WorkSpaceProvider};
 
@@ -22,18 +22,69 @@ impl QAG_FINITE {
             provider: WorkSpaceProvider::new(),
         }
     }
-}
 
-impl Debug for QAG_FINITE {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_str("QAG_FINITE")
-    }
-}
+    // initial integral
+    fn initial_integral<F: Integrand>(
+        &self,
+        f: &mut F,
+        interval: &Interval,
+        config: &IntegrationConfig,
+    ) -> (IntegrationResult, bool) {
+        for i in 0..2 {
+            let result0 = if i == 0 {
+                qk15(f, &interval)
+            } else if i == 1 {
+                qk21(f, &interval)
+            } else {
+                unreachable!();
+            };
 
-impl Default for QAG_FINITE {
-    #[inline]
-    fn default() -> Self {
-        Self::new()
+            if result0.estimate.is_nan() {
+                return (
+                    IntegrationResult::new(
+                        result0.estimate,
+                        result0.delta,
+                        Some(NanValueEncountered),
+                    ),
+                    true,
+                );
+            }
+
+            let tolerance = config.tolerance.to_abs(result0.estimate.abs());
+            if result0.delta <= tolerance && result0.delta != result0.asc || result0.delta == 0.0 {
+                return (
+                    IntegrationResult::new(result0.estimate, result0.delta, None),
+                    true,
+                );
+            } else if config.limit == 1 {
+                return (
+                    IntegrationResult::new(
+                        result0.estimate,
+                        result0.delta,
+                        Some(InsufficientIteration),
+                    ),
+                    true,
+                );
+            }
+
+            let round_off = 50. * std::f64::EPSILON * result0.absvalue;
+            if result0.delta <= round_off && result0.delta > tolerance {
+                // 精度の限界によりこれ以上誤差を減らすことは不可能
+                return (
+                    IntegrationResult::new(result0.estimate, result0.delta, Some(RoundoffError)),
+                    true,
+                );
+            }
+
+            if i == 1 || result0.delta > tolerance * 1024. {
+                return (
+                    IntegrationResult::new(result0.estimate, result0.delta, None),
+                    false,
+                );
+            }
+        }
+
+        unreachable!();
     }
 }
 
@@ -51,38 +102,10 @@ impl<F: Integrand> Algorithm<F> for QAG_FINITE {
         let (mut roundoff_type1, mut roundoff_type2) = (0_i32, 0_i32);
         let mut error = None;
 
-        let result0 = qk21(f, &interval);
-
-        if result0.estimate.is_nan() {
-            return IntegrationResult::new(
-                result0.estimate,
-                result0.delta,
-                Some(NanValueEncountered)
-            );
-        }
-
-        ws.push(SubIntervalInfo::new(
-            interval.clone(),
-            result0.estimate,
-            result0.delta,
-            0,
-        ));
-
-        let mut tolerance = config.tolerance.to_abs(result0.estimate.abs());
-        let round_off = 50. * std::f64::EPSILON * result0.absvalue;
-
-        if result0.delta <= round_off && result0.delta > tolerance {
-            // 精度の限界によりこれ以上誤差を減らすことは不可能
-            return IntegrationResult::new(result0.estimate, result0.delta, Some(RoundoffError));
-        } else if result0.delta <= tolerance && result0.delta != result0.asc || result0.delta == 0.0
-        {
-            return IntegrationResult::new(result0.estimate, result0.delta, None);
-        } else if config.limit == 1 {
-            return IntegrationResult::new(
-                result0.estimate,
-                result0.delta,
-                Some(InsufficientIteration),
-            );
+        // initial integral
+        let (result0, finished) = self.initial_integral(f, interval, config);
+        if finished {
+            return result0;
         }
 
         // sum of the integral estimates for each interval
@@ -91,7 +114,14 @@ impl<F: Integrand> Algorithm<F> for QAG_FINITE {
         // sum of the errors for each interval
         let mut deltasum = result0.delta;
 
-        for _ in 1..config.limit {
+        ws.push(SubIntervalInfo::new(
+            interval.clone(),
+            result0.estimate,
+            result0.delta,
+            0,
+        ));
+
+        for _ in 2..config.limit {
             // 最も誤差が大きい部分区間を取り出す
             let info = ws.get();
             let current_level = info.level + 1;
@@ -126,17 +156,22 @@ impl<F: Integrand> Algorithm<F> for QAG_FINITE {
                 }
             }
 
-            tolerance = config.tolerance.to_abs(area.abs());
+            let tolerance = config.tolerance.to_abs(area.abs());
 
             // 丸め誤差が多数発生してなおかつ収束しない場合、即座にエラー終了する
             if deltasum > tolerance {
                 if roundoff_type1 >= 6 || roundoff_type2 >= 20 {
                     error = Some(RoundoffError);
+                } else if subinterval_too_small(il1.begin, il1.end, il2.end) {
+                    error = Some(SubintervalTooSmall);
                 }
 
-                // very small interval cannot achive further precision
-                if subinterval_too_small(il1.begin, il1.end, il2.end) {
-                    error = Some(SubintervalTooSmall);
+                if error.is_some() {
+                    return IntegrationResult::new(
+                        ws.sum_results() + result1.estimate + result2.estimate,
+                        deltasum,
+                        error,
+                    );
                 }
             }
 
@@ -146,12 +181,25 @@ impl<F: Integrand> Algorithm<F> for QAG_FINITE {
                 SubIntervalInfo::new(il2, result2.estimate, result2.delta, current_level),
             );
 
-            if error.is_some() || deltasum <= tolerance {
+            if deltasum <= tolerance {
                 break;
             }
         }
 
         // 再度結果を足し合わせて正確な推定値を得る
         IntegrationResult::new(ws.sum_results(), deltasum, error)
+    }
+}
+
+impl Debug for QAG_FINITE {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.write_str("QAG_FINITE")
+    }
+}
+
+impl Default for QAG_FINITE {
+    #[inline]
+    fn default() -> Self {
+        Self::new()
     }
 }
