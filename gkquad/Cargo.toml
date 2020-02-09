@@ -3,6 +3,7 @@ name = "gkquad"
 version = "0.0.1"
 authors = ["Kogia-sima <orcinus4627@gmail.com>"]
 license = "MIT"
+description = "Numerical integration library for Rust"
 homepage = "https://github.com/Kogia-sima/gkquad-rs"
 repository = "https://github.com/Kogia-sima/gkquad-rs"
 readme = "../README.md"
