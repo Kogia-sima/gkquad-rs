@@ -101,8 +101,8 @@ impl<F: Integrand> Integrator<F> {
     }
 
     #[inline]
-    pub fn get_algorithm(&self) -> &SmallBox<dyn Algorithm<F>, S4> {
-        &self.algorithm
+    pub fn get_algorithm(&self) -> &dyn Algorithm<F> {
+        &*self.algorithm
     }
 
     #[inline]
