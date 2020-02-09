@@ -36,9 +36,9 @@ $ cargo bench
      Running /tmp/gkquad-rs/target/release/deps/single-3b52efd7f739cf4b
 
 running 3 tests
-test normal_distribution_qags ... bench:       3,186 ns/iter (+/- 111)
-test square_qag               ... bench:          54 ns/iter (+/- 1)
-test square_qags              ... bench:          58 ns/iter (+/- 3)
+test normal_distribution_qags ... bench:       3,056 ns/iter (+/- 106)
+test square_qag               ... bench:          44 ns/iter (+/- 2)
+test square_qags              ... bench:          44 ns/iter (+/- 3)
 
 test result: ok. 0 passed; 0 failed; 0 ignored; 3 measured
 ```
