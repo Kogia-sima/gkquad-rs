@@ -9,8 +9,9 @@ use std::f64::consts::PI;
 
 use gkquad::single::algorithm::*;
 use gkquad::single::Integrator;
+use gkquad::Tolerance;
 
-fn square_qag(b: &mut Bencher) {
+fn simple(b: &mut Bencher) {
     let integrator = Integrator::new(|x: f64| x * x).algorithm(QAG::new());
     b.iter(|| {
         let interval = black_box(0.0..1.0);
@@ -19,24 +20,28 @@ fn square_qag(b: &mut Bencher) {
     });
 }
 
-fn square_qags(b: &mut Bencher) {
-    let integrator = Integrator::new(|x: f64| x * x).algorithm(QAGS::new());
+fn singular_points(b: &mut Bencher) {
+    let integrator = Integrator::new(|x: f64| 1.0 / x)
+        .algorithm(QAGP::new())
+        .points(&[0.])
+        .tolerance(Tolerance::Absolute(1.49e-8));
+
     b.iter(|| {
-        let interval = black_box(0.0..1.0);
+        let interval = black_box(-1.0..1.0);
         let result = integrator.run(interval).estimate().unwrap();
-        assert!((result - 1.0 / 3.0).abs() <= 1.49e-8);
+        assert!(result.abs() <= 1.49e-8);
     });
 }
 
-fn normal_distribution_qags(b: &mut Bencher) {
+fn infinite_interval(b: &mut Bencher) {
     let integrator = Integrator::new(|x: f64| (-0.5 * x * x).exp()).algorithm(QAGS::new());
 
     b.iter(|| {
         let interval = black_box(NEG_INFINITY..INFINITY);
-        let result = integrator.run(interval).estimate().unwrap() / (2. * PI).sqrt();
-        assert!((result - 1.0).abs() <= 1.49e-8);
+        let result = integrator.run(interval).estimate().unwrap();
+        assert!((result - (2. * PI).sqrt()).abs() <= 1.49e-8);
     });
 }
 
-benchmark_group!(benches, square_qag, square_qags, normal_distribution_qags);
+benchmark_group!(benches, simple, singular_points, infinite_interval);
 benchmark_main!(benches);
