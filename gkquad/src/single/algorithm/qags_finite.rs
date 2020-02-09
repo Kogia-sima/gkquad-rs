@@ -99,10 +99,6 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
         interval: &Interval,
         config: &IntegrationConfig,
     ) -> IntegrationResult {
-        let mut ws = unsafe { self.provider.get_mut() };
-        ws.clear();
-        ws.reserve(config.limit);
-
         let mut ertest = 0f64;
         let mut error_over_large_intervals = 0f64;
         let mut correc = 0.;
@@ -115,12 +111,14 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
         let mut extrapolate = false;
         let mut disallow_extrapolation = false;
 
-        let mut table = ExtrapolationTable::default();
-
         let (result0, absvalue, finished) = self.initial_integral(f, interval, config);
         if finished {
             return result0;
         }
+
+        let mut ws = unsafe { self.provider.get_mut() };
+        ws.clear();
+        ws.reserve(config.limit);
 
         ws.push(SubIntervalInfo::new(
             interval.clone(),
@@ -130,6 +128,7 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
         ));
 
         // 計算結果を補外用の配列に加える
+        let mut table = ExtrapolationTable::default();
         table.append(result0.estimate);
 
         let mut area = result0.estimate;

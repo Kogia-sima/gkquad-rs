@@ -95,10 +95,6 @@ impl<F: Integrand> Algorithm<F> for QAG_FINITE {
         interval: &Interval,
         config: &IntegrationConfig,
     ) -> IntegrationResult {
-        let ws = unsafe { self.provider.get_mut() };
-        ws.clear();
-        ws.reserve(config.limit);
-
         let (mut roundoff_type1, mut roundoff_type2) = (0_i32, 0_i32);
         let mut error = None;
 
@@ -113,6 +109,10 @@ impl<F: Integrand> Algorithm<F> for QAG_FINITE {
 
         // sum of the errors for each interval
         let mut deltasum = result0.delta;
+
+        let ws = unsafe { self.provider.get_mut() };
+        ws.clear();
+        ws.reserve(config.limit);
 
         ws.push(SubIntervalInfo::new(
             interval.clone(),
