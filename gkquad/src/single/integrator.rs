@@ -13,6 +13,11 @@ use crate::{IntegrationResult, Tolerance};
 /// This object is useful when you want to re-use the configuration.
 ///
 /// ```
+/// use std::cell::Cell;
+///
+/// use gkquad::Tolerance;
+/// use gkquad::single::Integrator;
+///
 /// let m = Cell::new(1);
 /// let mut result = 1.0;
 ///
@@ -20,7 +25,7 @@ use crate::{IntegrationResult, Tolerance};
 ///     .tolerance(Tolerance::Relative(1e-7))
 ///     .limit(100);
 ///
-/// while m <= 10 {
+/// while m.get() <= 10 {
 ///     result *= integrator.run(0.0..1.0).estimate().unwrap();
 ///     
 ///     // increment the exponent

@@ -9,7 +9,9 @@ use crate::IntegrationResult;
 /// # Examples
 ///
 /// ```
-/// let result = integrate(|x| x.sqrt(), 1.0..2.0).estimate();
+/// use gkquad::single::integral;
+///
+/// let result = integral(|x: f64| x.sqrt(), 1.0..2.0).estimate();
 /// ```
 #[inline]
 pub fn integral<F: Integrand, I: Into<Interval>>(mut f: F, interval: I) -> IntegrationResult {

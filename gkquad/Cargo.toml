@@ -15,7 +15,6 @@ edition = "2018"
 name = "gkquad"
 path = "src/lib.rs"
 test = false
-doctest = false
 
 [features]
 default = ["std", "single"]

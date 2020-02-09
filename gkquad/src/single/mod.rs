@@ -27,7 +27,7 @@
 //!         .limit(100)
 //!         .algorithm(QAGP::new())
 //!         .points(&[0.])
-//!         .integrate(NEG_INFINITY..INFINITY)
+//!         .run(NEG_INFINITY..INFINITY)
 //!         .estimate()
 //!         .unwrap();
 //! ```

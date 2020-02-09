@@ -227,7 +227,10 @@ impl IntegrationResult {
     /// # Examples
     ///
     /// ```
-    /// let result = qags(f, a, b, 0., 1e-5, 50, &mut workspace);
+    /// use gkquad::single::integral;
+    /// use std::f64::NEG_INFINITY;
+    ///
+    /// let result = integral(|x: f64| x.exp(), NEG_INFINITY..0.0);
     /// let (estimate, delta) = result.estimate_delta().unwrap();
     /// ```
     #[inline]
