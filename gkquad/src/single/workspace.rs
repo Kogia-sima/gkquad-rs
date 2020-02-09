@@ -324,3 +324,6 @@ impl Clone for WorkSpaceProvider {
         }
     }
 }
+
+#[cfg(docsrs)]
+impl !Sync for WorkSpaceProvider {}
