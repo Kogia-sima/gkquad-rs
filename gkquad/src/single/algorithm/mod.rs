@@ -59,6 +59,32 @@ where F: Integrand + Any + 'static {
     }
 }
 
+macro_rules! extra_traits {
+    ($name:ident) => {
+        impl Default for $name {
+            #[inline(always)]
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+
+        impl std::fmt::Debug for $name {
+            fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+                f.write_str(stringify!($name))
+            }
+        }
+
+        impl PartialEq<$name> for $name {
+            #[inline(always)]
+            fn eq(&self, _: &Self) -> bool {
+                true
+            }
+        }
+
+        impl Eq for $name {}
+    }
+}
+
 mod qag;
 pub use qag::*;
 

@@ -17,13 +17,6 @@ impl QAGP {
     }
 }
 
-impl Default for QAGP {
-    #[inline]
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl<F: Integrand> Algorithm<F> for QAGP {
     #[inline]
     fn integrate(
@@ -58,3 +51,5 @@ impl<F: Integrand> Algorithm<F> for QAGP {
         }
     }
 }
+
+extra_traits!(QAGP);

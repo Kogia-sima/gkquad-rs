@@ -23,13 +23,6 @@ impl QAGP_FINITE {
     }
 }
 
-impl Default for QAGP_FINITE {
-    #[inline]
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
     fn integrate(
         &self,
@@ -347,3 +340,5 @@ fn make_sorted_points(interval: &Interval, pts: &[f64]) -> Points {
     pts2.retain(|&mut x| min <= x && x <= max);
     pts2
 }
+
+extra_traits!(QAGP_FINITE);

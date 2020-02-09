@@ -124,4 +124,14 @@ impl<F: Integrand + Debug> Debug for Integrator<F> {
     }
 }
 
+impl<F: Integrand + Default> Default for Integrator<F> {
+    fn default() -> Self {
+        Self {
+            integrand: UnsafeCell::new(F::default()),
+            algorithm: smallbox!(AUTO::new()),
+            config: IntegrationConfig::default()
+        }
+    }
+}
+
 unsafe impl<F: Integrand + Send> Send for Integrator<F> {}

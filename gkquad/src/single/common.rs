@@ -1,15 +1,18 @@
 use smallvec::SmallVec;
+use std::fmt::{self, Debug, Display};
+use std::hash::{Hash, Hasher};
 use std::marker::PhantomData;
 use std::ops::{Bound, RangeBounds};
 
 use crate::Tolerance;
 
+/// Singular points
 pub type Points = SmallVec<[f64; 8]>;
 
 /// Represent the interval for which the integral is estimated.
 ///
 /// Both `begin` and `end` are not NaN values (but may be infinite).
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub struct Interval {
     /// beginning of the interval
     pub begin: f64,
@@ -44,6 +47,34 @@ impl Interval {
 
 impl Eq for Interval {}
 
+impl Display for Interval {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({:?}, {:?})", self.begin, self.end)
+    }
+}
+
+impl Debug for Interval {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({:?}, {:?})", self.begin, self.end)
+    }
+}
+
+impl Hash for Interval {
+    fn hash<H: Hasher>(&self, h: &mut H) {
+        fn hash_impl<H: Hasher>(x: f64, state: &mut H) {
+            let bits = if x == 0.0 {
+                0 // this accounts for +0.0 and -0.0
+            } else {
+                unsafe { std::mem::transmute::<f64, u64>(x) }
+            };
+            bits.hash(state);
+        }
+
+        hash_impl(self.begin, h);
+        hash_impl(self.end, h);
+    }
+}
+
 impl<R: RangeBounds<f64>> From<R> for Interval {
     fn from(r: R) -> Interval {
         let a = match r.start_bound() {
@@ -63,7 +94,7 @@ impl<R: RangeBounds<f64>> From<R> for Interval {
 
 /// Integration configuration
 #[non_exhaustive]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct IntegrationConfig {
     /// the tolerance to be satisfied
     pub tolerance: Tolerance,

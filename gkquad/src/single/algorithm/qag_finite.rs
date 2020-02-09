@@ -1,7 +1,5 @@
 #![allow(non_camel_case_types, clippy::float_cmp)]
 
-use std::fmt::{self, Debug};
-
 use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
 use crate::single::common::{Integrand, IntegrationConfig, Interval};
@@ -191,15 +189,4 @@ impl<F: Integrand> Algorithm<F> for QAG_FINITE {
     }
 }
 
-impl Debug for QAG_FINITE {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_str("QAG_FINITE")
-    }
-}
-
-impl Default for QAG_FINITE {
-    #[inline]
-    fn default() -> Self {
-        Self::new()
-    }
-}
+extra_traits!(QAG_FINITE);

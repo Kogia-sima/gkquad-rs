@@ -22,13 +22,6 @@ impl AUTO {
     }
 }
 
-impl Default for AUTO {
-    #[inline]
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl<F: Integrand> Algorithm<F> for AUTO {
     fn integrate(
         &self,
@@ -51,3 +44,5 @@ impl<F: Integrand> Algorithm<F> for AUTO {
         }
     }
 }
+
+extra_traits!(AUTO);

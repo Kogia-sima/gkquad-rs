@@ -327,9 +327,4 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
     }
 }
 
-impl Default for QAGS_FINITE {
-    #[inline]
-    fn default() -> Self {
-        Self::new()
-    }
-}
+extra_traits!(QAGS_FINITE);
