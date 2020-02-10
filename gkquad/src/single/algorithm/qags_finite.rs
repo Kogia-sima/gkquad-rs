@@ -326,5 +326,3 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
         IntegrationResult::new(res_ext, err_ext, error)
     }
 }
-
-extra_traits!(QAGS_FINITE);

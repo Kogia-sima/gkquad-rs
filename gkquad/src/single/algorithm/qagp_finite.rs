@@ -340,5 +340,3 @@ fn make_sorted_points(interval: &Interval, pts: &[f64]) -> Points {
     pts2.retain(|&mut x| min <= x && x <= max);
     pts2
 }
-
-extra_traits!(QAGP_FINITE);

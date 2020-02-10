@@ -188,5 +188,3 @@ impl<F: Integrand> Algorithm<F> for QAG_FINITE {
         IntegrationResult::new(ws.sum_results(), deltasum, error)
     }
 }
-
-extra_traits!(QAG_FINITE);
