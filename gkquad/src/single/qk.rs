@@ -6,7 +6,7 @@
 
 use std::borrow::Borrow;
 use std::mem::MaybeUninit;
-use std::ops::{Add, AddAssign};
+use std::ops::{Add, AddAssign, Deref, DerefMut};
 
 use super::common::{Integrand, Interval};
 use super::qk_impl::qk;
@@ -51,12 +51,40 @@ impl<T: Borrow<QKResult>> AddAssign<T> for QKResult {
     }
 }
 
+#[repr(align(32))]
+struct Aligned<T: ?Sized> {
+    value: T,
+}
+
+impl<T: Sized> Aligned<T> {
+    #[inline]
+    unsafe fn uninit() -> Self {
+        MaybeUninit::uninit().assume_init()
+    }
+}
+
+impl<T: ?Sized> Deref for Aligned<T> {
+    type Target = T;
+
+    #[inline]
+    fn deref(&self) -> &T {
+        &self.value
+    }
+}
+
+impl<T: ?Sized> DerefMut for Aligned<T> {
+    #[inline]
+    fn deref_mut(&mut self) -> &mut T {
+        &mut self.value
+    }
+}
+
 /// Performs Gauss-Kronrod integration with 15-point kronrod rule
 #[inline]
 pub fn qk15<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
     unsafe {
-        let mut fv = MaybeUninit::<[f64; 15]>::uninit().assume_init();
-        qk(f, r, &XGK15, &WG15, &WGK15, &mut fv)
+        let mut fv = Aligned::<[f64; 15]>::uninit();
+        qk(f, r, &XGK15, &WG15, &WGK15, &mut *fv)
     }
 }
 
@@ -64,8 +92,8 @@ pub fn qk15<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
 #[inline]
 pub fn qk21<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
     unsafe {
-        let mut fv = MaybeUninit::<[f64; 21]>::uninit().assume_init();
-        qk(f, r, &XGK21, &WG21, &WGK21, &mut fv)
+        let mut fv = Aligned::<[f64; 21]>::uninit();
+        qk(f, r, &XGK21, &WG21, &WGK21, &mut *fv)
     }
 }
 
@@ -73,8 +101,8 @@ pub fn qk21<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
 #[inline]
 pub fn qk31<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
     unsafe {
-        let mut fv = MaybeUninit::<[f64; 31]>::uninit().assume_init();
-        qk(f, r, &XGK31, &WG31, &WGK31, &mut fv)
+        let mut fv = Aligned::<[f64; 31]>::uninit();
+        qk(f, r, &XGK31, &WG31, &WGK31, &mut *fv)
     }
 }
 
@@ -82,8 +110,8 @@ pub fn qk31<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
 #[inline]
 pub fn qk41<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
     unsafe {
-        let mut fv = MaybeUninit::<[f64; 41]>::uninit().assume_init();
-        qk(f, r, &XGK41, &WG41, &WGK41, &mut fv)
+        let mut fv = Aligned::<[f64; 41]>::uninit();
+        qk(f, r, &XGK41, &WG41, &WGK41, &mut *fv)
     }
 }
 
@@ -91,8 +119,8 @@ pub fn qk41<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
 #[inline]
 pub fn qk51<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
     unsafe {
-        let mut fv = MaybeUninit::<[f64; 51]>::uninit().assume_init();
-        qk(f, r, &XGK51, &WG51, &WGK51, &mut fv)
+        let mut fv = Aligned::<[f64; 51]>::uninit();
+        qk(f, r, &XGK51, &WG51, &WGK51, &mut *fv)
     }
 }
 
