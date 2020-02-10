@@ -1,5 +1,4 @@
 use alloc::vec::Vec;
-use std::cell::UnsafeCell;
 
 use super::Interval;
 
@@ -50,8 +49,14 @@ pub struct WorkSpace {
 
 impl WorkSpace {
     #[inline]
-    pub fn new() -> WorkSpace {
-        WorkSpace::with_capacity(0)
+    pub const fn new() -> WorkSpace {
+        WorkSpace {
+            nrmax: 0,
+            i: 0,
+            maximum_level: 0,
+            subintervals: Vec::new(),
+            order: Vec::new(),
+        }
     }
 
     #[inline]
@@ -273,62 +278,58 @@ impl WorkSpace {
 }
 
 impl Default for WorkSpace {
+    #[inline(always)]
     fn default() -> WorkSpace {
         WorkSpace::new()
     }
 }
 
 #[cfg(feature = "std")]
-thread_local! {
-    static WORKSPACE: UnsafeCell<WorkSpace> = UnsafeCell::new(WorkSpace::new());
-}
+mod provider {
+    use super::WorkSpace;
+    use std::cell::{RefCell, RefMut};
 
-#[cfg(feature = "std")]
-#[derive(Clone)]
-pub struct WorkSpaceProvider;
-
-#[cfg(feature = "std")]
-impl WorkSpaceProvider {
-    pub fn new() -> Self {
-        Self
+    thread_local! {
+        static WORKSPACE: RefCell<WorkSpace> = RefCell::new(WorkSpace::new());
     }
 
-    pub unsafe fn get_mut(&self) -> &mut WorkSpace {
-        let ptr = WORKSPACE.with(|v| v.get());
-        &mut *ptr
-    }
-}
+    #[derive(Clone)]
+    pub struct WorkSpaceProvider;
 
-#[cfg(not(feature = "std"))]
-pub struct WorkSpaceProvider {
-    workspace: UnsafeCell<WorkSpace>,
-}
-
-#[cfg(not(feature = "std"))]
-impl WorkSpaceProvider {
-    pub fn new() -> Self {
-        Self {
-            workspace: UnsafeCell::new(WorkSpace::new()),
+    impl WorkSpaceProvider {
+        #[inline(always)]
+        pub const fn new() -> Self {
+            Self
         }
-    }
 
-    pub unsafe fn get_mut(&self) -> &mut WorkSpace {
-        let ptr = self.workspace.get();
-        &mut *ptr
-    }
-}
-
-#[cfg(not(feature = "std"))]
-impl Clone for WorkSpaceProvider {
-    fn clone(&self) -> Self {
-        let ptr = self.workspace.get();
-        unsafe {
-            Self {
-                workspace: UnsafeCell::new((*ptr).clone()),
-            }
+        #[inline]
+        pub fn get_mut(&self) -> RefMut<'_, WorkSpace> {
+            WORKSPACE.with(|v| unsafe { std::mem::transmute(v.borrow_mut()) })
         }
     }
 }
 
-#[cfg(docsrs)]
-impl !Sync for WorkSpaceProvider {}
+#[cfg(not(feature = "std"))]
+mod provider {
+    use super::WorkSpace;
+    use crate::utils::{Mutex, MutexGuard};
+
+    static WORKSPACE: Mutex<WorkSpace> = Mutex::new(WorkSpace::new());
+
+    #[derive(Clone)]
+    pub struct WorkSpaceProvider;
+
+    impl WorkSpaceProvider {
+        #[inline(always)]
+        pub const fn new() -> Self {
+            Self
+        }
+
+        #[inline]
+        pub fn get_mut(&self) -> MutexGuard<'_, WorkSpace> {
+            WORKSPACE.lock()
+        }
+    }
+}
+
+pub use provider::*;

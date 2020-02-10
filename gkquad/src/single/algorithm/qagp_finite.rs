@@ -33,7 +33,7 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
         let pts = make_sorted_points(interval, &config.points);
         let nint = pts.len() - 1; // number of intervals
 
-        let mut ws = unsafe { self.provider.get_mut() };
+        let mut ws = self.provider.get_mut();
         ws.clear();
         ws.reserve(usize::max(config.limit, pts.len()));
 

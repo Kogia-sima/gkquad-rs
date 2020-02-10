@@ -116,7 +116,7 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
             return result0;
         }
 
-        let mut ws = unsafe { self.provider.get_mut() };
+        let mut ws = self.provider.get_mut();
         ws.clear();
         ws.reserve(config.limit);
 
