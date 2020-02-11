@@ -119,7 +119,7 @@ impl<F: Integrand> Algorithm<F> for QAG_FINITE {
             0,
         ));
 
-        for _ in 2..config.limit {
+        for _ in 1..config.limit {
             // 最も誤差が大きい部分区間を取り出す
             let info = ws.get();
             let current_level = info.level + 1;
