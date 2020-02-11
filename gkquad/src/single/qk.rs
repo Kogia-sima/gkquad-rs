@@ -128,7 +128,7 @@ pub fn qk31<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
 #[inline]
 pub fn qk33<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
     unsafe {
-        let mut fv = Aligned::<[f64; 31]>::uninit();
+        let mut fv = Aligned::<[f64; 33]>::uninit();
         qk(f, r, &XGK33, &WG33, &WGK33, &mut *fv)
     }
 }
@@ -146,7 +146,7 @@ pub fn qk41<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
 #[inline]
 pub fn qk49<F: Integrand>(f: &mut F, r: &Interval) -> QKResult {
     unsafe {
-        let mut fv = Aligned::<[f64; 41]>::uninit();
+        let mut fv = Aligned::<[f64; 49]>::uninit();
         qk(f, r, &XGK49, &WG49, &WGK49, &mut *fv)
     }
 }
