@@ -20,7 +20,7 @@ fn simple(b: &mut Bencher) {
 }
 
 fn singular_points(b: &mut Bencher) {
-    let integrator = Integrator::new(|x: f64| 1.0 / x)
+    let integrator = Integrator::new(|x: f64| x.recip())
         .algorithm(QAGP::new())
         .points(&[0.])
         .tolerance(Tolerance::Absolute(1.49e-8));
@@ -33,12 +33,12 @@ fn singular_points(b: &mut Bencher) {
 }
 
 fn infinite_interval(b: &mut Bencher) {
-    let integrand = |x: f64| (-0.5 * x * x).exp();
+    let integrand = |x: f64| (1.0 + x * x).recip();
 
     b.iter(|| {
         let interval = black_box(NEG_INFINITY..INFINITY);
         let result = integral(integrand, interval).estimate().unwrap();
-        assert!((result - (2. * PI).sqrt()).abs() <= 1.49e-8);
+        assert!((result - PI).abs() <= 1.49e-8);
     });
 }
 
