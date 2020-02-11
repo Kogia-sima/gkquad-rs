@@ -1,4 +1,6 @@
 # gkquad
+[![Version](https://img.shields.io/crates/v/gkquad)](https://crates.io/crates/gkquad)
+[![docs](https://docs.rs/gkquad/badge.svg)](https://docs.rs/gkquad)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Kogia-sima/gkquad-rs/blob/master/LICENSE)
 [![Twitter: Kogia_sima](https://img.shields.io/twitter/follow/Kogia\_sima.svg?style=social)](https://twitter.com/Kogia\_sima)
 
