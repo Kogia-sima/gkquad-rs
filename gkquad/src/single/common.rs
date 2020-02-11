@@ -49,29 +49,27 @@ impl Eq for Interval {}
 
 impl Display for Interval {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({:?}, {:?})", self.begin, self.end)
+        write!(f, "[{:?}, {:?}]", self.begin, self.end)
     }
 }
 
 impl Debug for Interval {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({:?}, {:?})", self.begin, self.end)
+        <Self as Display>::fmt(self, f)
     }
 }
 
 impl Hash for Interval {
+    #[inline]
     fn hash<H: Hasher>(&self, h: &mut H) {
-        fn hash_impl<H: Hasher>(x: f64, state: &mut H) {
+        for &x in &[self.begin, self.end] {
             let bits = if x == 0.0 {
                 0 // this accounts for +0.0 and -0.0
             } else {
-                unsafe { std::mem::transmute::<f64, u64>(x) }
+                x.to_bits()
             };
-            bits.hash(state);
+            bits.hash(h);
         }
-
-        hash_impl(self.begin, h);
-        hash_impl(self.end, h);
     }
 }
 
@@ -89,6 +87,12 @@ impl<R: RangeBounds<f64>> From<R> for Interval {
 
         Interval::new(a, b)
             .expect("cannot create Interval object from Range which contains NaN value.")
+    }
+}
+
+impl<'a> From<&'a Interval> for Interval {
+    fn from(other: &'a Interval) -> Self {
+        other.clone()
     }
 }
 
