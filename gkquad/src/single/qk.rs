@@ -13,7 +13,6 @@ use super::qk_impl::qk;
 
 /// holds the result of Gauss-Kronrod integration
 #[derive(Debug)]
-#[doc(hidden)]
 pub struct QKResult {
     /// approximation to the integral
     pub estimate: f64,
