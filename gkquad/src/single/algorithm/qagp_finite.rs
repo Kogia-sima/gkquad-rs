@@ -189,7 +189,7 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
 
             if deltasum <= tolerance {
                 return IntegrationResult::new(
-                    ws.sum_results() + result1.estimate + result2.estimate,
+                    ws.sum_results() - info.estimate + result1.estimate + result2.estimate,
                     deltasum,
                     error,
                 );

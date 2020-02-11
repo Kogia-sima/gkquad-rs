@@ -166,7 +166,7 @@ impl<F: Integrand> Algorithm<F> for QAG_FINITE {
 
                 if error.is_some() {
                     return IntegrationResult::new(
-                        ws.sum_results() + result1.estimate + result2.estimate,
+                        ws.sum_results() - info.estimate + result1.estimate + result2.estimate,
                         deltasum,
                         error,
                     );

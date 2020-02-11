@@ -197,16 +197,20 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
                 error = Some(SubintervalTooSmall);
             }
 
+            // 要求精度を下回った場合即座にreturnする
+            if errsum <= tolerance {
+                return IntegrationResult::new(
+                    ws.sum_results() - info.estimate + result1.estimate + result2.estimate,
+                    errsum,
+                    error,
+                );
+            }
+
             // append the newly-created intervals to the list
             ws.update(
                 SubIntervalInfo::new(il1, result1.estimate, result1.delta, current_level),
                 SubIntervalInfo::new(il2, result2.estimate, result2.delta, current_level),
             );
-
-            // 要求精度を下回った場合即座にreturnする
-            if errsum <= tolerance {
-                return IntegrationResult::new(ws.sum_results(), errsum, error);
-            }
 
             if error.is_some() {
                 break;
