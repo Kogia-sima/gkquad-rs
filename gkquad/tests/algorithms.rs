@@ -38,7 +38,6 @@ fn test_algorithm<A: Algorithm<fn(f64) -> f64>>(
 
         if cfg!(feature = "std") && !expect.order.is_empty() {
             let ws = provider.get_mut();
-            assert_eq!(ws.size(), expect.order.len());
             assert_eq!(&ws.order, &expect.order);
         }
     }
@@ -52,7 +51,6 @@ fn test_algorithm<A: Algorithm<fn(f64) -> f64>>(
 
         if cfg!(feature = "std") && !expect.order.is_empty() && pts.is_empty() {
             let ws = provider.get_mut();
-            assert_eq!(ws.size(), expect.order.len());
             assert_eq!(&ws.order, &expect.order);
         }
     }
@@ -71,11 +69,11 @@ fn qag_f1_15pt() {
 }
 
 #[test]
-fn qag_f1_21pt() {
+fn qag_f1() {
     let expect = Expect {
-        value: 7.716049382716050342E-02,
-        delta: 2.2279695259216852E-15,
-        order: &[0, 1, 2, 3, 4, 5, 6, 7],
+        value: 7.716049382716048954E-2,
+        delta: 3.385161349035466596E-15,
+        order: &[0, 1, 2, 3, 4, 5, 6],
         error: None,
     };
     test_algorithm(f1, 0.0, 1.0, &[], QAG::new(), Absolute(1e-14), expect);
@@ -97,10 +95,10 @@ fn qag_f2_15pt() {
 }
 
 #[test]
-fn qag_f3_21pt() {
+fn qag_f3() {
     let expect = Expect {
-        value: -9.449347361165283E-01,
-        delta: 1.2850150257194227E-14,
+        value: -9.449347361165283399E-1,
+        delta: 1.285829033513453162E-14,
         order: &[1, 4, 3, 2, 5, 0, 6],
         error: Some(RuntimeError::RoundoffError),
     };
@@ -110,9 +108,9 @@ fn qag_f3_21pt() {
 #[test]
 fn qags_f1() {
     let expect = Expect {
-        value: 7.716049382715789440E-02,
-        delta: 2.2163949776216234E-12,
-        order: &[0, 1, 2, 3, 4],
+        value: 7.716049382715210736E-2,
+        delta: 4.281425050711728165E-12,
+        order: &[0, 1, 2, 3],
         error: None,
     };
     test_algorithm(f1, 0.0, 1.0, &[], QAGS::new(), Relative(1e-10), expect);
@@ -121,9 +119,9 @@ fn qags_f1() {
 #[test]
 fn qags_f2() {
     let expect = Expect {
-        value: 9.99999999999887E+01,
-        delta: 8.43698444441543E-11,
-        order: &[0, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
+        value: 1.000000000000036806E2,
+        delta: 7.300116067199269310E-11,
+        order: &[0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
         error: None,
     };
     test_algorithm(f2, 0.0, 1.0, &[], QAGS::new(), Absolute(1e-10), expect);
@@ -132,8 +130,8 @@ fn qags_f2() {
 #[test]
 fn qags_f3() {
     let expect = Expect {
-        value: -7.238969575482959717E-01,
-        delta: 1.2854641464232937E-14,
+        value: -7.238969575482958607E-1,
+        delta: 1.842466275093522320E-14,
         order: &[],
         error: None,
     };
@@ -143,9 +141,9 @@ fn qags_f3() {
 #[test]
 fn qags_f4() {
     let expect = Expect {
-        value: -5.908755278982136588E+03,
-        delta: 1.3007539610690693E-10,
-        order: &[0, 1, 2, 3, 4, 5, 6, 7, 8],
+        value: -5.908755278982136588E3,
+        delta: 3.845076707914035937E-9,
+        order: &[0, 1, 2, 3, 4, 5, 6, 7],
         error: None,
     };
     test_algorithm(f4, 1.0, 1000.0, &[], QAGS::new(), Absolute(1e-7), expect);
@@ -154,9 +152,9 @@ fn qags_f4() {
 #[test]
 fn qagp_f5() {
     let expect = Expect {
-        value: 2.63346535755973E+02,
-        delta: 2.1000791359861604E-01,
-        order: &[0, 5, 1, 3, 2, 10, 7, 9, 8, 6, 4],
+        value: 2.629796772059168006E2,
+        delta: 2.439296220664418646E-1,
+        order: &[1, 5, 0, 3, 2, 7, 8, 9, 6, 4],
         error: None,
     };
     test_algorithm(f5, 0., 4., &[1., 2.], QAGP::new(), Relative(1e-3), expect);
@@ -165,8 +163,8 @@ fn qagp_f5() {
 #[test]
 fn qagp_f6() {
     let expect = Expect {
-        value: -9.559338370055698E-01,
-        delta: 3.530509218307998E-13,
+        value: -9.559338370056563727E-1,
+        delta: 2.436939539052218606E-13,
         order: &[0, 1, 3, 4, 6, 8, 10, 11, 9, 7, 5, 2],
         error: Some(RuntimeError::Divergent),
     };

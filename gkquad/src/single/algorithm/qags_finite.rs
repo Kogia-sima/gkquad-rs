@@ -4,7 +4,7 @@ use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
 use crate::single::common::{Integrand, IntegrationConfig, Interval};
 use crate::single::qelg::ExtrapolationTable;
-use crate::single::qk::{qk15, qk21};
+use crate::single::qk::{qk17, qk25};
 use crate::single::util::{bisect, subinterval_too_small, test_positivity};
 use crate::single::workspace::{SubIntervalInfo, WorkSpaceProvider};
 
@@ -31,9 +31,9 @@ impl QAGS_FINITE {
     ) -> (IntegrationResult, f64, bool) {
         for i in 0..2 {
             let result0 = if i == 0 {
-                qk15(f, &interval)
+                qk17(f, &interval)
             } else if i == 1 {
-                qk21(f, &interval)
+                qk25(f, &interval)
             } else {
                 unreachable!();
             };
@@ -146,8 +146,8 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
             let (il1, il2) = bisect(&info.interval);
 
             // 各部分区間でGauss-Kronrod積分
-            let result1 = qk21(f, &il1);
-            let result2 = qk21(f, &il2);
+            let result1 = qk25(f, &il1);
+            let result2 = qk25(f, &il2);
 
             if result1.estimate.is_nan() || result2.estimate.is_nan() {
                 error = Some(NanValueEncountered);

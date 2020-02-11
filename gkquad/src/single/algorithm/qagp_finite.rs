@@ -4,7 +4,7 @@ use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
 use crate::single::common::{Integrand, IntegrationConfig, Interval, Points};
 use crate::single::qelg::ExtrapolationTable;
-use crate::single::qk::{qk21, QKResult};
+use crate::single::qk::{qk25, QKResult};
 use crate::single::util::{bisect, subinterval_too_small, test_positivity};
 use crate::single::workspace::{SubIntervalInfo, WorkSpaceProvider};
 
@@ -60,7 +60,7 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
             }
 
             let interval = unsafe { Interval::new_unchecked(w[0], w[1]) };
-            let result1 = qk21(f, &interval);
+            let result1 = qk25(f, &interval);
 
             if result1.estimate.is_nan() {
                 return IntegrationResult::new(
@@ -135,8 +135,8 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
             let current_level = info.level + 1;
             let (il1, il2) = bisect(&info.interval);
 
-            let result1 = qk21(f, &il1);
-            let result2 = qk21(f, &il2);
+            let result1 = qk25(f, &il1);
+            let result2 = qk25(f, &il2);
 
             if result1.estimate.is_nan() || result2.estimate.is_nan() {
                 error = Some(NanValueEncountered);
