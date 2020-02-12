@@ -1,5 +1,3 @@
-use smallbox::space::S4;
-use smallbox::{smallbox, SmallBox};
 use std::cell::UnsafeCell;
 use std::fmt::{self, Debug};
 
@@ -32,43 +30,20 @@ use crate::{IntegrationResult, Tolerance};
 ///     m.set(m.get() + 1);
 /// }
 /// ```
-pub struct Integrator<F: Integrand> {
+pub struct Integrator<F: Integrand, A: Algorithm<F>> {
     integrand: UnsafeCell<F>,
-    algorithm: SmallBox<dyn Algorithm<F>, S4>,
+    algorithm: A,
     config: IntegrationConfig,
 }
 
-impl<F: Integrand> Integrator<F> {
+impl<F: Integrand, A: Algorithm<F>> Integrator<F, A> {
     #[inline]
-    pub fn new(f: F) -> Integrator<F> {
+    pub fn new(integrand: F, algorithm: A) -> Integrator<F, A> {
         Self {
-            integrand: UnsafeCell::new(f),
-            algorithm: smallbox!(AUTO::new()),
+            integrand: UnsafeCell::new(integrand),
+            algorithm,
             config: IntegrationConfig::default(),
         }
-    }
-
-    #[inline]
-    pub fn with_config(f: F, config: IntegrationConfig) -> Integrator<F> {
-        Self {
-            integrand: UnsafeCell::new(f),
-            algorithm: smallbox!(AUTO::new()),
-            config,
-        }
-    }
-
-    /// Set integration algorithm
-    #[inline]
-    pub fn algorithm<A: Algorithm<F> + 'static>(mut self, algorithm: A) -> Self {
-        self.algorithm = smallbox!(algorithm);
-        self
-    }
-
-    /// Set integration algorithm
-    #[inline]
-    pub fn boxed_algorithm(mut self, algorithm: SmallBox<dyn Algorithm<F>, S4>) -> Self {
-        self.algorithm = algorithm;
-        self
     }
 
     /// Set tolerance
@@ -101,8 +76,8 @@ impl<F: Integrand> Integrator<F> {
     }
 
     #[inline]
-    pub fn get_algorithm(&self) -> &dyn Algorithm<F> {
-        &*self.algorithm
+    pub fn get_algorithm(&self) -> &A {
+        &self.algorithm
     }
 
     #[inline]
@@ -115,23 +90,30 @@ impl<F: Integrand> Integrator<F> {
     }
 }
 
-impl<F: Integrand + Debug> Debug for Integrator<F> {
+impl<F, A> Debug for Integrator<F, A>
+where
+    F: Integrand + Debug,
+    A: Algorithm<F> + Debug,
+{
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         fmt.debug_struct("Integrator")
             .field("integrand", &self.integrand)
+            .field("algorithm", &self.algorithm)
             .field("config", &self.config)
             .finish()
     }
 }
 
-impl<F: Integrand + Default> Default for Integrator<F> {
+impl<F, A> Default for Integrator<F, A>
+where
+    F: Integrand + Default,
+    A: Algorithm<F> + Default,
+{
     fn default() -> Self {
         Self {
             integrand: UnsafeCell::new(F::default()),
-            algorithm: smallbox!(AUTO::new()),
+            algorithm: A::default(),
             config: IntegrationConfig::default(),
         }
     }
 }
-
-unsafe impl<F: Integrand + Send> Send for Integrator<F> {}
