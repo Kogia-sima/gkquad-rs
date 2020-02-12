@@ -39,6 +39,12 @@ pub struct Aligned<T: ?Sized> {
     value: T,
 }
 
+impl<T> Aligned<T> {
+    pub const fn new(value: T) -> Aligned<T> {
+        Aligned { value }
+    }
+}
+
 impl<T: Sized> Aligned<T> {
     #[inline]
     pub unsafe fn uninit() -> Self {
