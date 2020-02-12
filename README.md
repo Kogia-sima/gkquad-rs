@@ -38,9 +38,9 @@ $ cargo bench
      Running /tmp/gkquad-rs/target/release/deps/single-3b52efd7f739cf4b
 
 running 3 tests
-test infinite_interval ... bench:         253 ns/iter (+/- 5)
-test simple            ... bench:          47 ns/iter (+/- 1)
-test singular_points   ... bench:         701 ns/iter (+/- 12)
+test infinite_interval ... bench:         211 ns/iter (+/- 4)
+test simple            ... bench:          38 ns/iter (+/- 1)
+test singular_points   ... bench:         621 ns/iter (+/- 42)
 
 test result: ok. 0 passed; 0 failed; 0 ignored; 3 measured
 ```
