@@ -1,7 +1,7 @@
 use crate::error::IntegrationResult;
 use crate::single::algorithm::{qag_finite::QAG_FINITE, Algorithm};
-use crate::single::common::{ITransform, Integrand, IntegrationConfig, Range};
-use crate::single::util::transform_range;
+use crate::single::common::{Integrand, IntegrationConfig, Range};
+use crate::single::util::{transform_range, IntegrandWrapper};
 
 #[derive(Clone)]
 pub struct QAG {
@@ -19,12 +19,16 @@ impl QAG {
 
 impl<F: Integrand> Algorithm<F> for QAG {
     fn integrate(&self, f: &mut F, range: &Range, config: &IntegrationConfig) -> IntegrationResult {
-        if !range.begin.is_finite() || !range.end.is_finite() {
-            let mut f = ITransform(f);
+        let transform = !range.begin.is_finite() || !range.end.is_finite();
+        let mut wrapper = IntegrandWrapper {
+            inner: f,
+            transform,
+        };
+        if transform {
             let range = transform_range(range);
-            self.inner.integrate(&mut f, &range, config)
+            self.inner.integrate(&mut wrapper, &range, config)
         } else {
-            self.inner.integrate(f, range, config)
+            self.inner.integrate(&mut wrapper, range, config)
         }
     }
 }

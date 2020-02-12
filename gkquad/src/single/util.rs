@@ -1,7 +1,7 @@
 use std::mem::MaybeUninit;
 use std::ops::{Deref, DerefMut};
 
-use crate::single::common::Range;
+use crate::single::common::{Integrand, Range};
 
 pub trait Array {
     type Item;
@@ -65,6 +65,36 @@ impl<T: ?Sized> DerefMut for Aligned<T> {
     #[inline]
     fn deref_mut(&mut self) -> &mut T {
         &mut self.value
+    }
+}
+
+pub struct IntegrandWrapper<'a, F: Integrand + 'a> {
+    pub inner: &'a mut F,
+    pub transform: bool,
+}
+
+impl<'a, F: Integrand + 'a> Integrand for IntegrandWrapper<'a, F> {
+    #[inline]
+    fn apply(&mut self, x: f64) -> f64 {
+        if self.transform {
+            let coef = 1. / (1. - x.abs());
+            let x2 = x * coef;
+            self.inner.apply(x2) * coef * coef
+        } else {
+            self.inner.apply(x)
+        }
+    }
+
+    fn apply_to_slice(&mut self, s: &mut [f64]) {
+        if self.transform {
+            s.iter_mut().for_each(|x| {
+                let coef = 1. / (1. - x.abs());
+                let x2 = *x * coef;
+                *x = self.inner.apply(x2) * coef * coef
+            })
+        } else {
+            s.iter_mut().for_each(|x| *x = self.inner.apply(*x))
+        }
     }
 }
 

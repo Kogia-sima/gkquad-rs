@@ -1,7 +1,7 @@
 use crate::error::IntegrationResult;
 use crate::single::algorithm::{qagp_finite::QAGP_FINITE, Algorithm};
-use crate::single::common::{ITransform, Integrand, IntegrationConfig, Points, Range};
-use crate::single::util::{transform_point, transform_range};
+use crate::single::common::{Integrand, IntegrationConfig, Points, Range};
+use crate::single::util::{transform_point, transform_range, IntegrandWrapper};
 
 #[derive(Clone)]
 pub struct QAGP {
@@ -20,8 +20,13 @@ impl QAGP {
 impl<F: Integrand> Algorithm<F> for QAGP {
     #[inline]
     fn integrate(&self, f: &mut F, range: &Range, config: &IntegrationConfig) -> IntegrationResult {
-        if !range.begin.is_finite() || !range.end.is_finite() {
-            let mut f = ITransform(f);
+        let transform = !range.begin.is_finite() || !range.end.is_finite();
+        let mut wrapper = IntegrandWrapper {
+            inner: f,
+            transform,
+        };
+
+        if transform {
             let range = transform_range(range);
 
             // transform singular points
@@ -40,9 +45,9 @@ impl<F: Integrand> Algorithm<F> for QAGP {
                 points,
             };
 
-            self.inner.integrate(&mut f, &range, &new_config)
+            self.inner.integrate(&mut wrapper, &range, &new_config)
         } else {
-            self.inner.integrate(f, range, config)
+            self.inner.integrate(&mut wrapper, range, config)
         }
     }
 }
