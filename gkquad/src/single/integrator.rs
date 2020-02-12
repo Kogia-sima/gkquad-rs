@@ -1,5 +1,3 @@
-use std::fmt::{self, Debug};
-
 use super::algorithm::*;
 use super::common::{Integrand, IntegrationConfig, Interval, Points};
 
@@ -29,6 +27,7 @@ use crate::{IntegrationResult, Tolerance};
 ///     m.set(m.get() + 1);
 /// }
 /// ```
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct Integrator<F: Integrand, A: Algorithm<F>> {
     integrand: F,
     algorithm: A,
@@ -94,33 +93,5 @@ impl<F: Integrand, A: Algorithm<F>> Integrator<F, A> {
     pub fn run<T: Into<Interval>>(&mut self, interval: T) -> IntegrationResult {
         self.algorithm
             .integrate(&mut self.integrand, &interval.into(), &self.config)
-    }
-}
-
-impl<F, A> Debug for Integrator<F, A>
-where
-    F: Integrand + Debug,
-    A: Algorithm<F> + Debug,
-{
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        fmt.debug_struct("Integrator")
-            .field("integrand", &self.integrand)
-            .field("algorithm", &self.algorithm)
-            .field("config", &self.config)
-            .finish()
-    }
-}
-
-impl<F, A> Default for Integrator<F, A>
-where
-    F: Integrand + Default,
-    A: Algorithm<F> + Default,
-{
-    fn default() -> Self {
-        Self {
-            integrand: F::default(),
-            algorithm: A::default(),
-            config: IntegrationConfig::default(),
-        }
     }
 }
