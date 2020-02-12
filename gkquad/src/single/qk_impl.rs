@@ -2,8 +2,7 @@
 mod imp {
     use super::super::common::{Integrand, Interval};
     use super::super::qk::QKResult;
-    use super::super::util::rescale_error;
-    use super::Array;
+    use super::super::util::{rescale_error, Array};
 
     #[cfg(target_arch = "x86")]
     use std::arch::x86::*;
@@ -174,8 +173,7 @@ mod imp {
 mod imp {
     use super::super::common::{Integrand, Interval};
     use super::super::qk::QKResult;
-    use super::super::util::rescale_error;
-    use super::Array;
+    use super::super::util::{rescale_error, Array};
 
     /// perform Gauss-Kronrod integration with custom points
     ///
@@ -275,34 +273,3 @@ mod imp {
 }
 
 pub use imp::qk;
-
-pub trait Array {
-    type Item;
-    const CAPACITY: usize;
-
-    fn as_slice(&self) -> &[Self::Item];
-    fn as_mut_slice(&mut self) -> &mut [Self::Item];
-}
-
-macro_rules! impl_array {
-    ($($N:tt)*) => {
-        $(
-            impl Array for [f64; $N] {
-                type Item = f64;
-                const CAPACITY: usize = $N;
-
-                #[inline]
-                fn as_slice(&self) -> &[f64] {
-                    self.as_ref()
-                }
-
-                #[inline]
-                fn as_mut_slice(&mut self) -> &mut [f64] {
-                    self.as_mut()
-                }
-            }
-        )*
-    };
-}
-
-impl_array!(4 6 8 10 12 14 9 13 17 21 25 29);

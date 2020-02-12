@@ -1,5 +1,36 @@
 use crate::single::common::Interval;
 
+pub trait Array {
+    type Item;
+    const CAPACITY: usize;
+
+    fn as_slice(&self) -> &[Self::Item];
+    fn as_mut_slice(&mut self) -> &mut [Self::Item];
+}
+
+macro_rules! impl_array {
+    ($($N:tt)*) => {
+        $(
+            impl Array for [f64; $N] {
+                type Item = f64;
+                const CAPACITY: usize = $N;
+
+                #[inline]
+                fn as_slice(&self) -> &[f64] {
+                    self.as_ref()
+                }
+
+                #[inline]
+                fn as_mut_slice(&mut self) -> &mut [f64] {
+                    self.as_mut()
+                }
+            }
+        )*
+    };
+}
+
+impl_array!(4 6 8 10 12 14 9 13 17 21 25 29);
+
 /// 区間幅が中央値の値に対して狭すぎる場合trueを返す
 ///
 /// 例えば、区間[1e20, 1e20 + 1]は浮動小数点の桁落ちにより台形公式による分割を
