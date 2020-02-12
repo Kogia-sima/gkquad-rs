@@ -1,3 +1,6 @@
+use std::mem::MaybeUninit;
+use std::ops::{Deref, DerefMut};
+
 use crate::single::common::Interval;
 
 pub trait Array {
@@ -29,7 +32,41 @@ macro_rules! impl_array {
     };
 }
 
-impl_array!(4 6 8 10 12 14 9 13 17 21 25 29);
+impl_array!(4 6 8 10 12 14 16 20 24 28);
+
+#[repr(align(32))]
+pub struct Aligned<T: ?Sized> {
+    value: T,
+}
+
+impl<T> Aligned<T> {
+    pub const fn new(value: T) -> Aligned<T> {
+        Aligned { value }
+    }
+}
+
+impl<T: Sized> Aligned<T> {
+    #[inline]
+    pub unsafe fn uninit() -> Self {
+        MaybeUninit::uninit().assume_init()
+    }
+}
+
+impl<T: ?Sized> Deref for Aligned<T> {
+    type Target = T;
+
+    #[inline]
+    fn deref(&self) -> &T {
+        &self.value
+    }
+}
+
+impl<T: ?Sized> DerefMut for Aligned<T> {
+    #[inline]
+    fn deref_mut(&mut self) -> &mut T {
+        &mut self.value
+    }
+}
 
 /// 区間幅が中央値の値に対して狭すぎる場合trueを返す
 ///
