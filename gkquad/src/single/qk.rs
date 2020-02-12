@@ -5,11 +5,11 @@
 )]
 
 use std::borrow::Borrow;
-use std::mem::MaybeUninit;
-use std::ops::{Add, AddAssign, Deref, DerefMut};
+use std::ops::{Add, AddAssign};
 
 use super::common::{Integrand, Interval};
 use super::qk_impl::qk;
+use super::util::Aligned;
 
 /// holds the result of Gauss-Kronrod integration
 #[derive(Debug)]
@@ -47,34 +47,6 @@ impl<T: Borrow<QKResult>> AddAssign<T> for QKResult {
         self.delta += other.delta;
         self.absvalue += other.absvalue;
         self.asc += other.asc;
-    }
-}
-
-#[repr(align(32))]
-struct Aligned<T: ?Sized> {
-    value: T,
-}
-
-impl<T: Sized> Aligned<T> {
-    #[inline]
-    unsafe fn uninit() -> Self {
-        MaybeUninit::uninit().assume_init()
-    }
-}
-
-impl<T: ?Sized> Deref for Aligned<T> {
-    type Target = T;
-
-    #[inline]
-    fn deref(&self) -> &T {
-        &self.value
-    }
-}
-
-impl<T: ?Sized> DerefMut for Aligned<T> {
-    #[inline]
-    fn deref_mut(&mut self) -> &mut T {
-        &mut self.value
     }
 }
 
