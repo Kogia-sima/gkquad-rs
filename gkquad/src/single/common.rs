@@ -136,20 +136,3 @@ impl<F: FnMut(f64) -> f64> Integrand for F {
         (*self)(x)
     }
 }
-
-/// This struct is used in order to allow integration over infinite range
-pub(crate) struct ITransform<'a, F: Integrand>(pub &'a mut F);
-
-impl<'a, F: Integrand> Integrand for ITransform<'a, F> {
-    #[inline]
-    fn apply(&mut self, x: f64) -> f64 {
-        let coef = 1. / (1. - x.abs());
-        let x2 = x * coef;
-        self.0.apply(x2) * coef * coef
-    }
-
-    #[inline]
-    fn apply_to_slice(&mut self, s: &mut [f64]) {
-        s.iter_mut().for_each(|x| *x = self.apply(*x))
-    }
-}
