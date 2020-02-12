@@ -1,8 +1,8 @@
-#[cfg(target_feature = "avx")]
+#[cfg(all(feature = "simd", target_feature = "avx"))]
 #[path = "avx.rs"]
 mod imp;
 
-#[cfg(not(target_feature = "avx"))]
+#[cfg(not(all(feature = "simd", target_feature = "avx")))]
 #[path = "naive.rs"]
 mod imp;
 

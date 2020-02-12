@@ -18,8 +18,9 @@ path = "src/lib.rs"
 test = false
 
 [features]
-default = ["std", "single"]
+default = ["std", "simd", "single"]
 single = []
+simd = []
 std = ["smallbox/std"]
 
 [dependencies]
