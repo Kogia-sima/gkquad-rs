@@ -21,11 +21,10 @@ test = false
 default = ["std", "simd", "single"]
 single = []
 simd = []
-std = ["smallbox/std"]
+std = []
 
 [dependencies]
 smallvec = "1.2.0"
-smallbox = "0.8.0"
 
 [dev-dependencies]
 bencher = "0.1.5"
