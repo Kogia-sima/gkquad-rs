@@ -66,6 +66,7 @@ pub unsafe fn qk<F, K, G>(
     xgk: &K,
     wg: &G,
     wgk: &K,
+    wck: f64,
     buf: &mut [f64],
 ) -> QKResult
 where
@@ -78,8 +79,8 @@ where
     let wgk = wgk.as_slice();
 
     debug_assert!(!xgk.is_empty());
-    debug_assert!(xgk.len() / 2 == wg.len());
-    debug_assert!(buf.len() >= xgk.len() * 2 - 1);
+    debug_assert!(xgk.len() == wg.len() * 2);
+    debug_assert!(buf.len() >= xgk.len() * 2 + 1);
 
     let n = K::CAPACITY;
     let center = 0.5 * (range.begin + range.end);
@@ -90,9 +91,9 @@ where
     let wgp = wg.as_ptr();
     let wgkp = wgk.as_ptr();
     let bufp = buf.as_mut_ptr();
-    let bufp2 = bufp.add(n - 1);
+    let bufp2 = bufp.add(n);
 
-    *bufp = center;
+    *bufp.add(n << 1) = center;
 
     // The following lines may prevent optimization by compiler
 
@@ -105,7 +106,7 @@ where
     //     _mm256_storeu_pd(bufp2.add(j), _mm256_add_pd(center_simd, abscissa));
     // }
 
-    for j in 1..n {
+    for j in 0..n {
         let abscissa = half_length * *xgkp.add(j);
         *bufp.add(j) = center - abscissa;
         *bufp2.add(j) = center + abscissa;
@@ -113,13 +114,13 @@ where
 
     f.apply_to_slice(buf);
 
-    let f_center = *bufp;
-    let tmp = f_center * *wgkp;
+    let f_center = *bufp.add(n << 1);
+    let tmp = f_center * wck;
     let mut result_gauss = _mm_setzero_pd();
     let mut result_kronrod = _mm256_set_pd(tmp, 0., 0., 0.);
     let mut result_abs = _mm256_set_pd(tmp.abs(), 0., 0., 0.);
 
-    for j in (1..n).step_by(4) {
+    for j in (0..n).step_by(4) {
         let fval1 = _mm256_loadu_pd(bufp.add(j));
         let fval2 = _mm256_loadu_pd(bufp2.add(j));
         let fsum = _mm256_add_pd(fval1, fval2);
@@ -139,9 +140,9 @@ where
 
     let mean = result_kronrod * 0.5;
     let mean_simd = _mm256_set1_pd(mean);
-    let mut result_asc = _mm256_set_pd(*wgkp * (f_center - mean).abs(), 0., 0., 0.);
+    let mut result_asc = _mm256_set_pd(wck * (f_center - mean).abs(), 0., 0., 0.);
 
-    for j in (1..n).step_by(4) {
+    for j in (0..n).step_by(4) {
         let fval1 = _mm256_loadu_pd(bufp.add(j));
         let fval2 = _mm256_loadu_pd(bufp2.add(j));
         let diff1 = abs256(_mm256_sub_pd(fval1, mean_simd));
