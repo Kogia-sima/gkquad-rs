@@ -17,9 +17,10 @@ pub fn rescale_error(mut err: f64, result_abs: f64, result_asc: f64) -> f64 {
     err = err.abs();
 
     if result_asc != 0.0 && err != 0.0 {
-        let scale = 200.0 * err / result_asc;
+        let mut scale = 200.0 * err;
 
-        if scale < 1.0 {
+        if scale < result_asc {
+            scale /= result_asc;
             err = result_asc * scale * scale.sqrt();
         } else {
             err = result_asc;
