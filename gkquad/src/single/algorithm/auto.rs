@@ -1,6 +1,6 @@
 use crate::error::IntegrationResult;
 use crate::single::algorithm::*;
-use crate::single::common::{Integrand, IntegrationConfig, Interval};
+use crate::single::common::{Integrand, IntegrationConfig, Range};
 
 /// Automatically select algorithm based on configuration
 #[derive(Clone)]
@@ -14,18 +14,13 @@ impl AUTO {
 }
 
 impl<F: Integrand> Algorithm<F> for AUTO {
-    fn integrate(
-        &self,
-        f: &mut F,
-        interval: &Interval,
-        config: &IntegrationConfig,
-    ) -> IntegrationResult {
+    fn integrate(&self, f: &mut F, range: &Range, config: &IntegrationConfig) -> IntegrationResult {
         if config.points.is_empty() {
             let qags = QAGS::new();
-            qags.integrate(f, interval, config)
+            qags.integrate(f, range, config)
         } else {
             let qagp = QAGP::new();
-            qagp.integrate(f, interval, config)
+            qagp.integrate(f, range, config)
         }
     }
 }

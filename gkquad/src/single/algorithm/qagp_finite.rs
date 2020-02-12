@@ -2,13 +2,13 @@
 
 use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
-use crate::single::common::{Integrand, IntegrationConfig, Interval, Points};
+use crate::single::common::{Integrand, IntegrationConfig, Points, Range};
 use crate::single::qelg::ExtrapolationTable;
 use crate::single::qk::{qk25, QKResult};
-use crate::single::util::{bisect, subinterval_too_small, test_positivity};
-use crate::single::workspace::{SubIntervalInfo, WorkSpaceProvider};
+use crate::single::util::{bisect, subrange_too_small, test_positivity};
+use crate::single::workspace::{SubRangeInfo, WorkSpaceProvider};
 
-/// QAGP algorithm over finite interval
+/// QAGP algorithm over finite range
 #[derive(Clone)]
 pub struct QAGP_FINITE {
     provider: WorkSpaceProvider,
@@ -24,14 +24,9 @@ impl QAGP_FINITE {
 }
 
 impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
-    fn integrate(
-        &self,
-        f: &mut F,
-        interval: &Interval,
-        config: &IntegrationConfig,
-    ) -> IntegrationResult {
-        let pts = make_sorted_points(interval, &config.points);
-        let nint = pts.len() - 1; // number of intervals
+    fn integrate(&self, f: &mut F, range: &Range, config: &IntegrationConfig) -> IntegrationResult {
+        let pts = make_sorted_points(range, &config.points);
+        let nint = pts.len() - 1; // number of ranges
 
         let mut ws = self.provider.get_mut();
         ws.clear();
@@ -54,13 +49,13 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
         };
 
         for w in pts.windows(2) {
-            // ignore small interval
+            // ignore small range
             if (w[1] - w[0]).abs() < 100. * std::f64::MIN_POSITIVE {
                 continue;
             }
 
-            let interval = unsafe { Interval::new_unchecked(w[0], w[1]) };
-            let result1 = qk25(f, &interval);
+            let range = unsafe { Range::new_unchecked(w[0], w[1]) };
+            let result1 = qk25(f, &range);
 
             if result1.estimate.is_nan() {
                 return IntegrationResult::new(
@@ -73,8 +68,8 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
             let current_level = (result1.delta == result1.asc && result1.delta != 0.0) as usize;
             result0 += &result1;
 
-            ws.push(SubIntervalInfo::new(
-                interval,
+            ws.push(SubRangeInfo::new(
+                range,
                 result1.estimate,
                 result1.delta,
                 current_level,
@@ -84,7 +79,7 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
         //# Compute the initial error estimate
         let mut deltasum = 0.;
 
-        for si in ws.subintervals.iter_mut() {
+        for si in ws.subranges.iter_mut() {
             if si.level > 0 {
                 si.delta = result0.delta;
             }
@@ -92,7 +87,7 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
             deltasum += si.delta;
         }
 
-        ws.subintervals.iter_mut().for_each(|si| si.level = 0);
+        ws.subranges.iter_mut().for_each(|si| si.level = 0);
 
         // Sort results into order of decreasing error via the indirection
         // array order[]
@@ -126,17 +121,17 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
         let mut area = result0.estimate;
         let mut res_ext = result0.estimate;
         let mut err_ext = std::f64::MAX;
-        let mut error_over_large_intervals = deltasum;
+        let mut error_over_large_ranges = deltasum;
         let mut ertest = tolerance;
 
         for iteration in nint..=config.limit {
             let info = ws.get();
 
             let current_level = info.level + 1;
-            let (il1, il2) = bisect(&info.interval);
+            let (r1, r2) = bisect(&info.range);
 
-            let result1 = qk25(f, &il1);
-            let result2 = qk25(f, &il2);
+            let result1 = qk25(f, &r1);
+            let result2 = qk25(f, &r2);
 
             if result1.estimate.is_nan() || result2.estimate.is_nan() {
                 error = Some(NanValueEncountered);
@@ -183,8 +178,8 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
             // set error flag in the case of bad integrand behaviour at
             // a point of the integration range
 
-            if subinterval_too_small(il1.begin, il1.end, il2.end) {
-                error = Some(SubintervalTooSmall);
+            if subrange_too_small(r1.begin, r1.end, r2.end) {
+                error = Some(SubrangeTooSmall);
             }
 
             if deltasum <= tolerance {
@@ -195,10 +190,10 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
                 );
             }
 
-            // append the newly-created intervals to the list
+            // append the newly-created ranges to the list
             ws.update(
-                SubIntervalInfo::new(il1, result1.estimate, result1.delta, current_level),
-                SubIntervalInfo::new(il2, result2.estimate, result2.delta, current_level),
+                SubRangeInfo::new(r1, result1.estimate, result1.delta, current_level),
+                SubRangeInfo::new(r2, result2.estimate, result2.delta, current_level),
             );
 
             if error.is_some() {
@@ -214,10 +209,10 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
                 continue;
             }
 
-            error_over_large_intervals += -last_e_i;
+            error_over_large_ranges += -last_e_i;
 
             if current_level < ws.maximum_level {
-                error_over_large_intervals += error12;
+                error_over_large_ranges += error12;
             }
 
             if !extrapolate {
@@ -230,11 +225,11 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
                 ws.nrmax = 1;
             }
 
-            // The smallest interval has the largest error.  Before
+            // The smallest range has the largest error.  Before
             // bisecting decrease the sum of the errors over the larger
-            // intervals (error_over_large_intervals) and perform
+            // ranges (error_over_large_ranges) and perform
             // extrapolation.
-            if !error2 && error_over_large_intervals > ertest && ws.increase_nrmax() {
+            if !error2 && error_over_large_ranges > ertest && ws.increase_nrmax() {
                 continue;
             }
 
@@ -244,7 +239,7 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
             if table.n < 3 {
                 ws.reset_nrmax();
                 extrapolate = false;
-                error_over_large_intervals = deltasum;
+                error_over_large_ranges = deltasum;
                 continue;
             }
 
@@ -259,7 +254,7 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
                 ktmin = 0;
                 err_ext = abseps;
                 res_ext = reseps;
-                correc = error_over_large_intervals;
+                correc = error_over_large_ranges;
                 ertest = config.tolerance.to_abs(reseps.abs());
 
                 if err_ext <= ertest {
@@ -267,7 +262,7 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
                 }
             }
 
-            // Prepare bisection of the smallest interval.
+            // Prepare bisection of the smallest range.
             if table.n == 1 {
                 disallow_extrapolation = true;
             }
@@ -278,7 +273,7 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
 
             ws.reset_nrmax();
             extrapolate = false;
-            error_over_large_intervals = deltasum;
+            error_over_large_ranges = deltasum;
         }
 
         if err_ext == std::f64::MAX {
@@ -318,24 +313,24 @@ impl<F: Integrand> Algorithm<F> for QAGP_FINITE {
     }
 }
 
-fn make_sorted_points(interval: &Interval, pts: &[f64]) -> Points {
-    let (min, max) = if interval.begin < interval.end {
-        (interval.begin, interval.end)
+fn make_sorted_points(range: &Range, pts: &[f64]) -> Points {
+    let (min, max) = if range.begin < range.end {
+        (range.begin, range.end)
     } else {
-        (interval.end, interval.begin)
+        (range.end, range.begin)
     };
 
     let mut pts2 = Points::with_capacity(pts.len() + 2);
-    pts2.push(interval.begin);
+    pts2.push(range.begin);
     pts2.extend_from_slice(pts);
 
-    if interval.begin < interval.end {
+    if range.begin < range.end {
         pts2[1..].sort_unstable_by(|a, b| a.partial_cmp(b).unwrap());
     } else {
         pts2[1..].sort_unstable_by(|a, b| b.partial_cmp(a).unwrap());
     };
 
-    pts2.push(interval.end);
+    pts2.push(range.end);
 
     pts2.retain(|&mut x| min <= x && x <= max);
     pts2

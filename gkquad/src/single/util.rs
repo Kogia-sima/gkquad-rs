@@ -1,7 +1,7 @@
 use std::mem::MaybeUninit;
 use std::ops::{Deref, DerefMut};
 
-use crate::single::common::Interval;
+use crate::single::common::Range;
 
 pub trait Array {
     type Item;
@@ -73,7 +73,7 @@ impl<T: ?Sized> DerefMut for Aligned<T> {
 /// 例えば、区間[1e20, 1e20 + 1]は浮動小数点の桁落ちにより台形公式による分割を
 /// 行ったときのxの値の誤差が大きくなるため、これ以上分割できない
 #[inline]
-pub fn subinterval_too_small(a1: f64, a2: f64, b2: f64) -> bool {
+pub fn subrange_too_small(a1: f64, a2: f64, b2: f64) -> bool {
     let tmp = (1. + 100. * core::f64::EPSILON) * (a2.abs() + 1000. * core::f64::MIN_POSITIVE);
 
     // a1, b2は昇順とは限らないため両方チェックする:
@@ -114,12 +114,12 @@ pub fn test_positivity(result: f64, resabs: f64) -> bool {
 }
 
 #[inline]
-pub fn bisect(interval: &Interval) -> (Interval, Interval) {
-    let center = (interval.begin + interval.end) * 0.5;
+pub fn bisect(range: &Range) -> (Range, Range) {
+    let center = (range.begin + range.end) * 0.5;
     unsafe {
         (
-            Interval::new_unchecked(interval.begin, center),
-            Interval::new_unchecked(center, interval.end),
+            Range::new_unchecked(range.begin, center),
+            Range::new_unchecked(center, range.end),
         )
     }
 }
@@ -135,13 +135,8 @@ pub fn transform_point(x: f64) -> f64 {
     }
 }
 
-// transform infinite interval to finite
+// transform infinite range to finite
 #[inline]
-pub fn transform_interval(interval: &Interval) -> Interval {
-    unsafe {
-        Interval::new_unchecked(
-            transform_point(interval.begin),
-            transform_point(interval.end),
-        )
-    }
+pub fn transform_range(range: &Range) -> Range {
+    unsafe { Range::new_unchecked(transform_point(range.begin), transform_point(range.end)) }
 }

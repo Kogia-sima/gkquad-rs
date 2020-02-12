@@ -149,7 +149,7 @@ impl_error!(
             "The maximum number of subdivisions has been achieved.\n\
             If increasing the limit results in no further improvement, \
             check the integrand in order to determine the difficulties. \
-            If the function contains the singular points in the interval, \
+            If the function contains the singular points in the range, \
             you should specify the singular points by hand, or transform \
             the function to eliminate the singular points.",
         },
@@ -160,9 +160,9 @@ impl_error!(
             It is assumed that the requested tolerance cannot be achieved, and \
             that the returned result is the bst which can be obtained.",
         },
-        SubintervalTooSmall {
-            "subinterval is too small to calculate the integral",
-            "Subinterval was too small to calculate the integral.\n\
+        SubrangeTooSmall {
+            "subrange is too small to calculate the integral",
+            "Subrange was too small to calculate the integral.\n\
             Maybe you should specify the singular points, or transform the \
             function to eliminate the singular points.",
         },

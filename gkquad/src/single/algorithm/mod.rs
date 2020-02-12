@@ -3,10 +3,10 @@
 //! # Finite Algorithms
 //!
 //! Default algorithms (AUTO, QAG, QAGS, QAGP) will be applicable to both finite
-//! and infinite interval, but will produce multiple assembly for a single
+//! and infinite range, but will produce multiple assembly for a single
 //! integrand, which results in large binary size.
 //!
-//! If you know the interval is always finite, then you should use *_FINITE
+//! If you know the range is always finite, then you should use *_FINITE
 //! algorithms.
 //!
 //! # References
@@ -14,7 +14,7 @@
 //! * [Numerical Integration — GNU GSL documentation](https://www.gnu.org/software/gsl/doc/html/integration.html)
 //! * [Netlib quadpack library](http://www.netlib.org/quadpack/)
 
-use super::common::{Integrand, IntegrationConfig, Interval};
+use super::common::{Integrand, IntegrationConfig, Range};
 use crate::error::IntegrationResult;
 
 /// 1-dimentional integration algorithm API
@@ -23,12 +23,7 @@ use crate::error::IntegrationResult;
 ///
 /// This API is still unstable, and may changes dramatically in the future.
 pub trait Algorithm<F: Integrand> {
-    fn integrate(
-        &self,
-        f: &mut F,
-        interval: &Interval,
-        config: &IntegrationConfig,
-    ) -> IntegrationResult;
+    fn integrate(&self, f: &mut F, range: &Range, config: &IntegrationConfig) -> IntegrationResult;
 }
 
 macro_rules! extra_traits {

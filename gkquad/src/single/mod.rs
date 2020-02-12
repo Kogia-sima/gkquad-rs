@@ -7,7 +7,7 @@
 //! ```
 //! use gkquad::single::integral;
 //!
-//! // calculate the integral over interval (0.0, 1.0)
+//! // calculate the integral over range (0.0, 1.0)
 //! let result = integral(|x: f64| x.sin() * (- x * x).exp(), 0.0..1.0)
 //!         .estimate()
 //!         .unwrap();
@@ -21,7 +21,7 @@
 //! use gkquad::single::Integrator;
 //! use gkquad::single::algorithm::QAGP;
 //!
-//! // calculate the integral over interval (-∞, ∞), with QAGP algorithm,
+//! // calculate the integral over range (-∞, ∞), with QAGP algorithm,
 //! // maximum iteration limit being 100, singular point on the origin of coordinate.
 //! let result = Integrator::new(|x: f64| 1. - (-(x.abs() / 1.6).powf(-2.3)).exp(), QAGP::new())
 //!         .limit(100)

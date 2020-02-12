@@ -13,8 +13,8 @@ use gkquad::Tolerance;
 
 fn simple(b: &mut Bencher) {
     b.iter(|| {
-        let interval = black_box(0.0..1.0);
-        let result = integral(|x: f64| x * x, interval).estimate().unwrap();
+        let range = black_box(0.0..1.0);
+        let result = integral(|x: f64| x * x, range).estimate().unwrap();
         assert!((result - 1.0 / 3.0).abs() <= 1.49e-8);
     });
 }
@@ -25,21 +25,21 @@ fn singular_points(b: &mut Bencher) {
         .tolerance(Tolerance::Absolute(1.49e-8));
 
     b.iter(|| {
-        let interval = black_box(-1.0..1.0);
-        let result = integrator.run(interval).estimate().unwrap();
+        let range = black_box(-1.0..1.0);
+        let result = integrator.run(range).estimate().unwrap();
         assert!(result.abs() <= 1.49e-8);
     });
 }
 
-fn infinite_interval(b: &mut Bencher) {
+fn infinite_range(b: &mut Bencher) {
     let integrand = |x: f64| (1.0 + x * x).recip();
 
     b.iter(|| {
-        let interval = black_box(NEG_INFINITY..INFINITY);
-        let result = integral(integrand, interval).estimate().unwrap();
+        let range = black_box(NEG_INFINITY..INFINITY);
+        let result = integral(integrand, range).estimate().unwrap();
         assert!((result - PI).abs() <= 1.49e-8);
     });
 }
 
-benchmark_group!(benches, simple, singular_points, infinite_interval);
+benchmark_group!(benches, simple, singular_points, infinite_range);
 benchmark_main!(benches);

@@ -9,24 +9,24 @@ use crate::Tolerance;
 /// Singular points
 pub type Points = SmallVec<[f64; 8]>;
 
-/// Represent the interval for which the integral is estimated.
+/// Represent the range for which the integral is estimated.
 ///
 /// Both `begin` and `end` are not NaN values (but may be infinite).
 #[derive(Clone, PartialEq)]
-pub struct Interval {
-    /// beginning of the interval
+pub struct Range {
+    /// beginning of the range
     pub begin: f64,
-    /// end of the interval
+    /// end of the range
     pub end: f64,
     _private: PhantomData<()>,
 }
 
-impl Interval {
-    /// Create a new `Interval` object
+impl Range {
+    /// Create a new `Range` object
     ///
     /// Return `None` if either begin or end is NaN.
     #[inline]
-    pub fn new(begin: f64, end: f64) -> Option<Interval> {
+    pub fn new(begin: f64, end: f64) -> Option<Range> {
         if begin.is_nan() || end.is_nan() {
             None
         } else {
@@ -34,10 +34,10 @@ impl Interval {
         }
     }
 
-    /// Create a new `Interval` object without NaN check
+    /// Create a new `Range` object without NaN check
     #[inline]
-    pub unsafe fn new_unchecked(begin: f64, end: f64) -> Interval {
-        Interval {
+    pub unsafe fn new_unchecked(begin: f64, end: f64) -> Range {
+        Range {
             begin,
             end,
             _private: PhantomData,
@@ -45,21 +45,21 @@ impl Interval {
     }
 }
 
-impl Eq for Interval {}
+impl Eq for Range {}
 
-impl Display for Interval {
+impl Display for Range {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "[{:?}, {:?}]", self.begin, self.end)
     }
 }
 
-impl Debug for Interval {
+impl Debug for Range {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         <Self as Display>::fmt(self, f)
     }
 }
 
-impl Hash for Interval {
+impl Hash for Range {
     #[inline]
     fn hash<H: Hasher>(&self, h: &mut H) {
         for &x in &[self.begin, self.end] {
@@ -73,8 +73,8 @@ impl Hash for Interval {
     }
 }
 
-impl<R: RangeBounds<f64>> From<R> for Interval {
-    fn from(r: R) -> Interval {
+impl<R: RangeBounds<f64>> From<R> for Range {
+    fn from(r: R) -> Range {
         let a = match r.start_bound() {
             Bound::Excluded(&x) | Bound::Included(&x) => x,
             Bound::Unbounded => std::f64::NEG_INFINITY,
@@ -85,13 +85,12 @@ impl<R: RangeBounds<f64>> From<R> for Interval {
             Bound::Unbounded => std::f64::INFINITY,
         };
 
-        Interval::new(a, b)
-            .expect("cannot create Interval object from Range which contains NaN value.")
+        Range::new(a, b).expect("cannot create Range object from Range which contains NaN value.")
     }
 }
 
-impl<'a> From<&'a Interval> for Interval {
-    fn from(other: &'a Interval) -> Self {
+impl<'a> From<&'a Range> for Range {
+    fn from(other: &'a Range) -> Self {
         other.clone()
     }
 }
@@ -138,7 +137,7 @@ impl<F: FnMut(f64) -> f64> Integrand for F {
     }
 }
 
-/// This struct is used in order to allow integration over infinite interval
+/// This struct is used in order to allow integration over infinite range
 pub(crate) struct ITransform<'a, F: Integrand>(pub &'a mut F);
 
 impl<'a, F: Integrand> Integrand for ITransform<'a, F> {

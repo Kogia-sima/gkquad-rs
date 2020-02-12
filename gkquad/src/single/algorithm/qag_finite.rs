@@ -2,12 +2,12 @@
 
 use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
-use crate::single::common::{Integrand, IntegrationConfig, Interval};
+use crate::single::common::{Integrand, IntegrationConfig, Range};
 use crate::single::qk::{qk17, qk25};
-use crate::single::util::{bisect, subinterval_too_small};
-use crate::single::workspace::{SubIntervalInfo, WorkSpaceProvider};
+use crate::single::util::{bisect, subrange_too_small};
+use crate::single::workspace::{SubRangeInfo, WorkSpaceProvider};
 
-/// QAG algorithm over finite interval
+/// QAG algorithm over finite range
 #[derive(Clone)]
 pub struct QAG_FINITE {
     provider: WorkSpaceProvider,
@@ -25,14 +25,14 @@ impl QAG_FINITE {
     fn initial_integral<F: Integrand>(
         &self,
         f: &mut F,
-        interval: &Interval,
+        range: &Range,
         config: &IntegrationConfig,
     ) -> (IntegrationResult, bool) {
         for i in 0..2 {
             let result0 = if i == 0 {
-                qk17(f, &interval)
+                qk17(f, &range)
             } else if i == 1 {
-                qk25(f, &interval)
+                qk25(f, &range)
             } else {
                 unreachable!();
             };
@@ -87,33 +87,28 @@ impl QAG_FINITE {
 }
 
 impl<F: Integrand> Algorithm<F> for QAG_FINITE {
-    fn integrate(
-        &self,
-        f: &mut F,
-        interval: &Interval,
-        config: &IntegrationConfig,
-    ) -> IntegrationResult {
+    fn integrate(&self, f: &mut F, range: &Range, config: &IntegrationConfig) -> IntegrationResult {
         let (mut roundoff_type1, mut roundoff_type2) = (0_i32, 0_i32);
         let mut error = None;
 
         // initial integral
-        let (result0, finished) = self.initial_integral(f, interval, config);
+        let (result0, finished) = self.initial_integral(f, range, config);
         if finished {
             return result0;
         }
 
-        // sum of the integral estimates for each interval
+        // sum of the integral estimates for each range
         let mut area = result0.estimate;
 
-        // sum of the errors for each interval
+        // sum of the errors for each range
         let mut deltasum = result0.delta;
 
         let mut ws = self.provider.get_mut();
         ws.clear();
         ws.reserve(config.limit);
 
-        ws.push(SubIntervalInfo::new(
-            interval.clone(),
+        ws.push(SubRangeInfo::new(
+            range.clone(),
             result0.estimate,
             result0.delta,
             0,
@@ -125,11 +120,11 @@ impl<F: Integrand> Algorithm<F> for QAG_FINITE {
             let current_level = info.level + 1;
 
             // 区間を半分に分割
-            let (il1, il2) = bisect(&info.interval);
+            let (r1, r2) = bisect(&info.range);
 
             // 各部分区間でGauss-Kronrod積分
-            let result1 = qk25(f, &il1);
-            let result2 = qk25(f, &il2);
+            let result1 = qk25(f, &r1);
+            let result2 = qk25(f, &r2);
 
             if result1.estimate.is_nan() || result2.estimate.is_nan() {
                 error = Some(NanValueEncountered);
@@ -160,8 +155,8 @@ impl<F: Integrand> Algorithm<F> for QAG_FINITE {
             if deltasum > tolerance {
                 if roundoff_type1 >= 6 || roundoff_type2 >= 20 {
                     error = Some(RoundoffError);
-                } else if subinterval_too_small(il1.begin, il1.end, il2.end) {
-                    error = Some(SubintervalTooSmall);
+                } else if subrange_too_small(r1.begin, r1.end, r2.end) {
+                    error = Some(SubrangeTooSmall);
                 }
 
                 if error.is_some() {
@@ -175,8 +170,8 @@ impl<F: Integrand> Algorithm<F> for QAG_FINITE {
 
             // 部分区間における積分結果を保存する
             ws.update(
-                SubIntervalInfo::new(il1, result1.estimate, result1.delta, current_level),
-                SubIntervalInfo::new(il2, result2.estimate, result2.delta, current_level),
+                SubRangeInfo::new(r1, result1.estimate, result1.delta, current_level),
+                SubRangeInfo::new(r2, result2.estimate, result2.delta, current_level),
             );
 
             if deltasum <= tolerance {

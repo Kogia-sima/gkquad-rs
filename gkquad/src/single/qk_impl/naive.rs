@@ -1,4 +1,4 @@
-use super::super::common::{Integrand, Interval};
+use super::super::common::{Integrand, Range};
 use super::super::qk::QKResult;
 use super::super::util::{rescale_error, Array};
 
@@ -26,7 +26,7 @@ use super::super::util::{rescale_error, Array};
 /// - SIMD implementation
 pub unsafe fn qk<F, K, G>(
     f: &mut F,
-    range: &Interval,
+    range: &Range,
     xgk: &K,
     wg: &G,
     wgk: &K,

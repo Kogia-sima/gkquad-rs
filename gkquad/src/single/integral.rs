@@ -1,5 +1,5 @@
 use super::algorithm::*;
-use super::common::{Integrand, IntegrationConfig, Interval};
+use super::common::{Integrand, IntegrationConfig, Range};
 
 use crate::IntegrationResult;
 
@@ -14,18 +14,18 @@ use crate::IntegrationResult;
 /// let result = integral(|x: f64| x.sqrt(), 1.0..2.0).estimate();
 /// ```
 #[inline]
-pub fn integral<F: Integrand, I: Into<Interval>>(mut f: F, interval: I) -> IntegrationResult {
-    QAGS::new().integrate(&mut f, &interval.into(), &IntegrationConfig::default())
+pub fn integral<F: Integrand, I: Into<Range>>(mut f: F, range: I) -> IntegrationResult {
+    QAGS::new().integrate(&mut f, &range.into(), &IntegrationConfig::default())
 }
 
 /// Performs the integration with custom configuration.
 ///
 /// The algorithm will be automatically selected to achieve the greatest performance.
 #[inline]
-pub fn integral_with_config<F: Integrand, I: Into<Interval>>(
+pub fn integral_with_config<F: Integrand, I: Into<Range>>(
     mut f: F,
-    interval: I,
+    range: I,
     config: IntegrationConfig,
 ) -> IntegrationResult {
-    AUTO::new().integrate(&mut f, &interval.into(), &config)
+    AUTO::new().integrate(&mut f, &range.into(), &config)
 }

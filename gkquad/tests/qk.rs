@@ -2,7 +2,7 @@
 mod common;
 use common::functions::*;
 
-use gkquad::single::{qk17, qk25, qk33, qk41, qk49, qk57, Interval, QKResult};
+use gkquad::single::{qk17, qk25, qk33, qk41, qk49, qk57, QKResult, Range};
 
 struct Expect {
     estimate: f64,
@@ -12,22 +12,22 @@ struct Expect {
 }
 
 fn test_qk(
-    qk: fn(f: &mut fn(f64) -> f64, r: &Interval) -> QKResult,
+    qk: fn(f: &mut fn(f64) -> f64, r: &Range) -> QKResult,
     mut f: fn(f64) -> f64,
     a: f64,
     b: f64,
     expect: Expect,
 ) {
-    let mut interval = Interval::new(a, b).unwrap();
-    let mut result = qk(&mut f, &interval);
+    let mut range = Range::new(a, b).unwrap();
+    let mut result = qk(&mut f, &range);
 
     assert_rel!(result.estimate, expect.estimate, 1e-15);
     assert_rel!(result.delta, expect.delta, 1e-7);
     assert_rel!(result.absvalue, expect.absvalue, 1e-15);
     assert_rel!(result.asc, expect.asc, 1e-15);
 
-    interval = Interval::new(b, a).unwrap();
-    result = qk(&mut f, &interval);
+    range = Range::new(b, a).unwrap();
+    result = qk(&mut f, &range);
 
     assert_rel!(result.estimate, -expect.estimate, 1e-15);
     assert_rel!(result.delta, expect.delta, 1e-7);

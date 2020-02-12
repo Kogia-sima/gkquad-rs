@@ -2,13 +2,13 @@
 
 use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
-use crate::single::common::{Integrand, IntegrationConfig, Interval};
+use crate::single::common::{Integrand, IntegrationConfig, Range};
 use crate::single::qelg::ExtrapolationTable;
 use crate::single::qk::{qk17, qk25};
-use crate::single::util::{bisect, subinterval_too_small, test_positivity};
-use crate::single::workspace::{SubIntervalInfo, WorkSpaceProvider};
+use crate::single::util::{bisect, subrange_too_small, test_positivity};
+use crate::single::workspace::{SubRangeInfo, WorkSpaceProvider};
 
-/// QAGS algorithm over finite interval
+/// QAGS algorithm over finite range
 #[derive(Clone)]
 pub struct QAGS_FINITE {
     provider: WorkSpaceProvider,
@@ -26,14 +26,14 @@ impl QAGS_FINITE {
     fn initial_integral<F: Integrand>(
         &self,
         f: &mut F,
-        interval: &Interval,
+        range: &Range,
         config: &IntegrationConfig,
     ) -> (IntegrationResult, f64, bool) {
         for i in 0..2 {
             let result0 = if i == 0 {
-                qk17(f, &interval)
+                qk17(f, &range)
             } else if i == 1 {
-                qk25(f, &interval)
+                qk25(f, &range)
             } else {
                 unreachable!();
             };
@@ -93,14 +93,9 @@ impl QAGS_FINITE {
 }
 
 impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
-    fn integrate(
-        &self,
-        f: &mut F,
-        interval: &Interval,
-        config: &IntegrationConfig,
-    ) -> IntegrationResult {
+    fn integrate(&self, f: &mut F, range: &Range, config: &IntegrationConfig) -> IntegrationResult {
         let mut ertest = 0f64;
-        let mut error_over_large_intervals = 0f64;
+        let mut error_over_large_ranges = 0f64;
         let mut correc = 0.;
 
         let mut ktmin = 0usize;
@@ -111,7 +106,7 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
         let mut extrapolate = false;
         let mut disallow_extrapolation = false;
 
-        let (result0, absvalue, finished) = self.initial_integral(f, interval, config);
+        let (result0, absvalue, finished) = self.initial_integral(f, range, config);
         if finished {
             return result0;
         }
@@ -120,8 +115,8 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
         ws.clear();
         ws.reserve(config.limit);
 
-        ws.push(SubIntervalInfo::new(
-            interval.clone(),
+        ws.push(SubRangeInfo::new(
+            range.clone(),
             result0.estimate,
             result0.delta,
             0,
@@ -139,15 +134,15 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
         let mut err_ext = core::f64::MAX;
 
         for iteration in 2..=config.limit {
-            // Bisect the subinterval with the largest error estimate
+            // Bisect the subrange with the largest error estimate
             let info = ws.get();
             let current_level = info.level + 1;
 
-            let (il1, il2) = bisect(&info.interval);
+            let (r1, r2) = bisect(&info.range);
 
             // 各部分区間でGauss-Kronrod積分
-            let result1 = qk25(f, &il1);
-            let result2 = qk25(f, &il2);
+            let result1 = qk25(f, &r1);
+            let result2 = qk25(f, &r2);
 
             if result1.estimate.is_nan() || result2.estimate.is_nan() {
                 error = Some(NanValueEncountered);
@@ -193,8 +188,8 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
 
             // set error flag in the case of bad integrand behaviour at a point of
             // the integration range
-            if subinterval_too_small(il1.begin, il1.end, il2.end) {
-                error = Some(SubintervalTooSmall);
+            if subrange_too_small(r1.begin, r1.end, r2.end) {
+                error = Some(SubrangeTooSmall);
             }
 
             // 要求精度を下回った場合即座にreturnする
@@ -206,10 +201,10 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
                 );
             }
 
-            // append the newly-created intervals to the list
+            // append the newly-created ranges to the list
             ws.update(
-                SubIntervalInfo::new(il1, result1.estimate, result1.delta, current_level),
-                SubIntervalInfo::new(il2, result2.estimate, result2.delta, current_level),
+                SubRangeInfo::new(r1, result1.estimate, result1.delta, current_level),
+                SubRangeInfo::new(r2, result2.estimate, result2.delta, current_level),
             );
 
             if error.is_some() {
@@ -224,7 +219,7 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
 
             // 最初のループで補外用のパラメータを初期化する
             if iteration == 2 {
-                error_over_large_intervals = errsum;
+                error_over_large_ranges = errsum;
                 ertest = tolerance;
                 table.append(area);
                 continue;
@@ -234,10 +229,10 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
                 continue;
             }
 
-            error_over_large_intervals -= last_e_i;
+            error_over_large_ranges -= last_e_i;
 
             if current_level < ws.maximum_level() {
-                error_over_large_intervals += error12;
+                error_over_large_ranges += error12;
             }
             if !extrapolate {
                 // 次に分割する区間が最小区間である場合のみ、補外を行う
@@ -250,7 +245,7 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
             }
 
             // 大区間のみの誤差がまだ要求値を上回っている場合、大区間の分割を優先する
-            if error_over_large_intervals > ertest && ws.increase_nrmax() {
+            if error_over_large_ranges > ertest && ws.increase_nrmax() {
                 continue;
             }
 
@@ -269,14 +264,14 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
                 ktmin = 0;
                 err_ext = abseps;
                 res_ext = reseps;
-                correc = error_over_large_intervals;
+                correc = error_over_large_ranges;
                 ertest = config.tolerance.to_abs(reseps.abs());
                 if err_ext <= ertest {
                     break;
                 }
             }
 
-            // Prepare bisection of the smallest interval.
+            // Prepare bisection of the smallest range.
             if table.n == 1 {
                 disallow_extrapolation = true;
             }
@@ -285,10 +280,10 @@ impl<F: Integrand> Algorithm<F> for QAGS_FINITE {
                 break;
             }
 
-            // work on interval with largest error
+            // work on range with largest error
             ws.reset_nrmax();
             extrapolate = false;
-            error_over_large_intervals = errsum;
+            error_over_large_ranges = errsum;
         }
 
         if err_ext == core::f64::MAX {

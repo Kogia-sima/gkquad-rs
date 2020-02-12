@@ -1,4 +1,4 @@
-use super::super::common::{Integrand, Interval};
+use super::super::common::{Integrand, Range};
 use super::super::qk::QKResult;
 use super::super::util::{rescale_error, Array};
 
@@ -62,7 +62,7 @@ unsafe fn compact(x: __m256d) -> __m128d {
 
 pub unsafe fn qk<F, K, G>(
     f: &mut F,
-    range: &Interval,
+    range: &Range,
     xgk: &K,
     wg: &G,
     wgk: &K,

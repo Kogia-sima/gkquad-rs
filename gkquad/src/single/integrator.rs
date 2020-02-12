@@ -1,5 +1,5 @@
 use super::algorithm::*;
-use super::common::{Integrand, IntegrationConfig, Interval, Points};
+use super::common::{Integrand, IntegrationConfig, Points, Range};
 
 use crate::{IntegrationResult, Tolerance};
 
@@ -64,7 +64,7 @@ impl<F: Integrand, A: Algorithm<F>> Integrator<F, A> {
         self
     }
 
-    /// Set maximum number of subintervals
+    /// Set maximum number of subranges
     #[inline]
     pub fn limit(mut self, limit: usize) -> Self {
         self.config.limit = limit;
@@ -90,8 +90,8 @@ impl<F: Integrand, A: Algorithm<F>> Integrator<F, A> {
     }
 
     #[inline]
-    pub fn run<T: Into<Interval>>(&mut self, interval: T) -> IntegrationResult {
+    pub fn run<T: Into<Range>>(&mut self, range: T) -> IntegrationResult {
         self.algorithm
-            .integrate(&mut self.integrand, &interval.into(), &self.config)
+            .integrate(&mut self.integrand, &range.into(), &self.config)
     }
 }
