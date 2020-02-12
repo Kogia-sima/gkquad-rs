@@ -2,7 +2,7 @@
 //!
 //! # Finite Algorithms
 //!
-//! Default algorithms (AUTO, QAG, QAGS, QAGP) will applicable to both finite
+//! Default algorithms (AUTO, QAG, QAGS, QAGP) will be applicable to both finite
 //! and infinite interval, but will produce multiple assembly for a single
 //! integrand, which results in large binary size.
 //!
