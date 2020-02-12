@@ -5,7 +5,7 @@ use crate::single::algorithm::Algorithm;
 use crate::single::common::{Integrand, IntegrationConfig, Points, Range};
 use crate::single::qelg::ExtrapolationTable;
 use crate::single::qk::{qk25, QKResult};
-use crate::single::util::{bisect, subrange_too_small, test_positivity};
+use crate::single::util::{bisect, insert_sort, subrange_too_small, test_positivity};
 use crate::single::workspace::{SubRangeInfo, WorkSpaceProvider};
 
 /// QAGP algorithm over finite range
@@ -325,9 +325,9 @@ fn make_sorted_points(range: &Range, pts: &[f64]) -> Points {
     pts2.extend_from_slice(pts);
 
     if range.begin < range.end {
-        pts2[1..].sort_unstable_by(|a, b| a.partial_cmp(b).unwrap());
+        insert_sort(&mut pts2[1..], &mut |a, b| a < b);
     } else {
-        pts2[1..].sort_unstable_by(|a, b| b.partial_cmp(a).unwrap());
+        insert_sort(&mut pts2[1..], &mut |a, b| a > b);
     };
 
     pts2.push(range.end);

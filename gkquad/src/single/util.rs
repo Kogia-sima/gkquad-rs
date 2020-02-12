@@ -170,3 +170,38 @@ pub fn transform_point(x: f64) -> f64 {
 pub fn transform_range(range: &Range) -> Range {
     unsafe { Range::new_unchecked(transform_point(range.begin), transform_point(range.end)) }
 }
+
+pub fn insert_sort<F: FnMut(f64, f64) -> bool>(s: &mut [f64], is_less: &mut F) {
+    unsafe {
+        let sp_begin = s.as_mut_ptr();
+        let sp_end = sp_begin.add(s.len());
+        let mut sp = sp_begin.add(1);
+
+        while sp < sp_end {
+            let target = *sp;
+            if is_less(*sp.sub(1), target) {
+                sp = sp.add(1);
+                continue;
+            }
+
+            let mut ip = sp.sub(2);
+            let mut insert_pos = sp_begin;
+
+            while ip >= sp_begin {
+                let another = *ip;
+                if is_less(another, target) {
+                    insert_pos = ip.add(1);
+                    break;
+                }
+
+                ip = ip.sub(1);
+            }
+
+            let count = ((sp as usize) - (insert_pos as usize)) / 8;
+            std::ptr::copy(insert_pos, insert_pos.add(1), count);
+            *insert_pos = target;
+
+            sp = sp.add(1);
+        }
+    }
+}
