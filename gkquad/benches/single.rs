@@ -20,7 +20,7 @@ fn simple(b: &mut Bencher) {
 }
 
 fn singular_points(b: &mut Bencher) {
-    let mut integrator = Integrator::new(|x: f64| x.recip(), QAGP::new())
+    let mut integrator = Integrator::new(|x: f64| x.recip(), QAGP_FINITE::new())
         .points(&[0.])
         .tolerance(Tolerance::Absolute(1.49e-8));
 

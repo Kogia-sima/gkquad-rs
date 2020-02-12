@@ -62,7 +62,15 @@ fn qag_f1_15pt() {
         order: &[0, 1, 2, 3, 4, 5],
         error: None,
     };
-    test_algorithm(f1, 0.0, 1.0, &[], QAG::new(), Relative(1e-10), expect);
+    test_algorithm(
+        f1,
+        0.0,
+        1.0,
+        &[],
+        QAG_FINITE::new(),
+        Relative(1e-10),
+        expect,
+    );
 }
 
 #[test]
@@ -73,7 +81,15 @@ fn qag_f1() {
         order: &[0, 1, 2, 3, 4, 5, 6],
         error: None,
     };
-    test_algorithm(f1, 0.0, 1.0, &[], QAG::new(), Absolute(1e-14), expect);
+    test_algorithm(
+        f1,
+        0.0,
+        1.0,
+        &[],
+        QAG_FINITE::new(),
+        Absolute(1e-14),
+        expect,
+    );
 }
 
 #[test]
@@ -88,7 +104,7 @@ fn qag_f2_15pt() {
         ],
         error: Some(RuntimeError::InsufficientIteration),
     };
-    test_algorithm(f2, 0.0, 1.0, &[], QAG::new(), Absolute(1e-2), expect);
+    test_algorithm(f2, 0.0, 1.0, &[], QAG_FINITE::new(), Absolute(1e-2), expect);
 }
 
 #[test]
@@ -99,7 +115,15 @@ fn qag_f3() {
         order: &[1, 4, 3, 2, 5, 0, 6],
         error: Some(RuntimeError::RoundoffError),
     };
-    test_algorithm(f3, 0.3, 2.71, &[], QAG::new(), Absolute(1e-14), expect);
+    test_algorithm(
+        f3,
+        0.3,
+        2.71,
+        &[],
+        QAG_FINITE::new(),
+        Absolute(1e-14),
+        expect,
+    );
 }
 
 #[test]
@@ -110,7 +134,15 @@ fn qags_f1() {
         order: &[0, 1, 2],
         error: None,
     };
-    test_algorithm(f1, 0.0, 1.0, &[], QAGS::new(), Relative(1e-10), expect);
+    test_algorithm(
+        f1,
+        0.0,
+        1.0,
+        &[],
+        QAGS_FINITE::new(),
+        Relative(1e-10),
+        expect,
+    );
 }
 
 #[test]
@@ -121,7 +153,15 @@ fn qags_f2() {
         order: &[0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
         error: None,
     };
-    test_algorithm(f2, 0.0, 1.0, &[], QAGS::new(), Absolute(1e-10), expect);
+    test_algorithm(
+        f2,
+        0.0,
+        1.0,
+        &[],
+        QAGS_FINITE::new(),
+        Absolute(1e-10),
+        expect,
+    );
 }
 
 #[test]
@@ -132,7 +172,15 @@ fn qags_f3() {
         order: &[],
         error: None,
     };
-    test_algorithm(f3, 0.3, 2.71, &[], QAGS::new(), Absolute(1e-10), expect);
+    test_algorithm(
+        f3,
+        0.3,
+        2.71,
+        &[],
+        QAGS_FINITE::new(),
+        Absolute(1e-10),
+        expect,
+    );
 }
 
 #[test]
@@ -143,7 +191,15 @@ fn qags_f4() {
         order: &[0, 1, 2, 3, 4, 5, 6],
         error: None,
     };
-    test_algorithm(f4, 1.0, 1000.0, &[], QAGS::new(), Absolute(1e-7), expect);
+    test_algorithm(
+        f4,
+        1.0,
+        1000.0,
+        &[],
+        QAGS_FINITE::new(),
+        Absolute(1e-7),
+        expect,
+    );
 }
 
 #[test]
@@ -154,7 +210,15 @@ fn qagp_f5() {
         order: &[1, 5, 0, 3, 2, 7, 8, 9, 6, 4],
         error: None,
     };
-    test_algorithm(f5, 0., 4., &[1., 2.], QAGP::new(), Relative(1e-3), expect);
+    test_algorithm(
+        f5,
+        0.,
+        4.,
+        &[1., 2.],
+        QAGP_FINITE::new(),
+        Relative(1e-3),
+        expect,
+    );
 }
 
 #[test]
@@ -165,7 +229,15 @@ fn qagp_f6() {
         order: &[0, 1, 3, 4, 6, 8, 10, 11, 9, 7, 5, 2],
         error: Some(RuntimeError::Divergent),
     };
-    test_algorithm(f6, 0., 2., &[1.], QAGP::new(), Absolute(1e-10), expect);
+    test_algorithm(
+        f6,
+        0.,
+        2.,
+        &[1.],
+        QAGP_FINITE::new(),
+        Absolute(1e-10),
+        expect,
+    );
 }
 
 #[test]
@@ -176,5 +248,13 @@ fn qagp_f7() {
         order: &[0, 1, 5, 4, 3, 2],
         error: None,
     };
-    test_algorithm(f7, -1., 1., &[0.], QAGP::new(), Absolute(1e-10), expect);
+    test_algorithm(
+        f7,
+        -1.,
+        1.,
+        &[0.],
+        QAGP_FINITE::new(),
+        Absolute(1e-10),
+        expect,
+    );
 }
