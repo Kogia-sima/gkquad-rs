@@ -1,4 +1,3 @@
-use std::cell::UnsafeCell;
 use std::fmt::{self, Debug};
 
 use super::algorithm::*;
@@ -19,7 +18,7 @@ use crate::{IntegrationResult, Tolerance};
 /// let m = Cell::new(1);
 /// let mut result = 1.0;
 ///
-/// let integrator = Integrator::new(|x: f64| x.powi(m.get()))
+/// let mut integrator = Integrator::new(|x: f64| x.powi(m.get()))
 ///     .tolerance(Tolerance::Relative(1e-7))
 ///     .limit(100);
 ///
@@ -31,7 +30,7 @@ use crate::{IntegrationResult, Tolerance};
 /// }
 /// ```
 pub struct Integrator<F: Integrand, A: Algorithm<F>> {
-    integrand: UnsafeCell<F>,
+    integrand: F,
     algorithm: A,
     config: IntegrationConfig,
 }
@@ -40,7 +39,7 @@ impl<F: Integrand, A: Algorithm<F>> Integrator<F, A> {
     #[inline]
     pub fn new(integrand: F, algorithm: A) -> Integrator<F, A> {
         Self {
-            integrand: UnsafeCell::new(integrand),
+            integrand,
             algorithm,
             config: IntegrationConfig::default(),
         }
@@ -81,12 +80,9 @@ impl<F: Integrand, A: Algorithm<F>> Integrator<F, A> {
     }
 
     #[inline]
-    pub fn run<T: Into<Interval>>(&self, interval: T) -> IntegrationResult {
-        self.algorithm.integrate(
-            unsafe { &mut *self.integrand.get() },
-            &interval.into(),
-            &self.config,
-        )
+    pub fn run<T: Into<Interval>>(&mut self, interval: T) -> IntegrationResult {
+        self.algorithm
+            .integrate(&mut self.integrand, &interval.into(), &self.config)
     }
 }
 
@@ -111,7 +107,7 @@ where
 {
     fn default() -> Self {
         Self {
-            integrand: UnsafeCell::new(F::default()),
+            integrand: F::default(),
             algorithm: A::default(),
             config: IntegrationConfig::default(),
         }
