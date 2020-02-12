@@ -95,21 +95,13 @@ where
 
     *bufp.add(n << 1) = center;
 
-    // The following lines may prevent optimization by compiler
+    let center_simd = _mm256_set1_pd(center);
+    let half_length_simd = _mm256_set1_pd(half_length);
 
-    // let center_simd = _mm256_set1_pd(center);
-    // let half_length_simd = _mm256_set1_pd(half_length);
-
-    // for j in (1..n).step_by(4) {
-    //     let abscissa = _mm256_mul_pd(half_length_simd, _mm256_load_pd(xgkp.add(j)));
-    //     _mm256_store_pd(bufp.add(j), _mm256_sub_pd(center_simd, abscissa));
-    //     _mm256_store_pd(bufp2.add(j), _mm256_add_pd(center_simd, abscissa));
-    // }
-
-    for j in 0..n {
-        let abscissa = half_length * *xgkp.add(j);
-        *bufp.add(j) = center - abscissa;
-        *bufp2.add(j) = center + abscissa;
+    for j in (0..n).step_by(4) {
+        let abscissa = _mm256_mul_pd(half_length_simd, _mm256_load_pd(xgkp.add(j)));
+        _mm256_store_pd(bufp.add(j), _mm256_sub_pd(center_simd, abscissa));
+        _mm256_store_pd(bufp2.add(j), _mm256_add_pd(center_simd, abscissa));
     }
 
     f.apply_to_slice(buf);
