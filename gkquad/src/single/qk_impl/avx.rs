@@ -101,9 +101,9 @@ where
     // let half_length_simd = _mm256_set1_pd(half_length);
 
     // for j in (1..n).step_by(4) {
-    //     let abscissa = _mm256_mul_pd(half_length_simd, _mm256_loadu_pd(xgkp.add(j)));
-    //     _mm256_storeu_pd(bufp.add(j), _mm256_sub_pd(center_simd, abscissa));
-    //     _mm256_storeu_pd(bufp2.add(j), _mm256_add_pd(center_simd, abscissa));
+    //     let abscissa = _mm256_mul_pd(half_length_simd, _mm256_load_pd(xgkp.add(j)));
+    //     _mm256_store_pd(bufp.add(j), _mm256_sub_pd(center_simd, abscissa));
+    //     _mm256_store_pd(bufp2.add(j), _mm256_add_pd(center_simd, abscissa));
     // }
 
     for j in 0..n {
@@ -121,16 +121,16 @@ where
     let mut result_abs = _mm256_set_pd(tmp.abs(), 0., 0., 0.);
 
     for j in (0..n).step_by(4) {
-        let fval1 = _mm256_loadu_pd(bufp.add(j));
-        let fval2 = _mm256_loadu_pd(bufp2.add(j));
+        let fval1 = _mm256_load_pd(bufp.add(j));
+        let fval2 = _mm256_load_pd(bufp2.add(j));
         let fsum = _mm256_add_pd(fval1, fval2);
         let abssum = _mm256_add_pd(abs256(fval1), abs256(fval2));
-        let wgk = _mm256_loadu_pd(wgkp.add(j));
+        let wgk = _mm256_load_pd(wgkp.add(j));
         result_kronrod = fmadd256(wgk, fsum, result_kronrod);
         result_abs = fmadd256(wgk, abssum, result_abs);
 
         let fsum_compact = compact(fsum);
-        let wg = _mm_loadu_pd(wgp.add(j >> 1));
+        let wg = _mm_load_pd(wgp.add(j >> 1));
         result_gauss = fmadd128(wg, fsum_compact, result_gauss);
     }
 
@@ -143,12 +143,12 @@ where
     let mut result_asc = _mm256_set_pd(wck * (f_center - mean).abs(), 0., 0., 0.);
 
     for j in (0..n).step_by(4) {
-        let fval1 = _mm256_loadu_pd(bufp.add(j));
-        let fval2 = _mm256_loadu_pd(bufp2.add(j));
+        let fval1 = _mm256_load_pd(bufp.add(j));
+        let fval2 = _mm256_load_pd(bufp2.add(j));
         let diff1 = abs256(_mm256_sub_pd(fval1, mean_simd));
         let diff2 = abs256(_mm256_sub_pd(fval2, mean_simd));
         let diff_sum = _mm256_add_pd(diff1, diff2);
-        let wgk = _mm256_loadu_pd(wgkp.add(j));
+        let wgk = _mm256_load_pd(wgkp.add(j));
         result_asc = fmadd256(wgk, diff_sum, result_asc);
     }
 
