@@ -18,8 +18,7 @@ path = "src/lib.rs"
 test = false
 
 [features]
-default = ["std", "simd", "single"]
-single = []
+default = ["std", "simd"]
 simd = []
 std = []
 

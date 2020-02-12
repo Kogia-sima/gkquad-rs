@@ -1,4 +1,4 @@
-#[cfg(all(not(feature = "std"), feature = "single"))]
+#[cfg(not(feature = "std"))]
 mod mutex {
     use core::cell::UnsafeCell;
     use core::fmt;
@@ -90,5 +90,5 @@ mod mutex {
     }
 }
 
-#[cfg(all(not(feature = "std"), feature = "single"))]
+#[cfg(not(feature = "std"))]
 pub use mutex::*;

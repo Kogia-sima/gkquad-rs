@@ -134,7 +134,7 @@ macro_rules! impl_error {
         }
 
         #[cfg(feature = "std")]
-        #[cfg_attr(docsrs, doc(cfg(feature = "single")))]
+        #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
         impl ::std::error::Error for $name {}
     };
 }
