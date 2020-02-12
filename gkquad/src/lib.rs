@@ -24,4 +24,8 @@ pub use error::*;
 
 pub mod single;
 
+#[cfg(feature = "double")]
+#[cfg_attr(docsrs, doc(cfg(feature = "double")))]
+pub mod double;
+
 pub mod prelude;
