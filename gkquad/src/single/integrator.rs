@@ -18,7 +18,7 @@ use crate::{IntegrationResult, Tolerance};
 /// let m = Cell::new(1);
 /// let mut result = 1.0;
 ///
-/// let mut integrator = Integrator::new(|x: f64| x.powi(m.get()))
+/// let mut integrator = Integrator::auto(|x: f64| x.powi(m.get()))
 ///     .tolerance(Tolerance::Relative(1e-7))
 ///     .limit(100);
 ///
@@ -33,6 +33,17 @@ pub struct Integrator<F: Integrand, A: Algorithm<F>> {
     integrand: F,
     algorithm: A,
     config: IntegrationConfig,
+}
+
+impl<F: Integrand> Integrator<F, AUTO> {
+    #[inline]
+    pub fn auto(integrand: F) -> Integrator<F, AUTO> {
+        Self {
+            integrand,
+            algorithm: AUTO::new(),
+            config: IntegrationConfig::default(),
+        }
+    }
 }
 
 impl<F: Integrand, A: Algorithm<F>> Integrator<F, A> {
