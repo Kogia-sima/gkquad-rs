@@ -1,6 +1,7 @@
 use alloc::sync::Arc;
-
 use smallvec::SmallVec;
+use std::fmt::{self, Debug};
+use std::ops::RangeBounds;
 
 use crate::single::Range;
 use crate::Tolerance;
@@ -50,6 +51,41 @@ impl Range2 {
     #[inline]
     pub fn from_ranges(xrange: Range, yrange: Range) -> Range2 {
         Range2::Square { xrange, yrange }
+    }
+}
+
+impl<R1: RangeBounds<f64>, R2: RangeBounds<f64>> From<(R1, R2)> for Range2 {
+    fn from(r: (R1, R2)) -> Range2 {
+        Range2::Square {
+            xrange: r.0.into(),
+            yrange: r.1.into(),
+        }
+    }
+}
+
+impl Debug for Range2 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            &Range2::Square {
+                ref xrange,
+                ref yrange,
+            } => f
+                .debug_struct("Square")
+                .field("xrange", xrange)
+                .field("yrange", yrange)
+                .finish(),
+            &Range2::Custom { ref xrange, .. } => f
+                .debug_struct("Custom")
+                .field("xrange", xrange)
+                .field("yrange", &"<Function>")
+                .finish(),
+        }
+    }
+}
+
+impl<'a> From<&'a Range2> for Range2 {
+    fn from(other: &'a Range2) -> Self {
+        other.clone()
     }
 }
 
