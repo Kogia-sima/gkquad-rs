@@ -33,3 +33,7 @@ pub fn f6(x: f64) -> f64 {
 pub fn f7(x: f64) -> f64 {
     1. / x
 }
+
+pub fn g1(x: f64, y: f64) -> f64 {
+    1.0 - x * y
+}
