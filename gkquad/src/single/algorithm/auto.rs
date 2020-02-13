@@ -4,6 +4,7 @@ use crate::single::common::{Integrand, IntegrationConfig, Range};
 
 /// Automatically select algorithm based on configuration
 #[derive(Clone)]
+#[deprecated(since = "0.0.3", note = "Use QAGS or QAGP method instead.")]
 pub struct AUTO;
 
 impl AUTO {

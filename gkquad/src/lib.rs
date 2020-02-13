@@ -2,6 +2,7 @@
 
 #![cfg_attr(docsrs, feature(doc_cfg, optin_builtin_traits))]
 #![cfg_attr(not(feature = "std"), no_std)]
+#![allow(deprecated)]
 
 #[cfg(not(feature = "std"))]
 extern crate core as std;
