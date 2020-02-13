@@ -21,6 +21,7 @@ test = false
 default = ["std", "simd"]
 simd = []
 std = []
+double = []
 
 [dependencies]
 smallvec = "1.2.0"
