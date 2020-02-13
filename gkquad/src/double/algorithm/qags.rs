@@ -1,12 +1,12 @@
 use super::super::common::{Integrand2, Integration2Config, Range2};
 use super::Algorithm;
-use crate::single::algorithm::{Algorithm as Algorithm1, QAG as QAG1};
+use crate::single::algorithm::{Algorithm as Algorithm1, QAGS as QAGS1};
 use crate::single::IntegrationConfig;
 use crate::IntegrationResult;
 
-pub struct QAG;
+pub struct QAGS;
 
-impl<F: Integrand2> Algorithm<F> for QAG {
+impl<F: Integrand2> Algorithm<F> for QAGS {
     fn integrate(
         &self,
         f: &mut F,
@@ -27,13 +27,13 @@ impl<F: Integrand2> Algorithm<F> for QAG {
                 let mut integrand = |x: f64| -> f64 {
                     let mut integrand2 = |y: f64| f.apply((x, y));
                     todo!("avoid workspace confliction");
-                    QAG1::new()
+                    QAGS1::new()
                         .integrate(&mut integrand2, yrange, &config1)
                         .estimate()
                         .unwrap()
                 };
 
-                QAG1::new().integrate(&mut integrand, xrange, &config1)
+                QAGS1::new().integrate(&mut integrand, xrange, &config1)
             }
             &Range2::Custom {
                 ref xrange,
@@ -42,16 +42,16 @@ impl<F: Integrand2> Algorithm<F> for QAG {
                 let mut integrand = |x: f64| -> f64 {
                     let mut integrand2 = |y: f64| f.apply((x, y));
                     todo!("avoid workspace confliction");
-                    QAG1::new()
+                    QAGS1::new()
                         .integrate(&mut integrand2, &yrange(x), &config1)
                         .estimate()
                         .unwrap()
                 };
 
-                QAG1::new().integrate(&mut integrand, xrange, &config1)
+                QAGS1::new().integrate(&mut integrand, xrange, &config1)
             }
         }
     }
 }
 
-extra_traits!(QAG);
+extra_traits!(QAGS);
