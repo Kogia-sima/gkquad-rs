@@ -33,6 +33,11 @@ bencher = "0.1.5"
 name = "single"
 harness = false
 
+[[test]]
+name = "algorithms_double"
+path = "tests/algorithms_double.rs"
+required-features = ["double"]
+
 [package.metadata.docs.rs]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
