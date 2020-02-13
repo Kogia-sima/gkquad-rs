@@ -25,3 +25,12 @@ pub use error::*;
 pub mod single;
 
 pub mod prelude;
+
+/// Deallocate the cache memory
+pub fn free_memory() {
+    use single::WorkSpaceProvider;
+
+    let provider = WorkSpaceProvider::new();
+    let mut ws = provider.get_mut();
+    ws.release();
+}
