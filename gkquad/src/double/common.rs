@@ -1,3 +1,5 @@
+use alloc::sync::Arc;
+
 use smallvec::SmallVec;
 
 use crate::single::Range;
@@ -11,13 +13,14 @@ pub type Points2 = SmallVec<[(f64, f64); 8]>;
 
 /// Represent the range over which the integral is estimated.
 #[non_exhaustive]
+#[derive(Clone)]
 pub enum Range2 {
     /// Square (determined by ranges for each coordinate)
     Square { xrange: Range, yrange: Range },
     /// custom range
     Custom {
         xrange: Range,
-        yrange: Box<dyn Fn(f64) -> Range>,
+        yrange: Arc<dyn Fn(f64) -> Range>,
     },
 }
 
@@ -40,7 +43,7 @@ impl Range2 {
         let xrange = Range::new(x1, x2)?;
         Some(Range2::Custom {
             xrange,
-            yrange: Box::new(yrange),
+            yrange: Arc::new(yrange),
         })
     }
 
