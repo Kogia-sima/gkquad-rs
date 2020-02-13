@@ -13,7 +13,7 @@ struct Expect {
     error: Option<RuntimeError>,
 }
 
-fn test_algorithm<A: Algorithm<fn(f64, f64) -> f64>>(
+fn test_algorithm<A: Algorithm2<fn(f64, f64) -> f64>>(
     f: fn(f64, f64) -> f64,
     r: Range2,
     _: &[(f64, f64)],
@@ -39,7 +39,7 @@ fn qag_g1() {
         error: None,
     };
     let range = Range2::square(0., 1., 0., 1.).unwrap();
-    test_algorithm(g1, range, &[], QAG::new(), Relative(1e-10), expect);
+    test_algorithm(g1, range, &[], QAG2::new(), Relative(1e-10), expect);
 }
 
 #[test]
@@ -50,5 +50,5 @@ fn qags_g1() {
         error: None,
     };
     let range = Range2::square(0., 1., 0., 1.).unwrap();
-    test_algorithm(g1, range, &[], QAGS::new(), Relative(1e-10), expect);
+    test_algorithm(g1, range, &[], QAGS2::new(), Relative(1e-10), expect);
 }

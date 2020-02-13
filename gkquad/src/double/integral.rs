@@ -4,7 +4,7 @@ use crate::error::IntegrationResult;
 
 #[inline]
 pub fn integral2<F: Integrand2, R: AsRef<Range2>>(mut f: F, r: R) -> IntegrationResult {
-    QAGS::new().integrate(&mut f, r.as_ref(), &Integration2Config::default())
+    QAGS2::new().integrate(&mut f, r.as_ref(), &Integration2Config::default())
 }
 
 #[inline]
@@ -13,5 +13,5 @@ pub fn integral2_with_config<F: Integrand2, R: AsRef<Range2>>(
     r: R,
     config: &Integration2Config,
 ) -> IntegrationResult {
-    QAGS::new().integrate(&mut f, r.as_ref(), config)
+    QAGS2::new().integrate(&mut f, r.as_ref(), config)
 }

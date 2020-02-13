@@ -1,19 +1,19 @@
 use super::super::common::{Integrand2, Integration2Config, Range2};
-use super::Algorithm;
-use crate::single::algorithm::{Algorithm as Algorithm1, QAG as QAG1};
+use super::Algorithm2;
+use crate::single::algorithm::{Algorithm, QAG};
 use crate::single::IntegrationConfig;
 use crate::single::WorkSpaceId;
 use crate::IntegrationResult;
 
-pub struct QAG;
+pub struct QAG2;
 
-impl QAG {
+impl QAG2 {
     pub fn new() -> Self {
         Self
     }
 }
 
-impl<F: Integrand2> Algorithm<F> for QAG {
+impl<F: Integrand2> Algorithm2<F> for QAG2 {
     fn integrate(
         &self,
         f: &mut F,
@@ -26,7 +26,7 @@ impl<F: Integrand2> Algorithm<F> for QAG {
             ..Default::default()
         };
 
-        let inner = QAG1::with_id(WorkSpaceId::Single);
+        let inner = QAG::with_id(WorkSpaceId::Single);
         let mut error = None;
 
         match range {
@@ -42,7 +42,7 @@ impl<F: Integrand2> Algorithm<F> for QAG {
                 };
 
                 let mut result =
-                    QAG1::with_id(WorkSpaceId::Double).integrate(&mut integrand, xrange, &config1);
+                    QAG::with_id(WorkSpaceId::Double).integrate(&mut integrand, xrange, &config1);
                 if error.is_some() {
                     result.error = error;
                 }
@@ -61,7 +61,7 @@ impl<F: Integrand2> Algorithm<F> for QAG {
                 };
 
                 let mut result =
-                    QAG1::with_id(WorkSpaceId::Double).integrate(&mut integrand, xrange, &config1);
+                    QAG::with_id(WorkSpaceId::Double).integrate(&mut integrand, xrange, &config1);
                 if error.is_some() {
                     result.error = error;
                 }
@@ -72,4 +72,4 @@ impl<F: Integrand2> Algorithm<F> for QAG {
     }
 }
 
-extra_traits!(QAG);
+extra_traits!(QAG2);

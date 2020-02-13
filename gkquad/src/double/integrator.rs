@@ -5,13 +5,13 @@ use crate::{IntegrationResult, Tolerance};
 
 /// 2-dimentional integration Executor
 #[derive(Clone, Debug, Default, PartialEq)]
-pub struct Integrator2<F: Integrand2, A: Algorithm<F>> {
+pub struct Integrator2<F: Integrand2, A: Algorithm2<F>> {
     integrand: F,
     algorithm: A,
     config: Integration2Config,
 }
 
-impl<F: Integrand2, A: Algorithm<F>> Integrator2<F, A> {
+impl<F: Integrand2, A: Algorithm2<F>> Integrator2<F, A> {
     #[inline]
     pub fn new(integrand: F, algorithm: A) -> Integrator2<F, A> {
         Self {
