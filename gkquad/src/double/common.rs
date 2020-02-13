@@ -47,11 +47,6 @@ impl Range2 {
             yrange: Arc::new(yrange),
         })
     }
-
-    #[inline]
-    pub fn from_ranges(xrange: Range, yrange: Range) -> Range2 {
-        Range2::Square { xrange, yrange }
-    }
 }
 
 impl<R1: RangeBounds<f64>, R2: RangeBounds<f64>> From<(R1, R2)> for Range2 {
