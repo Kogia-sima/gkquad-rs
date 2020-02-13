@@ -6,7 +6,7 @@ use crate::single::common::{Integrand, IntegrationConfig, Range};
 use crate::single::qelg::ExtrapolationTable;
 use crate::single::qk::{qk17, qk25};
 use crate::single::util::{bisect, subrange_too_small, test_positivity};
-use crate::single::workspace::{SubRangeInfo, WorkSpaceProvider};
+use crate::single::workspace::{SubRangeInfo, WorkSpaceId, WorkSpaceProvider};
 
 /// QAGS algorithm over finite range
 #[derive(Clone)]
@@ -18,7 +18,14 @@ impl QAGS_FINITE {
     #[inline]
     pub fn new() -> Self {
         Self {
-            provider: WorkSpaceProvider::new(),
+            provider: WorkSpaceProvider::new(WorkSpaceId::Single),
+        }
+    }
+
+    #[inline]
+    pub fn with_id(id: WorkSpaceId) -> Self {
+        Self {
+            provider: WorkSpaceProvider::new(id),
         }
     }
 

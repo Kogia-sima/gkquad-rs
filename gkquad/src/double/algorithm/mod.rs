@@ -1,7 +1,7 @@
 use super::common::{Integrand2, Integration2Config, Range2};
 use crate::IntegrationResult;
 
-trait Algorithm<F: Integrand2> {
+pub trait Algorithm<F: Integrand2> {
     fn integrate(
         &self,
         f: &mut F,

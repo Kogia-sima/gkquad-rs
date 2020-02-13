@@ -5,7 +5,7 @@ use crate::single::algorithm::Algorithm;
 use crate::single::common::{Integrand, IntegrationConfig, Range};
 use crate::single::qk::{qk17, qk25};
 use crate::single::util::{bisect, subrange_too_small};
-use crate::single::workspace::{SubRangeInfo, WorkSpaceProvider};
+use crate::single::workspace::{SubRangeInfo, WorkSpaceId, WorkSpaceProvider};
 
 /// QAG algorithm over finite range
 #[derive(Clone)]
@@ -17,7 +17,14 @@ impl QAG_FINITE {
     #[inline]
     pub fn new() -> Self {
         Self {
-            provider: WorkSpaceProvider::new(),
+            provider: WorkSpaceProvider::new(WorkSpaceId::Single),
+        }
+    }
+
+    #[inline]
+    pub fn with_id(id: WorkSpaceId) -> Self {
+        Self {
+            provider: WorkSpaceProvider::new(id),
         }
     }
 
