@@ -79,9 +79,9 @@ pub trait Integrand2 {
     fn apply(&mut self, x: Point2) -> f64;
 }
 
-impl<F: FnMut(Point2) -> f64> Integrand2 for F {
+impl<F: FnMut(f64, f64) -> f64> Integrand2 for F {
     #[inline]
     fn apply(&mut self, x: Point2) -> f64 {
-        (*self)(x)
+        (*self)(x.0, x.1)
     }
 }
