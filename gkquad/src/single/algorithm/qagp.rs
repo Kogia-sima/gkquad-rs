@@ -2,6 +2,7 @@ use crate::error::IntegrationResult;
 use crate::single::algorithm::{qagp_finite::QAGP_FINITE, Algorithm};
 use crate::single::common::{Integrand, IntegrationConfig, Points, Range};
 use crate::single::util::{transform_point, transform_range, IntegrandWrapper};
+use crate::single::workspace::WorkSpaceId;
 
 #[derive(Clone)]
 pub struct QAGP {
@@ -13,6 +14,13 @@ impl QAGP {
     pub fn new() -> Self {
         Self {
             inner: QAGP_FINITE::new(),
+        }
+    }
+
+    #[inline]
+    pub(crate) fn with_id(id: WorkSpaceId) -> Self {
+        Self {
+            inner: QAGP_FINITE::with_id(id),
         }
     }
 }

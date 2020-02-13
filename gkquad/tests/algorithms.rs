@@ -4,7 +4,7 @@ use common::functions::*;
 
 use gkquad::single::algorithm::*;
 use gkquad::single::Integrator;
-use gkquad::single::WorkSpaceProvider;
+use gkquad::single::{WorkSpaceId, WorkSpaceProvider};
 use gkquad::RuntimeError;
 use gkquad::Tolerance::{self, *};
 
@@ -25,7 +25,7 @@ fn test_algorithm<A: Algorithm<fn(f64) -> f64>>(
     expect: Expect,
 ) {
     let mut integrator = Integrator::new(f, algorithm).tolerance(tol).points(pts);
-    let provider = WorkSpaceProvider::new();
+    let provider = WorkSpaceProvider::new(WorkSpaceId::Single);
 
     let result = integrator.run(a..b);
     unsafe {

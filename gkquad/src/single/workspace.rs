@@ -290,21 +290,37 @@ mod provider {
     use std::cell::{RefCell, RefMut};
 
     thread_local! {
-        static WORKSPACE: RefCell<WorkSpace> = RefCell::new(WorkSpace::new());
+        static WORKSPACE1: RefCell<WorkSpace> = RefCell::new(WorkSpace::new());
+        static WORKSPACE2: RefCell<WorkSpace> = RefCell::new(WorkSpace::new());
     }
 
     #[derive(Clone)]
-    pub struct WorkSpaceProvider;
+    pub enum WorkSpaceId {
+        Single,
+        Double,
+    }
+
+    #[derive(Clone)]
+    pub struct WorkSpaceProvider {
+        id: WorkSpaceId,
+    }
 
     impl WorkSpaceProvider {
         #[inline(always)]
-        pub const fn new() -> Self {
-            Self
+        pub const fn new(id: WorkSpaceId) -> Self {
+            Self { id }
         }
 
         #[inline]
         pub fn get_mut(&self) -> RefMut<'_, WorkSpace> {
-            WORKSPACE.with(|v| unsafe { std::mem::transmute(v.borrow_mut()) })
+            match self.id {
+                WorkSpaceId::Single => {
+                    WORKSPACE1.with(|v| unsafe { std::mem::transmute(v.borrow_mut()) })
+                }
+                WorkSpaceId::Double => {
+                    WORKSPACE2.with(|v| unsafe { std::mem::transmute(v.borrow_mut()) })
+                }
+            }
         }
     }
 }
@@ -314,20 +330,32 @@ mod provider {
     use super::WorkSpace;
     use crate::utils::{Mutex, MutexGuard};
 
-    static WORKSPACE: Mutex<WorkSpace> = Mutex::new(WorkSpace::new());
+    static WORKSPACE1: Mutex<WorkSpace> = Mutex::new(WorkSpace::new());
+    static WORKSPACE2: Mutex<WorkSpace> = Mutex::new(WorkSpace::new());
 
     #[derive(Clone)]
-    pub struct WorkSpaceProvider;
+    pub enum WorkSpaceId {
+        Single,
+        Double,
+    }
+
+    #[derive(Clone)]
+    pub struct WorkSpaceProvider {
+        id: WorkSpaceId,
+    }
 
     impl WorkSpaceProvider {
         #[inline(always)]
-        pub const fn new() -> Self {
-            Self
+        pub const fn new(id: WorkSpaceId) -> Self {
+            Self { id }
         }
 
         #[inline]
         pub fn get_mut(&self) -> MutexGuard<'_, WorkSpace> {
-            WORKSPACE.lock()
+            match self.id {
+                WorkSpaceId::Single => WORKSPACE1.lock(),
+                WorkSpaceId::Double => WORKSPACE2.lock(),
+            }
         }
     }
 }
