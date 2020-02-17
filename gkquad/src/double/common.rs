@@ -15,18 +15,18 @@ pub type Points2 = SmallVec<[(f64, f64); 8]>;
 /// Represent the range over which the integral is estimated.
 #[non_exhaustive]
 #[derive(Clone)]
-pub enum Range2 {
+pub enum Range2<'a> {
     /// Square (determined by ranges for each coordinate)
     Square { xrange: Range, yrange: Range },
     /// custom range
     Custom {
         xrange: Range,
-        yrange: Arc<dyn Fn(f64) -> Range>,
+        yrange: Arc<dyn Fn(f64) -> Range + 'a>,
     },
 }
 
-impl Range2 {
-    pub fn square(x1: f64, x2: f64, y1: f64, y2: f64) -> Option<Range2> {
+impl<'a> Range2<'a> {
+    pub fn square(x1: f64, x2: f64, y1: f64, y2: f64) -> Option<Range2<'static>> {
         let xrange = Range::new(x1, x2)?;
         let yrange = Range::new(y1, y2)?;
         if !(x1.is_finite() && x2.is_finite() && y1.is_finite() && y2.is_finite()) {
@@ -36,11 +36,10 @@ impl Range2 {
     }
 
     #[inline]
-    pub fn custom<F: Fn(f64) -> Range + Clone + 'static>(
-        x1: f64,
-        x2: f64,
-        yrange: F,
-    ) -> Option<Range2> {
+    pub fn custom<F>(x1: f64, x2: f64, yrange: F) -> Option<Range2<'a>>
+    where
+        F: Fn(f64) -> Range + 'a,
+    {
         let xrange = Range::new(x1, x2)?;
         Some(Range2::Custom {
             xrange,
@@ -49,8 +48,8 @@ impl Range2 {
     }
 }
 
-impl<R1: RangeBounds<f64>, R2: RangeBounds<f64>> From<(R1, R2)> for Range2 {
-    fn from(r: (R1, R2)) -> Range2 {
+impl<R1: RangeBounds<f64>, R2: RangeBounds<f64>> From<(R1, R2)> for Range2<'static> {
+    fn from(r: (R1, R2)) -> Range2<'static> {
         Range2::Square {
             xrange: r.0.into(),
             yrange: r.1.into(),
@@ -58,7 +57,7 @@ impl<R1: RangeBounds<f64>, R2: RangeBounds<f64>> From<(R1, R2)> for Range2 {
     }
 }
 
-impl Debug for Range2 {
+impl<'a> Debug for Range2<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             &Range2::Square {
@@ -78,8 +77,8 @@ impl Debug for Range2 {
     }
 }
 
-impl<'a> From<&'a Range2> for Range2 {
-    fn from(other: &'a Range2) -> Self {
+impl<'a, 'b> From<&'b Range2<'a>> for Range2<'a> {
+    fn from(other: &'b Range2<'a>) -> Self {
         other.clone()
     }
 }

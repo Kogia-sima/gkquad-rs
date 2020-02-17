@@ -56,7 +56,7 @@ impl<F: Integrand2, A: Algorithm2<F>> Integrator2<F, A> {
     }
 
     #[inline]
-    pub fn run<T: Into<Range2>>(&mut self, range: T) -> IntegrationResult {
+    pub fn run<'a, T: Into<Range2<'a>>>(&mut self, range: T) -> IntegrationResult {
         self.algorithm
             .integrate(&mut self.integrand, &range.into(), &self.config)
     }
