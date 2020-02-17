@@ -16,13 +16,6 @@ pub struct QAGP_FINITE {
 
 impl QAGP_FINITE {
     #[inline]
-    pub fn new() -> Self {
-        Self {
-            provider: WorkSpaceProvider::new(WorkSpaceId::Single),
-        }
-    }
-
-    #[inline]
     pub fn with_id(id: WorkSpaceId) -> Self {
         Self {
             provider: WorkSpaceProvider::new(id),

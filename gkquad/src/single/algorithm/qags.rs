@@ -12,9 +12,7 @@ pub struct QAGS {
 impl QAGS {
     #[inline]
     pub fn new() -> Self {
-        Self {
-            inner: QAGS_FINITE::new(),
-        }
+        Self::with_id(WorkSpaceId::Single)
     }
 
     #[inline]

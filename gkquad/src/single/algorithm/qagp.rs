@@ -12,9 +12,7 @@ pub struct QAGP {
 impl QAGP {
     #[inline]
     pub fn new() -> Self {
-        Self {
-            inner: QAGP_FINITE::new(),
-        }
+        Self::with_id(WorkSpaceId::Single)
     }
 
     #[inline]
