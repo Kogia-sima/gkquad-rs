@@ -1,4 +1,4 @@
-use super::common::{Integrand2, Integration2Config, Range2};
+use super::common::{Integrand2, IntegrationConfig2, Range2};
 use crate::IntegrationResult;
 
 pub trait Algorithm2<F: Integrand2> {
@@ -6,7 +6,7 @@ pub trait Algorithm2<F: Integrand2> {
         &self,
         f: &mut F,
         range: &Range2,
-        config: &Integration2Config,
+        config: &IntegrationConfig2,
     ) -> IntegrationResult;
 }
 

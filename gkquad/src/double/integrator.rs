@@ -1,5 +1,5 @@
 use super::algorithm::*;
-use super::common::{Integrand2, Integration2Config, Points2, Range2};
+use super::common::{Integrand2, IntegrationConfig2, Points2, Range2};
 
 use crate::{IntegrationResult, Tolerance};
 
@@ -8,7 +8,7 @@ use crate::{IntegrationResult, Tolerance};
 pub struct Integrator2<F: Integrand2, A: Algorithm2<F>> {
     integrand: F,
     algorithm: A,
-    config: Integration2Config,
+    config: IntegrationConfig2,
 }
 
 impl<F: Integrand2, A: Algorithm2<F>> Integrator2<F, A> {
@@ -17,7 +17,7 @@ impl<F: Integrand2, A: Algorithm2<F>> Integrator2<F, A> {
         Self {
             integrand,
             algorithm,
-            config: Integration2Config::default(),
+            config: IntegrationConfig2::default(),
         }
     }
 

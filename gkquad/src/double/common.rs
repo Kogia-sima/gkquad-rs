@@ -87,7 +87,7 @@ impl<'a> From<&'a Range2> for Range2 {
 /// Integration configuration
 #[non_exhaustive]
 #[derive(Clone, Debug, PartialEq)]
-pub struct Integration2Config {
+pub struct IntegrationConfig2 {
     /// the tolerance to be satisfied
     pub tolerance: Tolerance,
     /// maximum number of subdivisions
@@ -96,7 +96,7 @@ pub struct Integration2Config {
     pub points: Points2,
 }
 
-impl Default for Integration2Config {
+impl Default for IntegrationConfig2 {
     #[inline]
     fn default() -> Self {
         Self {

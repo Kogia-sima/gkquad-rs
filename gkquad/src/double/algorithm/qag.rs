@@ -1,4 +1,4 @@
-use super::super::common::{Integrand2, Integration2Config, Range2};
+use super::super::common::{Integrand2, IntegrationConfig2, Range2};
 use super::Algorithm2;
 use crate::single::algorithm::{Algorithm, QAG};
 use crate::single::IntegrationConfig;
@@ -18,7 +18,7 @@ impl<F: Integrand2> Algorithm2<F> for QAG2 {
         &self,
         f: &mut F,
         range: &Range2,
-        config: &Integration2Config,
+        config: &IntegrationConfig2,
     ) -> IntegrationResult {
         let config1 = IntegrationConfig {
             tolerance: config.tolerance.clone(),
