@@ -21,6 +21,7 @@ test = false
 default = ["std", "simd"]
 simd = []
 std = []
+double = []
 
 [dependencies]
 smallvec = "1.2.0"
@@ -31,6 +32,11 @@ bencher = "0.1.5"
 [[bench]]
 name = "single"
 harness = false
+
+[[test]]
+name = "algorithms_double"
+path = "tests/algorithms_double.rs"
+required-features = ["double"]
 
 [package.metadata.docs.rs]
 all-features = true

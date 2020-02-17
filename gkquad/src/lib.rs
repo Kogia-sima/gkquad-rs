@@ -25,13 +25,20 @@ pub use error::*;
 
 pub mod single;
 
+#[cfg(feature = "double")]
+#[cfg_attr(docsrs, doc(cfg(feature = "double")))]
+pub mod double;
+
 pub mod prelude;
 
 /// Deallocate the cache memory
 pub fn free_memory() {
+    use single::WorkSpaceId::*;
     use single::WorkSpaceProvider;
 
-    let provider = WorkSpaceProvider::new();
-    let mut ws = provider.get_mut();
-    ws.release();
+    for id in &[Single, Double] {
+        let provider = WorkSpaceProvider::new(id.clone());
+        let mut ws = provider.get_mut();
+        ws.release();
+    }
 }

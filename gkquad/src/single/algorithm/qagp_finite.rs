@@ -6,7 +6,7 @@ use crate::single::common::{Integrand, IntegrationConfig, Points, Range};
 use crate::single::qelg::ExtrapolationTable;
 use crate::single::qk::{qk25, QKResult};
 use crate::single::util::{bisect, insert_sort, subrange_too_small, test_positivity};
-use crate::single::workspace::{SubRangeInfo, WorkSpaceProvider};
+use crate::single::workspace::{SubRangeInfo, WorkSpaceId, WorkSpaceProvider};
 
 /// QAGP algorithm over finite range
 #[derive(Clone)]
@@ -16,9 +16,9 @@ pub struct QAGP_FINITE {
 
 impl QAGP_FINITE {
     #[inline]
-    pub fn new() -> Self {
+    pub fn with_id(id: WorkSpaceId) -> Self {
         Self {
-            provider: WorkSpaceProvider::new(),
+            provider: WorkSpaceProvider::new(id),
         }
     }
 }
