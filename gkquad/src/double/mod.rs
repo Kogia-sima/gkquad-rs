@@ -1,3 +1,5 @@
+//! Performs 2-dimentional numerical integration
+
 pub mod algorithm;
 mod common;
 mod integral;

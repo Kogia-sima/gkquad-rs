@@ -1,3 +1,5 @@
+//! Algorithms for 2-dimentional numerical integration
+
 use super::common::{Integrand2, IntegrationConfig2, Range2};
 use crate::IntegrationResult;
 

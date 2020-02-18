@@ -1,4 +1,17 @@
-//! Perform general numeric integration
+//! Numerical Integradion Library for Rust
+//!
+//! This crate offers utilities for calculating 1-dimentional integral by default.
+//! Also, multi-dimentional integral toolbox are available (but experimental).
+//!
+//! Experimental utilities are not tested well, and then quite buggy at the moment.
+//! If you found any bugs, feel free to create an issue or send a pull request.
+//! This crate is looking for contributors.
+//!
+//! # Features
+//!
+//! `gkquad` aims to offer **easy**, **extensible**, and **fast** utilities.
+//! Not only users can calculate the integral for various functions, but
+//! developpers are able to write a new integration algorithms.
 
 #![cfg_attr(docsrs, feature(doc_cfg, optin_builtin_traits))]
 #![cfg_attr(not(feature = "std"), no_std)]
@@ -32,6 +45,14 @@ pub mod double;
 pub mod prelude;
 
 /// Deallocate the cache memory
+///
+/// `gkquad` keeps the allocated memory on the thread-local storage until program ends.
+/// However, if you use this crate in the multi-thread application or set `limit`
+/// option too high, then that storage leaks and occupies large amount of memory.
+///
+/// `free_memory` function will deallocate this storage of the `current thread`. If you
+/// want to deallocate the storages on the all threads, you have to call this function
+/// from all threads.
 pub fn free_memory() {
     use single::WorkSpaceId::*;
     use single::WorkSpaceProvider;
