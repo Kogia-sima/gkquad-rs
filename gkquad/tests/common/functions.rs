@@ -37,3 +37,15 @@ pub fn f7(x: f64) -> f64 {
 pub fn g1(x: f64, y: f64) -> f64 {
     1.0 - x * y
 }
+
+pub fn g2(x: f64, y: f64) -> f64 {
+    (y / x).exp()
+}
+
+pub fn g3(x: f64, y: f64) -> f64 {
+    (0.25 - x * x - y * y).sqrt()
+}
+
+pub fn g4(x: f64, y: f64) -> f64 {
+    1.0 / (1.0 + x + y).powi(3)
+}

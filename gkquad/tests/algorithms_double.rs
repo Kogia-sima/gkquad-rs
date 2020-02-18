@@ -4,6 +4,7 @@ use common::functions::*;
 
 use gkquad::double::algorithm::*;
 use gkquad::double::{Integrator2, Range2};
+use gkquad::single::Range;
 use gkquad::RuntimeError;
 use gkquad::Tolerance::{self, *};
 
@@ -51,4 +52,63 @@ fn qags_g1() {
     };
     let range = Range2::square(0., 1., 0., 1.).unwrap();
     test_algorithm(g1, range, &[], QAGS2::new(), Relative(1e-10), expect);
+}
+
+#[test]
+fn qag_g2() {
+    let expect = Expect {
+        value: 8.591409142295225e-01,
+        delta: 9.538380243751227E-15,
+        error: None,
+    };
+    let range = Range2::custom(0., 1., |x| (0.0..x).into()).unwrap();
+    test_algorithm(g2, range, &[], QAG2::new(), Relative(1e-10), expect);
+}
+
+#[test]
+fn qags_g2() {
+    let expect = Expect {
+        value: 8.591409142295225e-01,
+        delta: 9.538380243751227E-15,
+        error: None,
+    };
+    let range = Range2::custom(0., 1., |x| (0.0..x).into()).unwrap();
+    test_algorithm(g2, range, &[], QAGS2::new(), Relative(1e-10), expect);
+}
+
+#[test]
+fn qags_g3() {
+    let expect = Expect {
+        value: 2.617993877991495e-01,
+        delta: 2.906557081673861E-15,
+        error: None,
+    };
+    let yrange = |x: f64| {
+        let ymax = (0.25 - x * x).sqrt();
+        Range::new(-ymax, ymax).unwrap()
+    };
+    let range = Range2::custom(-0.5, 0.5, yrange).unwrap();
+    test_algorithm(g3, range, &[], QAGS2::new(), Absolute(1e-12), expect);
+}
+
+#[test]
+fn qag_g4() {
+    let expect = Expect {
+        value: 4.9999999999953537e-01,
+        delta: 9.058237841799824E-13,
+        error: None,
+    };
+    let range = (0.0.., 0.0..).into();
+    test_algorithm(g4, range, &[], QAG2::new(), Absolute(1e-8), expect);
+}
+
+#[test]
+fn qags_g4() {
+    let expect = Expect {
+        value: 4.9999999999953537e-01,
+        delta: 9.058231687644665E-13,
+        error: None,
+    };
+    let range = (0.0.., 0.0..).into();
+    test_algorithm(g4, range, &[], QAGS2::new(), Absolute(1e-8), expect);
 }
