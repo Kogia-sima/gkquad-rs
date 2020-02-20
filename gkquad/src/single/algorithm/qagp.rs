@@ -4,7 +4,7 @@ use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
 use crate::single::common::{Integrand, IntegrationConfig, Points, Range};
 use crate::single::qelg::ExtrapolationTable;
-use crate::single::qk::{qk17, qk25, QKResult};
+use crate::single::qk::{qk25, QKResult};
 use crate::single::util::{
     bisect, insert_sort, subrange_too_small, test_positivity, transform_point, transform_range,
     IntegrandWrapper,
@@ -37,7 +37,6 @@ impl<F: Integrand> Algorithm<F> for QAGP {
             transform,
         });
 
-        let qk17 = |r: &Range| unsafe { qk17(&mut *wrapper.get(), r) };
         let qk25 = |r: &Range| unsafe { qk25(&mut *wrapper.get(), r) };
 
         if transform {
@@ -59,9 +58,9 @@ impl<F: Integrand> Algorithm<F> for QAGP {
                 points,
             };
 
-            integrate_impl(&qk17, &qk25, &range, &new_config, self.id)
+            integrate_impl(&qk25, &range, &new_config, self.id)
         } else {
-            integrate_impl(&qk17, &qk25, range, config, self.id)
+            integrate_impl(&qk25, range, config, self.id)
         }
     }
 }
@@ -69,7 +68,6 @@ impl<F: Integrand> Algorithm<F> for QAGP {
 extra_traits!(QAGP);
 
 fn integrate_impl(
-    _qk17: &dyn Fn(&Range) -> QKResult,
     qk25: &dyn Fn(&Range) -> QKResult,
     range: &Range,
     config: &IntegrationConfig,
