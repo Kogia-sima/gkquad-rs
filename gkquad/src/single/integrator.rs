@@ -95,3 +95,20 @@ impl<F: Integrand, A: Algorithm<F>> Integrator<F, A> {
             .integrate(&mut self.integrand, &range.into(), &self.config)
     }
 }
+
+// Integrator can safely implement Eq because Nan value of tolerance is always checked.
+impl<F: Integrand + Eq, A: Algorithm<F> + Eq> Eq for Integrator<F, A> {}
+
+impl<F: Integrand> From<F> for Integrator<F, AUTO> {
+    #[inline]
+    fn from(integrand: F) -> Self {
+        Self::new(integrand)
+    }
+}
+
+impl<F: Integrand + Clone> From<&F> for Integrator<F, AUTO> {
+    #[inline]
+    fn from(integrand: &F) -> Self {
+        Self::new(integrand.clone())
+    }
+}
