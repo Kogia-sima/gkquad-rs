@@ -8,6 +8,7 @@ use crate::single::workspace::{SubRangeInfo, WorkSpaceId, WorkSpaceProvider};
 use crate::single::{qk17, qk25, QKResult};
 
 #[derive(Clone)]
+#[deprecated(since = "0.0.3", note = "QAG algorithm is always worse than QAGS.")]
 pub struct QAG {
     id: WorkSpaceId,
 }
