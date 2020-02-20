@@ -291,6 +291,7 @@ impl Default for WorkSpace {
 }
 
 #[cfg(feature = "std")]
+#[path = ""]
 mod provider {
     use super::WorkSpace;
     use std::cell::{RefCell, RefMut};
@@ -332,6 +333,7 @@ mod provider {
 }
 
 #[cfg(not(feature = "std"))]
+#[path = ""]
 mod provider {
     use super::WorkSpace;
     use crate::utils::{Mutex, MutexGuard};

@@ -1,9 +1,9 @@
 #[cfg(all(feature = "simd", target_feature = "avx"))]
-#[path = "avx.rs"]
-mod imp;
+mod avx;
+#[cfg(all(feature = "simd", target_feature = "avx"))]
+pub use avx::qk;
 
 #[cfg(not(all(feature = "simd", target_feature = "avx")))]
-#[path = "naive.rs"]
-mod imp;
-
-pub use imp::qk;
+mod naive;
+#[cfg(not(all(feature = "simd", target_feature = "avx")))]
+pub use naive::qk;
