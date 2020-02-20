@@ -22,7 +22,7 @@ fn test_algorithm<A: Algorithm2<fn(f64, f64) -> f64>>(
     tol: Tolerance,
     expect: Expect,
 ) {
-    let mut integrator = Integrator2::new(f, algorithm).tolerance(tol);
+    let mut integrator = Integrator2::with_algorithm(f, algorithm).tolerance(tol);
 
     let result = integrator.run(r.clone());
     unsafe {

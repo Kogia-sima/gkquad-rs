@@ -13,7 +13,7 @@ pub struct Integrator2<F: Integrand2, A: Algorithm2<F>> {
 
 impl<F: Integrand2, A: Algorithm2<F>> Integrator2<F, A> {
     #[inline]
-    pub fn new(integrand: F, algorithm: A) -> Integrator2<F, A> {
+    pub fn with_algorithm(integrand: F, algorithm: A) -> Integrator2<F, A> {
         Self {
             integrand,
             algorithm,
