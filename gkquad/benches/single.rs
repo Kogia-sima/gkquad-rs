@@ -7,7 +7,6 @@ use bencher::{black_box, Bencher};
 use std::f64::consts::PI;
 use std::f64::{INFINITY, NEG_INFINITY};
 
-use gkquad::single::algorithm::*;
 use gkquad::single::{integral, Integrator};
 use gkquad::Tolerance;
 
@@ -20,7 +19,7 @@ fn simple(b: &mut Bencher) {
 }
 
 fn singular_points(b: &mut Bencher) {
-    let mut integrator = Integrator::new(|x: f64| x.recip(), QAGP::new())
+    let mut integrator = Integrator::new(|x: f64| x.recip())
         .points(&[0.])
         .tolerance(Tolerance::Absolute(1.49e-8));
 

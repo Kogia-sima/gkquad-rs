@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 #[macro_use]
 mod common;
 use common::functions::*;
@@ -24,7 +26,9 @@ fn test_algorithm<A: Algorithm<fn(f64) -> f64>>(
     tol: Tolerance,
     expect: Expect,
 ) {
-    let mut integrator = Integrator::new(f, algorithm).tolerance(tol).points(pts);
+    let mut integrator = Integrator::with_algorithm(f, algorithm)
+        .tolerance(tol)
+        .points(pts);
     let provider = WorkSpaceProvider::new(WorkSpaceId::Single);
 
     let result = integrator.run(a..b);

@@ -23,7 +23,7 @@
 //!
 //! // calculate the integral over range (-∞, ∞), with QAGP algorithm,
 //! // maximum iteration limit being 100, singular point on the origin of coordinate.
-//! let result = Integrator::new(|x: f64| 1. - (-(x.abs() / 1.6).powf(-2.3)).exp(), QAGP::new())
+//! let result = Integrator::new(|x: f64| 1. - (-(x.abs() / 1.6).powf(-2.3)).exp())
 //!         .limit(100)
 //!         .points(&[0.])
 //!         .run(NEG_INFINITY..INFINITY)

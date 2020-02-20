@@ -1,6 +1,5 @@
 extern crate gkquad;
 
-use gkquad::single::algorithm::QAGS;
 use gkquad::single::Integrator;
 use gkquad::Tolerance;
 use std::cell::Cell;
@@ -10,8 +9,8 @@ use std::time::Instant;
 fn main() {
     let timer = Instant::now();
     let m = Cell::new(1);
-    let mut integrator = Integrator::new(|x: f64| (x * PI).sin().powi(m.get()), QAGS::new())
-        .tolerance(Tolerance::Absolute(1.));
+    let mut integrator =
+        Integrator::new(|x: f64| (x * PI).sin().powi(m.get())).tolerance(Tolerance::Absolute(1.));
     let expected = 36722.362174233774391;
 
     for _ in 0..100000 {
