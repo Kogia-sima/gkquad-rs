@@ -41,26 +41,9 @@ impl<F: Integrand> Algorithm<F> for QAGP {
 
         if transform {
             let range = transform_range(range);
-
-            // transform singular points
-            let mut points = Points::with_capacity(config.points.len());
-            config
-                .points
-                .iter()
-                .zip(points.iter_mut())
-                .for_each(|(x, y)| {
-                    *y = transform_point(*x);
-                });
-
-            let new_config = IntegrationConfig {
-                tolerance: config.tolerance.clone(),
-                limit: config.limit,
-                points,
-            };
-
-            integrate_impl(&qk25, &range, &new_config, self.id)
+            integrate_impl(&qk25, &range, config, self.id, transform)
         } else {
-            integrate_impl(&qk25, range, config, self.id)
+            integrate_impl(&qk25, range, config, self.id, transform)
         }
     }
 }
@@ -72,8 +55,9 @@ fn integrate_impl(
     range: &Range,
     config: &IntegrationConfig,
     id: WorkSpaceId,
+    transform: bool,
 ) -> IntegrationResult {
-    let pts = make_sorted_points(range, &config.points);
+    let pts = make_sorted_points(range, &config.points, transform);
     let nint = pts.len() - 1; // number of ranges
 
     let provider = WorkSpaceProvider::new(id);
@@ -359,7 +343,7 @@ fn integrate_impl(
     IntegrationResult::new(res_ext, err_ext, error)
 }
 
-fn make_sorted_points(range: &Range, pts: &[f64]) -> Points {
+fn make_sorted_points(range: &Range, pts: &[f64], transform: bool) -> Points {
     let (min, max) = if range.begin < range.end {
         (range.begin, range.end)
     } else {
@@ -368,7 +352,12 @@ fn make_sorted_points(range: &Range, pts: &[f64]) -> Points {
 
     let mut pts2 = Points::with_capacity(pts.len() + 2);
     pts2.push(range.begin);
-    pts2.extend_from_slice(pts);
+
+    if transform {
+        pts2.extend(pts.iter().map(|v| transform_point(*v)));
+    } else {
+        pts2.extend_from_slice(pts);
+    }
 
     if range.begin < range.end {
         insert_sort(&mut pts2[1..], &mut |a, b| a < b);
@@ -376,8 +365,7 @@ fn make_sorted_points(range: &Range, pts: &[f64]) -> Points {
         insert_sort(&mut pts2[1..], &mut |a, b| a > b);
     };
 
-    pts2.push(range.end);
-
     pts2.retain(|&mut x| min <= x && x <= max);
+    pts2.push(range.end);
     pts2
 }
