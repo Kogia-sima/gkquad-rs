@@ -300,7 +300,7 @@ mod provider {
         static WORKSPACE2: RefCell<WorkSpace> = RefCell::new(WorkSpace::new());
     }
 
-    #[derive(Clone)]
+    #[derive(Clone, Copy)]
     pub enum WorkSpaceId {
         Single,
         Double,
@@ -339,7 +339,7 @@ mod provider {
     static WORKSPACE1: Mutex<WorkSpace> = Mutex::new(WorkSpace::new());
     static WORKSPACE2: Mutex<WorkSpace> = Mutex::new(WorkSpace::new());
 
-    #[derive(Clone)]
+    #[derive(Clone, Copy)]
     pub enum WorkSpaceId {
         Single,
         Double,

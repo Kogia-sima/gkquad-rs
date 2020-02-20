@@ -64,17 +64,11 @@ macro_rules! extra_traits {
 mod qag;
 pub use qag::*;
 
-mod qag_finite;
-
 mod qags;
 pub use qags::*;
 
-mod qags_finite;
-
 mod qagp;
 pub use qagp::*;
-
-mod qagp_finite;
 
 mod auto;
 pub use auto::*;
