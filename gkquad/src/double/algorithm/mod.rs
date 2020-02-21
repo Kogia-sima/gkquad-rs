@@ -61,3 +61,6 @@ pub use qag::*;
 
 mod qags;
 pub use qags::*;
+
+mod qagp;
+pub use qagp::*;
