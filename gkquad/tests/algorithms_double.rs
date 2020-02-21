@@ -17,12 +17,14 @@ struct Expect {
 fn test_algorithm<A: Algorithm2<fn(f64, f64) -> f64>>(
     f: fn(f64, f64) -> f64,
     r: Range2,
-    _: &[(f64, f64)],
+    pts: &[(f64, f64)],
     algorithm: A,
     tol: Tolerance,
     expect: Expect,
 ) {
-    let mut integrator = Integrator2::with_algorithm(f, algorithm).tolerance(tol);
+    let mut integrator = Integrator2::with_algorithm(f, algorithm)
+        .tolerance(tol)
+        .points(pts);
 
     let result = integrator.run(r.clone());
     unsafe {
@@ -111,4 +113,44 @@ fn qags_g4() {
     };
     let range = (0.0.., 0.0..).into();
     test_algorithm(g4, range, &[], QAGS2::new(), Absolute(1e-8), expect);
+}
+
+#[test]
+fn qagp_gp1() {
+    let expect = Expect {
+        value: 4.418277998646525e+00,
+        delta: 5.178080186851730e-13,
+        error: None,
+    };
+    let range = Range2::square(-1.0, 1.0, -1.0, 1.0).unwrap();
+    test_algorithm(
+        gp1,
+        range,
+        &[(0.0, 0.0)],
+        QAGP2::new(),
+        Relative(1e-6),
+        expect,
+    )
+}
+
+#[test]
+fn qagp_gp2() {
+    let expect = Expect {
+        value: 0.0,
+        delta: 4.008855112182828e-14,
+        error: None,
+    };
+    let yrange = |x: f64| {
+        let ymax = (1.0 - x * x).sqrt();
+        Range::new(-ymax, ymax).unwrap()
+    };
+    let range = Range2::custom(-1.0, 1.0, yrange).unwrap();
+    test_algorithm(
+        gp2,
+        range,
+        &[(0.0, 0.0)],
+        QAGP2::new(),
+        Absolute(1e-5),
+        expect,
+    )
 }

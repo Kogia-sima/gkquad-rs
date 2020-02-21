@@ -49,3 +49,12 @@ pub fn g3(x: f64, y: f64) -> f64 {
 pub fn g4(x: f64, y: f64) -> f64 {
     1.0 / (1.0 + x + y).powi(3)
 }
+
+// singular points in (0.0, 0.0)
+pub fn gp1(x: f64, y: f64) -> f64 {
+    1.0 / f64::sqrt(f64::abs(x) + f64::abs(y))
+}
+
+pub fn gp2(x: f64, y: f64) -> f64 {
+    x / (x * x + y * y)
+}
