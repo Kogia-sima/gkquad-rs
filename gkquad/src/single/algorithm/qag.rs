@@ -72,7 +72,7 @@ fn integrate_impl(
     let provider = WorkSpaceProvider::new(id);
     let mut ws = provider.get_mut();
     ws.clear();
-    ws.reserve(config.limit);
+    ws.reserve(config.max_iters);
 
     ws.push(SubRangeInfo::new(
         range.clone(),
@@ -81,7 +81,7 @@ fn integrate_impl(
         0,
     ));
 
-    for _ in 1..config.limit {
+    for _ in 1..config.max_iters {
         // 最も誤差が大きい部分区間を取り出す
         let info = ws.get();
         let current_level = info.level + 1;
@@ -178,7 +178,7 @@ fn initial_integral(
                 IntegrationResult::new(result0.estimate, result0.delta, None),
                 true,
             );
-        } else if config.limit == 1 {
+        } else if config.max_iters == 1 {
             return (
                 IntegrationResult::new(
                     result0.estimate,

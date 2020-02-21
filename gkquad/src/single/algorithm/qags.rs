@@ -76,7 +76,7 @@ fn integrate_impl(
     let provider = WorkSpaceProvider::new(id);
     let mut ws = provider.get_mut();
     ws.clear();
-    ws.reserve(config.limit);
+    ws.reserve(config.max_iters);
 
     ws.push(SubRangeInfo::new(
         range.clone(),
@@ -96,7 +96,7 @@ fn integrate_impl(
     let mut res_ext = result0.estimate;
     let mut err_ext = core::f64::MAX;
 
-    for iteration in 2..=config.limit {
+    for iteration in 2..=config.max_iters {
         // Bisect the subrange with the largest error estimate
         let info = ws.get();
         let current_level = info.level + 1;
@@ -174,7 +174,7 @@ fn integrate_impl(
         }
 
         // 最終ループでは補外を行う必要がないため即座にreturnする
-        if iteration >= config.limit - 1 {
+        if iteration >= config.max_iters - 1 {
             error = Some(InsufficientIteration);
             break;
         }
@@ -318,7 +318,7 @@ fn initial_integral(
                 0.,
                 true,
             );
-        } else if config.limit == 1 {
+        } else if config.max_iters == 1 {
             return (
                 IntegrationResult::new(
                     result0.estimate,

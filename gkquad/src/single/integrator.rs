@@ -18,7 +18,7 @@ use crate::{IntegrationResult, Tolerance};
 ///
 /// let mut integrator = Integrator::new(|x: f64| x.powi(m.get()))
 ///     .tolerance(Tolerance::Relative(1e-7))
-///     .limit(100);
+///     .max_iters(100);
 ///
 /// while m.get() <= 10 {
 ///     result *= integrator.run(0.0..1.0).estimate().unwrap();
@@ -66,8 +66,8 @@ impl<F: Integrand, A: Algorithm<F>> Integrator<F, A> {
 
     /// Set maximum number of subranges
     #[inline]
-    pub fn limit(mut self, limit: usize) -> Self {
-        self.config.limit = limit;
+    pub fn max_iters(mut self, max_iters: usize) -> Self {
+        self.config.max_iters = max_iters;
         self
     }
 

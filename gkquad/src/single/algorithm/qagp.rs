@@ -63,7 +63,7 @@ fn integrate_impl(
     let provider = WorkSpaceProvider::new(id);
     let mut ws = provider.get_mut();
     ws.clear();
-    ws.reserve(usize::max(config.limit, pts.len()));
+    ws.reserve(usize::max(config.max_iters, pts.len()));
 
     let (mut reseps, mut abseps, mut correc) = (0.0, 0.0, 0.0);
     let mut ktmin = 0;
@@ -137,7 +137,7 @@ fn integrate_impl(
         return IntegrationResult::new(result0.estimate, result0.delta, Some(RoundoffError));
     } else if result0.delta <= tolerance && result0.delta != result0.asc || result0.delta == 0.0 {
         return IntegrationResult::new(result0.estimate, result0.delta, None);
-    } else if config.limit == 1 {
+    } else if config.max_iters == 1 {
         return IntegrationResult::new(
             result0.estimate,
             result0.delta,
@@ -156,7 +156,7 @@ fn integrate_impl(
     let mut error_over_large_ranges = deltasum;
     let mut ertest = tolerance;
 
-    for iteration in nint..=config.limit {
+    for iteration in nint..=config.max_iters {
         let info = ws.get();
 
         let current_level = info.level + 1;
@@ -231,7 +231,7 @@ fn integrate_impl(
             break;
         }
 
-        if iteration >= config.limit - 1 {
+        if iteration >= config.max_iters - 1 {
             error = Some(InsufficientIteration);
             break;
         }
