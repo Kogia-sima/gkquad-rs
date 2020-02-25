@@ -4,9 +4,6 @@
     clippy::uninit_assumed_init
 )]
 
-use std::borrow::Borrow;
-use std::ops::{Add, AddAssign};
-
 use super::common::{Integrand, Range};
 use super::qk_impl::qk;
 use super::util::Aligned;
@@ -22,32 +19,6 @@ pub struct QKResult {
     pub absvalue: f64,
     /// approximation to the integral of |f - quad(f)/(b - a)|
     pub asc: f64,
-}
-
-impl<T: Borrow<QKResult>> Add<T> for QKResult {
-    type Output = QKResult;
-
-    #[inline]
-    fn add(self, other: T) -> QKResult {
-        let other = other.borrow();
-        QKResult {
-            estimate: self.estimate + other.estimate,
-            delta: self.delta + other.delta,
-            absvalue: self.absvalue + other.absvalue,
-            asc: self.asc + other.asc,
-        }
-    }
-}
-
-impl<T: Borrow<QKResult>> AddAssign<T> for QKResult {
-    #[inline]
-    fn add_assign(&mut self, other: T) {
-        let other = other.borrow();
-        self.estimate += other.estimate;
-        self.delta += other.delta;
-        self.absvalue += other.absvalue;
-        self.asc += other.asc;
-    }
 }
 
 /// Performs Gauss-Kronrod integration with 17-point kronrod rule

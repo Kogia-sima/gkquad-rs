@@ -99,7 +99,7 @@ fn integrate_impl(
         }
 
         let current_level = (result1.delta == result1.asc && result1.delta != 0.0) as usize;
-        result0 += &result1;
+        add_qkresult(&mut result0, &result1);
 
         ws.push(SubRangeInfo::new(
             range,
@@ -368,4 +368,11 @@ fn make_sorted_points(range: &Range, pts: &[f64], transform: bool) -> Points {
     pts2.retain(|&mut x| min <= x && x <= max);
     pts2.push(range.end);
     pts2
+}
+
+fn add_qkresult(result1: &mut QKResult, result2: &QKResult) {
+    result1.estimate += result2.estimate;
+    result1.delta += result2.delta;
+    result1.absvalue += result2.absvalue;
+    result1.asc += result2.asc;
 }
