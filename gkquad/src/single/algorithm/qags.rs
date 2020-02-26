@@ -8,22 +8,15 @@ use crate::single::qk::{qk17, qk25, QKResult};
 use crate::single::util::{
     bisect, subrange_too_small, test_positivity, transform_range, IntegrandWrapper,
 };
-use crate::single::workspace::{SubRangeInfo, WorkSpaceId, WorkSpaceProvider};
+use crate::single::workspace::{borrow_workspace, SubRangeInfo};
 
 #[derive(Clone)]
-pub struct QAGS {
-    id: WorkSpaceId,
-}
+pub struct QAGS;
 
 impl QAGS {
     #[inline]
     pub fn new() -> Self {
-        Self::with_id(WorkSpaceId::Single)
-    }
-
-    #[inline]
-    pub(crate) fn with_id(id: WorkSpaceId) -> Self {
-        Self { id }
+        Self
     }
 }
 
@@ -40,9 +33,9 @@ impl<F: Integrand> Algorithm<F> for QAGS {
 
         if transform {
             let range = transform_range(range);
-            integrate_impl(&qk17, &qk25, &range, config, self.id)
+            integrate_impl(&qk17, &qk25, &range, config)
         } else {
-            integrate_impl(&qk17, &qk25, range, config, self.id)
+            integrate_impl(&qk17, &qk25, range, config)
         }
     }
 }
@@ -54,7 +47,6 @@ fn integrate_impl(
     qk25: &dyn Fn(&Range) -> QKResult,
     range: &Range,
     config: &IntegrationConfig,
-    id: WorkSpaceId,
 ) -> IntegrationResult {
     let mut ertest = 0f64;
     let mut error_over_large_ranges = 0f64;
@@ -73,8 +65,7 @@ fn integrate_impl(
         return result0;
     }
 
-    let provider = WorkSpaceProvider::new(id);
-    let mut ws = provider.get_mut();
+    let mut ws = borrow_workspace();
     ws.clear();
     ws.reserve(config.max_iters);
 

@@ -9,22 +9,15 @@ use crate::single::util::{
     bisect, insert_sort, subrange_too_small, test_positivity, transform_point, transform_range,
     IntegrandWrapper,
 };
-use crate::single::workspace::{SubRangeInfo, WorkSpaceId, WorkSpaceProvider};
+use crate::single::workspace::{borrow_workspace, SubRangeInfo};
 
 #[derive(Clone)]
-pub struct QAGP {
-    id: WorkSpaceId,
-}
+pub struct QAGP;
 
 impl QAGP {
     #[inline]
     pub fn new() -> Self {
-        Self::with_id(WorkSpaceId::Single)
-    }
-
-    #[inline]
-    pub(crate) fn with_id(id: WorkSpaceId) -> Self {
-        Self { id }
+        Self
     }
 }
 
@@ -41,9 +34,9 @@ impl<F: Integrand> Algorithm<F> for QAGP {
 
         if transform {
             let range = transform_range(range);
-            integrate_impl(&qk25, &range, config, self.id, transform)
+            integrate_impl(&qk25, &range, config, transform)
         } else {
-            integrate_impl(&qk25, range, config, self.id, transform)
+            integrate_impl(&qk25, range, config, transform)
         }
     }
 }
@@ -54,14 +47,12 @@ fn integrate_impl(
     qk25: &dyn Fn(&Range) -> QKResult,
     range: &Range,
     config: &IntegrationConfig,
-    id: WorkSpaceId,
     transform: bool,
 ) -> IntegrationResult {
     let pts = make_sorted_points(range, &config.points, transform);
     let nint = pts.len() - 1; // number of ranges
 
-    let provider = WorkSpaceProvider::new(id);
-    let mut ws = provider.get_mut();
+    let mut ws = borrow_workspace();
     ws.clear();
     ws.reserve(usize::max(config.max_iters, pts.len()));
 

@@ -5,8 +5,8 @@ mod common;
 use common::functions::*;
 
 use gkquad::single::algorithm::*;
+use gkquad::single::borrow_workspace;
 use gkquad::single::Integrator;
-use gkquad::single::{WorkSpaceId, WorkSpaceProvider};
 use gkquad::RuntimeError;
 use gkquad::Tolerance::{self, *};
 
@@ -29,8 +29,6 @@ fn test_algorithm<A: Algorithm<fn(f64) -> f64>>(
     let mut integrator = Integrator::with_algorithm(f, algorithm)
         .tolerance(tol)
         .points(pts);
-    let provider = WorkSpaceProvider::new(WorkSpaceId::Single);
-
     let result = integrator.run(a..b);
     unsafe {
         assert_eq!(result.err(), expect.error);
@@ -38,7 +36,7 @@ fn test_algorithm<A: Algorithm<fn(f64) -> f64>>(
         assert_rel!(result.delta_unchecked(), expect.delta, 1e-7);
 
         if cfg!(feature = "std") && !expect.order.is_empty() {
-            let ws = provider.get_mut();
+            let ws = borrow_workspace();
             assert_eq!(&ws.order, &expect.order);
         }
     }
@@ -51,7 +49,7 @@ fn test_algorithm<A: Algorithm<fn(f64) -> f64>>(
         assert_rel!(result.delta_unchecked(), expect.delta, 1e-7);
 
         if cfg!(feature = "std") && !expect.order.is_empty() && pts.is_empty() {
-            let ws = provider.get_mut();
+            let ws = borrow_workspace();
             assert_eq!(&ws.order, &expect.order);
         }
     }
