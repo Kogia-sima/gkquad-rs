@@ -22,6 +22,13 @@ impl<'a> QAG<'a> {
             workspace: CowMut::Owned(WorkSpace::new()),
         }
     }
+
+    #[inline]
+    pub fn with_workspace(ws: &'a mut WorkSpace) -> Self {
+        Self {
+            workspace: CowMut::Borrowed(ws),
+        }
+    }
 }
 
 impl<'a, F: Integrand> Algorithm<F> for QAG<'a> {
