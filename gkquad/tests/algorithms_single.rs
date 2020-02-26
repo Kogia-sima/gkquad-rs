@@ -5,7 +5,6 @@ mod common;
 use common::functions::*;
 
 use gkquad::single::algorithm::*;
-use gkquad::single::borrow_workspace;
 use gkquad::single::Integrator;
 use gkquad::RuntimeError;
 use gkquad::Tolerance::{self, *};

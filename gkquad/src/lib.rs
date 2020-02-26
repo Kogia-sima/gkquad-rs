@@ -43,19 +43,3 @@ pub mod single;
 pub mod double;
 
 pub mod prelude;
-
-/// Deallocate the cache memory
-///
-/// `gkquad` keeps the allocated memory on the thread-local storage until program ends.
-/// However, if you use this crate in the multi-thread application or set `limit`
-/// option too high, then that storage leaks and occupies large amount of memory.
-///
-/// `free_memory` function will deallocate this storage of the `current thread`. If you
-/// want to deallocate the storages on the all threads, you have to call this function
-/// from all threads.
-pub fn free_memory() {
-    use single::borrow_workspace;
-
-    let mut ws = borrow_workspace();
-    ws.release();
-}
