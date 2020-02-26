@@ -9,15 +9,20 @@ use crate::single::qk::{qk17, qk25, QKResult};
 use crate::single::util::{
     bisect, subrange_too_small, test_positivity, transform_range, IntegrandWrapper,
 };
-use crate::single::workspace::{borrow_workspace, SubRangeInfo};
+use crate::single::workspace::{SubRangeInfo, WorkSpace};
+use crate::utils::CowMut;
 
 #[derive(Clone)]
-pub struct QAGS;
+pub struct QAGS<'a> {
+    workspace: CowMut<'a, WorkSpace>,
+}
 
-impl QAGS {
+impl<'a> QAGS<'a> {
     #[inline]
     pub fn new() -> Self {
-        Self
+        Self {
+            workspace: CowMut::Owned(WorkSpace::new()),
+        }
     }
 }
 
@@ -41,17 +46,18 @@ impl<'a, F: Integrand> Algorithm<F> for QAGS<'a> {
 
         let qk17 = |r: &Range| unsafe { qk17(&mut *wrapper.get(), r) };
         let qk25 = |r: &Range| unsafe { qk25(&mut *wrapper.get(), r) };
-        integrate_impl(&qk17, &qk25, &range, config)
+        integrate_impl(&qk17, &qk25, &range, config, &mut *self.workspace)
     }
 }
 
-extra_traits!(QAGS);
+extra_traits!(QAGS<'a>);
 
 fn integrate_impl(
     qk17: &dyn Fn(&Range) -> QKResult,
     qk25: &dyn Fn(&Range) -> QKResult,
     range: &Range,
     config: &IntegrationConfig,
+    ws: &mut WorkSpace,
 ) -> IntegrationResult {
     let mut ertest = 0f64;
     let mut error_over_large_ranges = 0f64;
@@ -70,7 +76,6 @@ fn integrate_impl(
         return result0;
     }
 
-    let mut ws = borrow_workspace();
     ws.clear();
     ws.reserve(config.max_iters);
 

@@ -5,12 +5,18 @@ use crate::single::common::{Integrand, IntegrationConfig, Range};
 /// Automatically select algorithm based on configuration
 #[derive(Clone)]
 #[deprecated(since = "0.0.3", note = "Use QAGS or QAGP method instead.")]
-pub struct AUTO;
+pub struct AUTO {
+    qags: QAGS<'static>,
+    qagp: QAGP<'static>,
+}
 
 impl AUTO {
     #[inline(always)]
-    pub const fn new() -> Self {
-        Self
+    pub fn new() -> Self {
+        Self {
+            qags: QAGS::new(),
+            qagp: QAGP::new(),
+        }
     }
 }
 
@@ -22,11 +28,9 @@ impl<F: Integrand> Algorithm<F> for AUTO {
         config: &IntegrationConfig,
     ) -> IntegrationResult {
         if config.points.is_empty() {
-            let mut qags = QAGS::new();
-            qags.integrate(f, range, config)
+            self.qags.integrate(f, range, config)
         } else {
-            let mut qagp = QAGP::new();
-            qagp.integrate(f, range, config)
+            self.qagp.integrate(f, range, config)
         }
     }
 }

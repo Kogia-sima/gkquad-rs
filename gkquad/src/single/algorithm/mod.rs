@@ -69,6 +69,8 @@ macro_rules! extra_traits {
         impl $($lifetimes)* std::hash::Hash for $name $($lifetimes)* {
             fn hash<H: std::hash::Hasher>(&self, _: &mut H) {}
         }
+
+        impl $($lifetimes)* std::panic::UnwindSafe for $name $($lifetimes)* {}
     };
 }
 
