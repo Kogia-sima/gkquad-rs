@@ -17,7 +17,7 @@ struct Expect<'a> {
     error: Option<RuntimeError>,
 }
 
-fn test_algorithm<A: Algorithm<fn(f64) -> f64>>(
+fn test_algorithm<A: Algorithm<fn(f64) -> f64> + AlgorithmWithWorkSpace>(
     f: fn(f64) -> f64,
     a: f64,
     b: f64,
@@ -36,7 +36,7 @@ fn test_algorithm<A: Algorithm<fn(f64) -> f64>>(
         assert_rel!(result.delta_unchecked(), expect.delta, 1e-7);
 
         if cfg!(feature = "std") && !expect.order.is_empty() {
-            let ws = borrow_workspace();
+            let ws = integrator.get_algorithm().workspace();
             assert_eq!(&ws.order, &expect.order);
         }
     }
@@ -49,7 +49,7 @@ fn test_algorithm<A: Algorithm<fn(f64) -> f64>>(
         assert_rel!(result.delta_unchecked(), expect.delta, 1e-7);
 
         if cfg!(feature = "std") && !expect.order.is_empty() && pts.is_empty() {
-            let ws = borrow_workspace();
+            let ws = integrator.get_algorithm().workspace();
             assert_eq!(&ws.order, &expect.order);
         }
     }

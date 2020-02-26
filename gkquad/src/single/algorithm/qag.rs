@@ -24,10 +24,18 @@ impl<'a> QAG<'a> {
     }
 
     #[inline]
+    #[doc(hidden)]
     pub fn with_workspace(ws: &'a mut WorkSpace) -> Self {
         Self {
             workspace: CowMut::Borrowed(ws),
         }
+    }
+}
+
+#[doc(hidden)]
+impl<'a> super::AlgorithmWithWorkSpace for QAG<'a> {
+    fn workspace(&self) -> &WorkSpace {
+        &*self.workspace
     }
 }
 
