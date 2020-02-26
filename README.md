@@ -30,7 +30,7 @@ features = ["single"]
 
 ## Performance
 
-Here is the benchmark measured on Intel Core(TM) i5 @ 1.60GHz
+Here is the benchmark measured on Intel Core(TM) i5 @ 1.60GHz (without turbo boost)
 
 ```console
 $ cargo bench
@@ -38,9 +38,9 @@ $ cargo bench
      Running /tmp/gkquad-rs/target/release/deps/single-3b52efd7f739cf4b
 
 running 3 tests
-test infinite_interval ... bench:         211 ns/iter (+/- 4)
-test simple            ... bench:          38 ns/iter (+/- 1)
-test singular_points   ... bench:         621 ns/iter (+/- 42)
+test infinite_range  ... bench:         524 ns/iter (+/- 10)
+test simple          ... bench:          96 ns/iter (+/- 1)
+test singular_points ... bench:       1,516 ns/iter (+/- 2)
 
 test result: ok. 0 passed; 0 failed; 0 ignored; 3 measured
 ```
