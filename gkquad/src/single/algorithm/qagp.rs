@@ -24,7 +24,12 @@ impl QAGP {
 
 impl<F: Integrand> Algorithm<F> for QAGP {
     #[inline]
-    fn integrate(&self, f: &mut F, range: &Range, config: &IntegrationConfig) -> IntegrationResult {
+    fn integrate(
+        &mut self,
+        f: &mut F,
+        range: &Range,
+        config: &IntegrationConfig,
+    ) -> IntegrationResult {
         let transform = !range.begin.is_finite() || !range.end.is_finite();
         let wrapper = UnsafeCell::new(IntegrandWrapper {
             inner: f,

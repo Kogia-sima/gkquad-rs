@@ -21,8 +21,13 @@ impl QAGS {
     }
 }
 
-impl<F: Integrand> Algorithm<F> for QAGS {
-    fn integrate(&self, f: &mut F, range: &Range, config: &IntegrationConfig) -> IntegrationResult {
+impl<'a, F: Integrand> Algorithm<F> for QAGS<'a> {
+    fn integrate(
+        &mut self,
+        f: &mut F,
+        range: &Range,
+        config: &IntegrationConfig,
+    ) -> IntegrationResult {
         let transform = !range.begin.is_finite() || !range.end.is_finite();
         let wrapper = UnsafeCell::new(IntegrandWrapper {
             inner: f,

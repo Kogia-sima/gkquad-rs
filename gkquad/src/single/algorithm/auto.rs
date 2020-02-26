@@ -15,12 +15,17 @@ impl AUTO {
 }
 
 impl<F: Integrand> Algorithm<F> for AUTO {
-    fn integrate(&self, f: &mut F, range: &Range, config: &IntegrationConfig) -> IntegrationResult {
+    fn integrate(
+        &mut self,
+        f: &mut F,
+        range: &Range,
+        config: &IntegrationConfig,
+    ) -> IntegrationResult {
         if config.points.is_empty() {
-            let qags = QAGS::new();
+            let mut qags = QAGS::new();
             qags.integrate(f, range, config)
         } else {
-            let qagp = QAGP::new();
+            let mut qagp = QAGP::new();
             qagp.integrate(f, range, config)
         }
     }
