@@ -11,9 +11,10 @@ use gkquad::single::{integral, Integrator};
 use gkquad::Tolerance;
 
 fn simple(b: &mut Bencher) {
+    let mut integrator = Integrator::new(|x: f64| x * x);
     b.iter(|| {
         let range = black_box(0.0..1.0);
-        let result = integral(|x: f64| x * x, range).estimate().unwrap();
+        let result = integrator.run(range).estimate().unwrap();
         assert!((result - 1.0 / 3.0).abs() <= 1.49e-8);
     });
 }
@@ -31,11 +32,11 @@ fn singular_points(b: &mut Bencher) {
 }
 
 fn infinite_range(b: &mut Bencher) {
-    let integrand = |x: f64| (1.0 + x * x).recip();
+    let mut integrator = Integrator::new(|x: f64| (1.0 + x * x).recip());
 
     b.iter(|| {
         let range = black_box(NEG_INFINITY..INFINITY);
-        let result = integral(integrand, range).estimate().unwrap();
+        let result = integrator.run(range).estimate().unwrap();
         assert!((result - PI).abs() <= 1.49e-8);
     });
 }
