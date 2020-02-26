@@ -1,3 +1,4 @@
+use alloc::borrow::Cow;
 use std::cell::UnsafeCell;
 
 use crate::error::{IntegrationResult, RuntimeError::*};
@@ -32,16 +33,15 @@ impl<F: Integrand> Algorithm<F> for QAG {
             inner: f,
             transform,
         });
+        let range = if transform {
+            Cow::Owned(transform_range(range))
+        } else {
+            Cow::Borrowed(range)
+        };
 
         let qk17 = |r: &Range| unsafe { qk17(&mut *wrapper.get(), r) };
         let qk25 = |r: &Range| unsafe { qk25(&mut *wrapper.get(), r) };
-
-        if transform {
-            let range = transform_range(range);
-            integrate_impl(&qk17, &qk25, &range, config, self.id)
-        } else {
-            integrate_impl(&qk17, &qk25, range, config, self.id)
-        }
+        integrate_impl(&qk17, &qk25, &range, config, self.id)
     }
 }
 
