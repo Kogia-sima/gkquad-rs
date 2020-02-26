@@ -24,6 +24,7 @@ fn test_algorithm<A: Algorithm2<fn(f64, f64) -> f64>>(
 ) {
     let mut integrator = Integrator2::with_algorithm(f, algorithm)
         .tolerance(tol)
+        .max_iters(50)
         .points(pts);
 
     let result = integrator.run(r.clone());
@@ -137,7 +138,7 @@ fn qagp_gp1() {
 fn qagp_gp2() {
     let expect = Expect {
         value: 0.0,
-        delta: 4.008855112182828e-14,
+        delta: 0.0,
         error: None,
     };
     let yrange = |x: f64| {
@@ -151,6 +152,28 @@ fn qagp_gp2() {
         &[(0.0, 0.0)],
         QAGP2::new(),
         Absolute(1e-5),
+        expect,
+    )
+}
+
+#[test]
+fn qagp_gp3() {
+    let expect = Expect {
+        value: 3.1405512761654535e+00,
+        delta: 1.2713636980836154e+00,
+        error: None,
+    };
+    let yrange = |x: f64| {
+        let ymax = (1.0 - x * x).sqrt();
+        Range::new(-ymax, ymax).unwrap()
+    };
+    let range = Range2::custom(-1.0, 1.0, yrange).unwrap();
+    test_algorithm(
+        gp3,
+        range,
+        &[(0.0, 0.0)],
+        QAGP2::new(),
+        Absolute(1e+1),
         expect,
     )
 }

@@ -58,3 +58,7 @@ pub fn gp1(x: f64, y: f64) -> f64 {
 pub fn gp2(x: f64, y: f64) -> f64 {
     x / (x * x + y * y)
 }
+
+pub fn gp3(x: f64, y: f64) -> f64 {
+    0.5 / f64::sqrt(x * x + y * y)
+}
