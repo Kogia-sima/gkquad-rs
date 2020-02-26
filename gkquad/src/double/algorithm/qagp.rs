@@ -4,7 +4,7 @@ use super::super::common::{Integrand2, IntegrationConfig2, Range2};
 use super::Algorithm2;
 use crate::single::algorithm::{Algorithm, QAGP};
 use crate::single::IntegrationConfig;
-use crate::single::WorkSpaceId;
+use crate::single::WorkSpace;
 use crate::IntegrationResult;
 
 pub struct QAGP2;
@@ -24,13 +24,14 @@ impl<F: Integrand2> Algorithm2<F> for QAGP2 {
     ) -> IntegrationResult {
         let mut config1 = IntegrationConfig {
             tolerance: config.tolerance.clone(),
-            limit: config.limit,
+            max_iters: config.max_iters,
             ..Default::default()
         };
 
         let config2 = config1.clone();
 
-        let inner = QAGP::with_id(WorkSpaceId::Single);
+        let mut inner_ws = WorkSpace::new();
+        let mut inner = QAGP::with_workspace(&mut inner_ws);
         let mut error = None;
 
         let xrange = match range {
@@ -80,8 +81,7 @@ impl<F: Integrand2> Algorithm2<F> for QAGP2 {
             result.estimate().unwrap_or(std::f64::NAN)
         };
 
-        let mut result =
-            QAGP::with_id(WorkSpaceId::Double).integrate(&mut integrand, xrange, &config2);
+        let mut result = QAGP::new().integrate(&mut integrand, xrange, &config2);
         if error.is_some() {
             result.error = error;
         }
