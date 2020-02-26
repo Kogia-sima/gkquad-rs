@@ -3,8 +3,7 @@ use alloc::borrow::Cow;
 use super::super::common::{Integrand2, IntegrationConfig2, Range2};
 use super::Algorithm2;
 use crate::single::algorithm::{Algorithm, QAGP};
-use crate::single::IntegrationConfig;
-use crate::single::WorkSpace;
+use crate::single::{IntegrationConfig, Points, WorkSpace};
 use crate::IntegrationResult;
 
 pub struct QAGP2;
@@ -22,13 +21,17 @@ impl<F: Integrand2> Algorithm2<F> for QAGP2 {
         range: &Range2,
         config: &IntegrationConfig2,
     ) -> IntegrationResult {
-        let mut config1 = IntegrationConfig {
+        let mut inner_config = IntegrationConfig {
             tolerance: config.tolerance.clone(),
             max_iters: config.max_iters,
-            ..Default::default()
+            points: Points::with_capacity(config.points.len()),
         };
 
-        let config2 = config1.clone();
+        let mut outer_config = IntegrationConfig {
+            tolerance: config.tolerance.clone(),
+            max_iters: config.max_iters,
+            points: Points::with_capacity(config.points.len()),
+        };
 
         let mut inner_ws = WorkSpace::new();
         let mut inner = QAGP::with_workspace(&mut inner_ws);
@@ -44,44 +47,27 @@ impl<F: Integrand2> Algorithm2<F> for QAGP2 {
             &Range2::Custom { ref yrange, .. } => Cow::Owned(yrange(x)),
         };
 
-        let transform = !xrange.begin.is_finite() || !xrange.end.is_finite();
-
-        // look up table
-        let point_lut = if transform {
-            Cow::Owned(
-                config
-                    .points
-                    .iter()
-                    .map(|(x, y)| (transform_point(*x), *y))
-                    .collect(),
-            )
-        } else {
-            Cow::Borrowed(&config.points)
-        };
+        let xtransform = !xrange.begin.is_finite() || !xrange.end.is_finite();
+        config.points.iter().for_each(|&(x, y)| {
+            if xtransform {
+                outer_config.points.push(transform_point(x));
+            } else {
+                outer_config.points.push(x)
+            }
+            inner_config.points.push(y);
+        });
 
         let mut integrand = |x: f64| -> f64 {
-            let ypoints = point_lut
-                .iter()
-                .filter_map(|(x2, y2)| if *x2 == x { Some(*y2) } else { None });
-
-            if ypoints.clone().count() > 0 {
-                config1.points.extend(ypoints);
-            }
-
             let mut integrand2 = |y: f64| f.apply((x, y));
-            let result = inner.integrate(&mut integrand2, &yrange(x), &config1);
+            let result = inner.integrate(&mut integrand2, &*yrange(x), &inner_config);
             if result.has_err() {
                 error = result.err();
-            }
-
-            if !config1.points.is_empty() {
-                config1.points.clear();
             }
 
             result.estimate().unwrap_or(std::f64::NAN)
         };
 
-        let mut result = QAGP::new().integrate(&mut integrand, xrange, &config2);
+        let mut result = QAGP::new().integrate(&mut integrand, xrange, &outer_config);
         if error.is_some() {
             result.error = error;
         }
