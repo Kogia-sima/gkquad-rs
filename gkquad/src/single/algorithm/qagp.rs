@@ -10,21 +10,46 @@ use crate::single::util::{
     bisect, insert_sort, subrange_too_small, test_positivity, transform_point, transform_range,
     IntegrandWrapper,
 };
-use crate::single::workspace::{borrow_workspace, SubRangeInfo};
+use crate::single::workspace::{SubRangeInfo, WorkSpace};
+use crate::utils::CowMut;
 
 #[derive(Clone)]
-pub struct QAGP;
+pub struct QAGP<'a> {
+    workspace: CowMut<'a, WorkSpace>,
+}
 
-impl QAGP {
+impl<'a> QAGP<'a> {
     #[inline]
     pub fn new() -> Self {
-        Self
+        Self {
+            workspace: CowMut::Owned(WorkSpace::new()),
+        }
+    }
+
+    #[inline]
+    #[doc(hidden)]
+    pub fn with_workspace(ws: &'a mut WorkSpace) -> Self {
+        Self {
+            workspace: CowMut::Borrowed(ws),
+        }
     }
 }
 
-impl<F: Integrand> Algorithm<F> for QAGP {
+#[doc(hidden)]
+impl<'a> super::AlgorithmWithWorkSpace for QAGP<'a> {
+    fn workspace(&self) -> &WorkSpace {
+        &*self.workspace
+    }
+}
+
+impl<'a, F: Integrand> Algorithm<F> for QAGP<'a> {
     #[inline]
-    fn integrate(&self, f: &mut F, range: &Range, config: &IntegrationConfig) -> IntegrationResult {
+    fn integrate(
+        &mut self,
+        f: &mut F,
+        range: &Range,
+        config: &IntegrationConfig,
+    ) -> IntegrationResult {
         let transform = !range.begin.is_finite() || !range.end.is_finite();
         let wrapper = UnsafeCell::new(IntegrandWrapper {
             inner: f,
@@ -37,22 +62,22 @@ impl<F: Integrand> Algorithm<F> for QAGP {
         };
 
         let qk25 = |r: &Range| unsafe { qk25(&mut *wrapper.get(), r) };
-        integrate_impl(&qk25, &range, config, transform)
+        integrate_impl(&qk25, &range, config, transform, &mut *self.workspace)
     }
 }
 
-extra_traits!(QAGP);
+extra_traits!(QAGP<'a>);
 
 fn integrate_impl(
     qk25: &dyn Fn(&Range) -> QKResult,
     range: &Range,
     config: &IntegrationConfig,
     transform: bool,
+    ws: &mut WorkSpace,
 ) -> IntegrationResult {
     let pts = make_sorted_points(range, &config.points, transform);
     let nint = pts.len() - 1; // number of ranges
 
-    let mut ws = borrow_workspace();
     ws.clear();
     ws.reserve(usize::max(config.max_iters, pts.len()));
 
