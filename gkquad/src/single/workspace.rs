@@ -294,41 +294,49 @@ impl Default for WorkSpace {
 #[path = ""]
 mod provider {
     use super::WorkSpace;
-    use std::cell::{RefCell, RefMut};
+    use std::cell::RefCell;
+    use std::mem::{ManuallyDrop, MaybeUninit};
+    use std::ops::{Deref, DerefMut};
 
     thread_local! {
-        static WORKSPACE1: RefCell<WorkSpace> = RefCell::new(WorkSpace::new());
-        static WORKSPACE2: RefCell<WorkSpace> = RefCell::new(WorkSpace::new());
+        static WORKSPACES: RefCell<Vec<WorkSpace>> = RefCell::new(Vec::new());
     }
 
-    #[derive(Clone, Copy)]
-    pub enum WorkSpaceId {
-        Single,
-        Double,
-    }
+    pub struct WorkSpaceHolder(ManuallyDrop<WorkSpace>);
 
-    #[derive(Clone)]
-    pub struct WorkSpaceProvider {
-        id: WorkSpaceId,
-    }
-
-    impl WorkSpaceProvider {
-        #[inline(always)]
-        pub const fn new(id: WorkSpaceId) -> Self {
-            Self { id }
-        }
+    impl Deref for WorkSpaceHolder {
+        type Target = WorkSpace;
 
         #[inline]
-        pub fn get_mut(&self) -> RefMut<'_, WorkSpace> {
-            match self.id {
-                WorkSpaceId::Single => {
-                    WORKSPACE1.with(|v| unsafe { std::mem::transmute(v.borrow_mut()) })
-                }
-                WorkSpaceId::Double => {
-                    WORKSPACE2.with(|v| unsafe { std::mem::transmute(v.borrow_mut()) })
-                }
-            }
+        fn deref(&self) -> &WorkSpace {
+            &self.0
         }
+    }
+
+    impl DerefMut for WorkSpaceHolder {
+        #[inline]
+        fn deref_mut(&mut self) -> &mut WorkSpace {
+            &mut self.0
+        }
+    }
+
+    impl Drop for WorkSpaceHolder {
+        #[inline]
+        fn drop(&mut self) {
+            WORKSPACES.with(|v| unsafe {
+                let buffer = MaybeUninit::uninit();
+                let out = std::mem::replace(&mut *self.0, buffer.assume_init());
+                v.borrow_mut().push(out);
+            })
+        }
+    }
+
+    #[inline]
+    pub fn borrow_workspace() -> WorkSpaceHolder {
+        WORKSPACES.with(|v| {
+            let ws = v.borrow_mut().pop().unwrap_or_else(|| WorkSpace::new());
+            WorkSpaceHolder(ManuallyDrop::new(ws))
+        })
     }
 }
 
@@ -336,35 +344,39 @@ mod provider {
 #[path = ""]
 mod provider {
     use super::WorkSpace;
-    use crate::utils::{Mutex, MutexGuard};
+    use crate::utils::Mutex;
+    use std::mem::{ManuallyDrop, MaybeUninit};
+    use std::ops::{Deref, DerefMut};
 
-    static WORKSPACE1: Mutex<WorkSpace> = Mutex::new(WorkSpace::new());
-    static WORKSPACE2: Mutex<WorkSpace> = Mutex::new(WorkSpace::new());
+    static WORKSPACES: Mutex<Vec<WorkSpace>> = Mutex::new(Vec::new());
 
-    #[derive(Clone, Copy)]
-    pub enum WorkSpaceId {
-        Single,
-        Double,
+    pub struct WorkSpaceHolder(ManuallyDrop<WorkSpace>);
+
+    impl Deref for WorkSpaceHolder {
+        type Target = WorkSpace;
+
+        fn deref(&self) -> &WorkSpace {
+            &self.0
+        }
     }
 
-    #[derive(Clone)]
-    pub struct WorkSpaceProvider {
-        id: WorkSpaceId,
+    impl DerefMut for WorkSpaceHolder {
+        fn deref_mut(&mut self) -> &mut WorkSpace {
+            &mut self.0
+        }
     }
 
-    impl WorkSpaceProvider {
-        #[inline(always)]
-        pub const fn new(id: WorkSpaceId) -> Self {
-            Self { id }
+    impl Drop for WorkSpaceHolder {
+        fn drop(&mut self) {
+            let buffer = MaybeUninit::uninit();
+            let out = std::mem::replace(&mut *self.0, buffer.assume_init());
+            WORKSPACES.lock().push(out);
         }
+    }
 
-        #[inline]
-        pub fn get_mut(&self) -> MutexGuard<'_, WorkSpace> {
-            match self.id {
-                WorkSpaceId::Single => WORKSPACE1.lock(),
-                WorkSpaceId::Double => WORKSPACE2.lock(),
-            }
-        }
+    fn borrow_workspace() -> WorkSpaceHolder {
+        let ws = WORKSPACES.lock().pop().unwrap_or_else(|| WorkSpace::new());
+        WorkSpaceHolder(ManuallyDrop::new(ws))
     }
 }
 

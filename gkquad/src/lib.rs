@@ -54,12 +54,8 @@ pub mod prelude;
 /// want to deallocate the storages on the all threads, you have to call this function
 /// from all threads.
 pub fn free_memory() {
-    use single::WorkSpaceId::*;
-    use single::WorkSpaceProvider;
+    use single::borrow_workspace;
 
-    for id in &[Single, Double] {
-        let provider = WorkSpaceProvider::new(id.clone());
-        let mut ws = provider.get_mut();
-        ws.release();
-    }
+    let mut ws = borrow_workspace();
+    ws.release();
 }

@@ -5,24 +5,17 @@ use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
 use crate::single::common::{Integrand, IntegrationConfig, Range};
 use crate::single::util::{bisect, subrange_too_small, transform_range, IntegrandWrapper};
-use crate::single::workspace::{SubRangeInfo, WorkSpaceId, WorkSpaceProvider};
+use crate::single::workspace::{borrow_workspace, SubRangeInfo};
 use crate::single::{qk17, qk25, QKResult};
 
 #[derive(Clone)]
 #[deprecated(since = "0.0.3", note = "QAG algorithm is always worse than QAGS.")]
-pub struct QAG {
-    id: WorkSpaceId,
-}
+pub struct QAG;
 
 impl QAG {
     #[inline]
     pub fn new() -> Self {
-        Self::with_id(WorkSpaceId::Single)
-    }
-
-    #[inline]
-    pub(crate) fn with_id(id: WorkSpaceId) -> Self {
-        Self { id }
+        Self
     }
 }
 
@@ -41,7 +34,7 @@ impl<F: Integrand> Algorithm<F> for QAG {
 
         let qk17 = |r: &Range| unsafe { qk17(&mut *wrapper.get(), r) };
         let qk25 = |r: &Range| unsafe { qk25(&mut *wrapper.get(), r) };
-        integrate_impl(&qk17, &qk25, &range, config, self.id)
+        integrate_impl(&qk17, &qk25, &range, config)
     }
 }
 
@@ -52,7 +45,6 @@ fn integrate_impl(
     qk25: &dyn Fn(&Range) -> QKResult,
     range: &Range,
     config: &IntegrationConfig,
-    id: WorkSpaceId,
 ) -> IntegrationResult {
     let (mut roundoff_type1, mut roundoff_type2) = (0_i32, 0_i32);
     let mut error = None;
@@ -69,8 +61,7 @@ fn integrate_impl(
     // sum of the errors for each range
     let mut deltasum = result0.delta;
 
-    let provider = WorkSpaceProvider::new(id);
-    let mut ws = provider.get_mut();
+    let mut ws = borrow_workspace();
     ws.clear();
     ws.reserve(config.max_iters);
 
