@@ -84,7 +84,7 @@ where
             error = result.err();
         }
 
-        result.estimate().unwrap_or(std::f64::NAN)
+        result.estimate().unwrap_or(core::f64::NAN)
     };
 
     let mut result = QAGP::new().integrate(&mut integrand, xrange, &outer_config);
@@ -97,9 +97,9 @@ where
 
 #[inline]
 fn transform_point(x: f64) -> f64 {
-    if x == std::f64::NEG_INFINITY {
+    if x == core::f64::NEG_INFINITY {
         -1.0
-    } else if x == std::f64::INFINITY {
+    } else if x == core::f64::INFINITY {
         1.0
     } else {
         x / (1.0 + x.abs())

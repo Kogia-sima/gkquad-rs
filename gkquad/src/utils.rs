@@ -16,7 +16,7 @@ mod mutex {
         data: &'a mut T,
     }
 
-    // Same unsafe impls as `std::sync::Mutex`
+    // Same unsafe impls as `core::sync::Mutex`
     unsafe impl<T: ?Sized + Send> Sync for Mutex<T> {}
     unsafe impl<T: ?Sized + Send> Send for Mutex<T> {}
 
@@ -94,8 +94,8 @@ mod mutex {
 pub use mutex::*;
 
 mod cowmut {
-    use std::fmt::{self, Debug, Display};
-    pub use std::ops::{Deref, DerefMut};
+    use core::fmt::{self, Debug, Display};
+    pub use core::ops::{Deref, DerefMut};
 
     pub enum CowMut<'a, T: 'a> {
         Owned(T),

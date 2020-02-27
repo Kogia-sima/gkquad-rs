@@ -18,8 +18,8 @@ macro_rules! extra_traits {
             }
         }
 
-        impl std::fmt::Debug for $name {
-            fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        impl core::fmt::Debug for $name {
+            fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
                 f.write_str(stringify!($name))
             }
         }
@@ -35,20 +35,20 @@ macro_rules! extra_traits {
 
         impl PartialOrd for $name {
             #[inline]
-            fn partial_cmp(&self, _: &Self) -> Option<std::cmp::Ordering> {
-                Some(std::cmp::Ordering::Equal)
+            fn partial_cmp(&self, _: &Self) -> Option<core::cmp::Ordering> {
+                Some(core::cmp::Ordering::Equal)
             }
         }
 
         impl Ord for $name {
             #[inline]
-            fn cmp(&self, _: &Self) -> std::cmp::Ordering {
-                std::cmp::Ordering::Equal
+            fn cmp(&self, _: &Self) -> core::cmp::Ordering {
+                core::cmp::Ordering::Equal
             }
         }
 
-        impl std::hash::Hash for $name {
-            fn hash<H: std::hash::Hasher>(&self, _: &mut H) {}
+        impl core::hash::Hash for $name {
+            fn hash<H: core::hash::Hasher>(&self, _: &mut H) {}
         }
     };
 }

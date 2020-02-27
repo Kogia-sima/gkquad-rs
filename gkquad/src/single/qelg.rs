@@ -267,7 +267,7 @@ impl ExtrapolationTable {
             //# table->n = n_final + 1;
 
             if n_orig != n_final {
-                std::ptr::copy(
+                core::ptr::copy(
                     epstab.as_ptr().add(n_orig - n_final),
                     epstab.as_mut_ptr(),
                     n_final + 1,

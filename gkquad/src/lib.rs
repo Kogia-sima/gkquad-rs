@@ -25,7 +25,7 @@
 )]
 
 #[cfg(not(feature = "std"))]
-extern crate core as std;
+extern crate core;
 
 extern crate alloc;
 

@@ -43,8 +43,8 @@ macro_rules! extra_traits {
             }
         }
 
-        impl $($lifetimes)* std::fmt::Debug for $name $($lifetimes)* {
-            fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        impl $($lifetimes)* core::fmt::Debug for $name $($lifetimes)* {
+            fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
                 f.write_str(stringify!($name))
             }
         }
@@ -60,22 +60,23 @@ macro_rules! extra_traits {
 
         impl $($lifetimes)* PartialOrd for $name $($lifetimes)* {
             #[inline]
-            fn partial_cmp(&self, _: &Self) -> Option<std::cmp::Ordering> {
-                Some(std::cmp::Ordering::Equal)
+            fn partial_cmp(&self, _: &Self) -> Option<core::cmp::Ordering> {
+                Some(core::cmp::Ordering::Equal)
             }
         }
 
         impl $($lifetimes)* Ord for $name $($lifetimes)* {
             #[inline]
-            fn cmp(&self, _: &Self) -> std::cmp::Ordering {
-                std::cmp::Ordering::Equal
+            fn cmp(&self, _: &Self) -> core::cmp::Ordering {
+                core::cmp::Ordering::Equal
             }
         }
 
-        impl $($lifetimes)* std::hash::Hash for $name $($lifetimes)* {
-            fn hash<H: std::hash::Hasher>(&self, _: &mut H) {}
+        impl $($lifetimes)* core::hash::Hash for $name $($lifetimes)* {
+            fn hash<H: core::hash::Hasher>(&self, _: &mut H) {}
         }
 
+        #[cfg(feature = "std")]
         impl $($lifetimes)* std::panic::UnwindSafe for $name $($lifetimes)* {}
     };
 }

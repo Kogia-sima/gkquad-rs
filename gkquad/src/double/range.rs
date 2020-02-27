@@ -1,8 +1,8 @@
 //! 2-dimentional range types
 
 use alloc::sync::Arc;
-use std::fmt::{self, Debug};
-use std::ops::RangeBounds;
+use core::fmt::{self, Debug};
+use core::ops::RangeBounds;
 
 use crate::single::Range;
 

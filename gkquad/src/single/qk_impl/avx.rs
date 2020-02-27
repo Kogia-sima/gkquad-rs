@@ -3,9 +3,9 @@ use super::super::qk::QKResult;
 use super::super::util::{rescale_error, Array};
 
 #[cfg(target_arch = "x86")]
-use std::arch::x86::*;
+use core::arch::x86::*;
 #[cfg(target_arch = "x86_64")]
-use std::arch::x86_64::*;
+use core::arch::x86_64::*;
 
 #[inline]
 unsafe fn abs256(x: __m256d) -> __m256d {

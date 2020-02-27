@@ -1,5 +1,5 @@
 use alloc::borrow::Cow;
-use std::cell::UnsafeCell;
+use core::cell::UnsafeCell;
 
 use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
@@ -99,7 +99,7 @@ fn integrate_impl(
 
     for w in pts.windows(2) {
         // ignore small range
-        if (w[1] - w[0]).abs() < 100. * std::f64::MIN_POSITIVE {
+        if (w[1] - w[0]).abs() < 100. * core::f64::MIN_POSITIVE {
             continue;
         }
 
@@ -147,7 +147,7 @@ fn integrate_impl(
 
     let tolerance = config.tolerance.to_abs(result0.estimate.abs());
 
-    let round_off = 100. * std::f64::EPSILON * result0.absvalue;
+    let round_off = 100. * core::f64::EPSILON * result0.absvalue;
 
     if result0.delta <= round_off && result0.delta > tolerance {
         return IntegrationResult::new(result0.estimate, result0.delta, Some(RoundoffError));
@@ -168,7 +168,7 @@ fn integrate_impl(
 
     let mut area = result0.estimate;
     let mut res_ext = result0.estimate;
-    let mut err_ext = std::f64::MAX;
+    let mut err_ext = core::f64::MAX;
     let mut error_over_large_ranges = deltasum;
     let mut ertest = tolerance;
 
@@ -323,7 +323,7 @@ fn integrate_impl(
         error_over_large_ranges = deltasum;
     }
 
-    if err_ext == std::f64::MAX {
+    if err_ext == core::f64::MAX {
         return IntegrationResult::new(ws.sum_results(), deltasum, error);
     }
     if error.is_some() || error2 {

@@ -37,7 +37,7 @@ impl<F: Integrand2> Algorithm2<F, Square> for QAG2 {
             if result.has_err() {
                 error = result.err();
             }
-            result.estimate().unwrap_or(std::f64::NAN)
+            result.estimate().unwrap_or(core::f64::NAN)
         };
 
         let mut result = QAG::new().integrate(&mut integrand, &square.xrange, &config1);
@@ -72,7 +72,7 @@ impl<'a, F: Integrand2> Algorithm2<F, DynamicY<'a>> for QAG2 {
             if result.has_err() {
                 error = result.err();
             }
-            result.estimate().unwrap_or(std::f64::NAN)
+            result.estimate().unwrap_or(core::f64::NAN)
         };
 
         let mut result = QAG::new().integrate(&mut integrand, &range.xrange, &config1);

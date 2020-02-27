@@ -1,4 +1,4 @@
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 macro_rules! impl_error {
     (
@@ -112,9 +112,9 @@ macro_rules! impl_error {
             )*
         }
 
-        impl ::std::fmt::Display for $name {
+        impl ::core::fmt::Display for $name {
             #[allow(unused_variables)]
-            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
                 match self {
                     $(
                         Self::$var $($args2)* => write!(f, $desc),
@@ -123,8 +123,8 @@ macro_rules! impl_error {
             }
         }
 
-        impl ::std::fmt::Debug for $name {
-            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        impl ::core::fmt::Debug for $name {
+            fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
                 match self {
                     $(
                         Self::$var $($args2)* => write!(f, $msg $(,$arg)*),
@@ -229,7 +229,7 @@ impl IntegrationResult {
     ///
     /// ```
     /// use gkquad::single::integral;
-    /// use std::f64::NEG_INFINITY;
+    /// use core::f64::NEG_INFINITY;
     ///
     /// let result = integral(|x: f64| x.exp(), NEG_INFINITY..0.0);
     /// let (estimate, delta) = result.estimate_delta().unwrap();
