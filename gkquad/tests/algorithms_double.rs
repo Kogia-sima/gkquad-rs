@@ -46,7 +46,7 @@ fn qag_g1() {
         delta: 8.326672684688676E-15,
         error: None,
     };
-    let range = Square::new(0., 1., 0., 1.).unwrap();
+    let range = Rectangle::new(0., 1., 0., 1.).unwrap();
     test_algorithm(g1, range, &[], QAG2::new(), Relative(1e-10), expect);
 }
 
@@ -57,7 +57,7 @@ fn qags_g1() {
         delta: 8.326672684688676E-15,
         error: None,
     };
-    let range = Square::new(0., 1., 0., 1.).unwrap();
+    let range = Rectangle::new(0., 1., 0., 1.).unwrap();
     test_algorithm(g1, range, &[], QAGS2::new(), Relative(1e-10), expect);
 }
 
@@ -105,7 +105,7 @@ fn qag_g4() {
         delta: 9.058237841799824E-13,
         error: None,
     };
-    let range = Square::from((0.0.., 0.0..));
+    let range = Rectangle::from((0.0.., 0.0..));
     test_algorithm(g4, range, &[], QAG2::new(), Absolute(1e-8), expect);
 }
 
@@ -116,7 +116,7 @@ fn qags_g4() {
         delta: 9.058231687644665E-13,
         error: None,
     };
-    let range = Square::from((0.0.., 0.0..));
+    let range = Rectangle::from((0.0.., 0.0..));
     test_algorithm(g4, range, &[], QAGS2::new(), Absolute(1e-8), expect);
 }
 
@@ -127,7 +127,7 @@ fn qagp_gp1() {
         delta: 5.178080186851730e-13,
         error: None,
     };
-    let range = Square::new(-1.0, 1.0, -1.0, 1.0).unwrap();
+    let range = Rectangle::new(-1.0, 1.0, -1.0, 1.0).unwrap();
     test_algorithm(
         gp1,
         range,

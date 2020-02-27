@@ -1,7 +1,7 @@
 use alloc::borrow::Cow;
 
 use super::super::common::{Integrand2, IntegrationConfig2};
-use super::super::range::{DynamicY, Square};
+use super::super::range::{DynamicY, Rectangle};
 use super::Algorithm2;
 use crate::single::algorithm::{Algorithm, QAGP};
 use crate::single::{IntegrationConfig, Points, Range, WorkSpace};
@@ -18,11 +18,11 @@ impl QAGP2 {
     }
 }
 
-impl<F: Integrand2> Algorithm2<F, Square> for QAGP2 {
+impl<F: Integrand2> Algorithm2<F, Rectangle> for QAGP2 {
     fn integrate(
         &mut self,
         f: &mut F,
-        square: &Square,
+        square: &Rectangle,
         config: &IntegrationConfig2,
     ) -> IntegrationResult {
         let yrange = |_: f64| Cow::Borrowed(&square.yrange);

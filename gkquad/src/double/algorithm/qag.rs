@@ -1,5 +1,5 @@
 use super::super::common::{Integrand2, IntegrationConfig2};
-use super::super::range::{DynamicY, Square};
+use super::super::range::{DynamicY, Rectangle};
 use super::Algorithm2;
 use crate::single::algorithm::{Algorithm, QAG};
 use crate::single::IntegrationConfig;
@@ -14,11 +14,11 @@ impl QAG2 {
     }
 }
 
-impl<F: Integrand2> Algorithm2<F, Square> for QAG2 {
+impl<F: Integrand2> Algorithm2<F, Rectangle> for QAG2 {
     fn integrate(
         &mut self,
         f: &mut F,
-        square: &Square,
+        square: &Rectangle,
         config: &IntegrationConfig2,
     ) -> IntegrationResult {
         let config1 = IntegrationConfig {
