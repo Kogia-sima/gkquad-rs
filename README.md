@@ -10,14 +10,14 @@ Numerical Integration Library for Rust
 
 - Compatible with latest stable/beta/nightly Rust compiler
 - Compatible with `no_std`
-- Super fast and simple API
-- Semi verified computation (You can specify the maximum calculation tolerance)
+- Extremely fast and simple API
+- Semi-verified computation (You can specify the maximum calculation tolerance)
 - Lightweight (small dependencies)
 - Highly extensible (you can implement a new algorithm)
 
 #### Note: no\_std compatibility
 
-`gkquad` depends [alloc](https://doc.rust-lang.org/alloc/) crate, so you have to specify the global allocator in order to use `gkquad`.
+`gkquad` depends on [alloc](https://doc.rust-lang.org/alloc/) crate, so you have to specify the global allocator in order to use `gkquad`.
 
 If you want to use this crate in no\_std environment, you must disable the `std` feature flag.
 
@@ -30,7 +30,7 @@ features = ["single"]
 
 ## Performance
 
-Here is the benchmark measured on Intel Core(TM) i5 @ 1.60GHz (without turbo boost)
+Here is the benchmark measured on the Intel Core(TM) i5 @ 1.60GHz (without turbo boost)
 
 ```console
 $ cargo bench
