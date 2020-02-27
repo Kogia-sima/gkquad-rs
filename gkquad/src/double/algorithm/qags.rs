@@ -15,7 +15,7 @@ impl QAGS2 {
 
 impl<F: Integrand2> Algorithm2<F> for QAGS2 {
     fn integrate(
-        &self,
+        &mut self,
         f: &mut F,
         range: &Range2,
         config: &IntegrationConfig2,

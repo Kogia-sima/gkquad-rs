@@ -5,7 +5,7 @@ use crate::IntegrationResult;
 
 pub trait Algorithm2<F: Integrand2> {
     fn integrate(
-        &self,
+        &mut self,
         f: &mut F,
         range: &Range2,
         config: &IntegrationConfig2,
