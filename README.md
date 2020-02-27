@@ -1,5 +1,6 @@
 # gkquad
 [![Build Status](https://travis-ci.org/Kogia-sima/gkquad-rs.svg?branch=master)](https://travis-ci.org/Kogia-sima/gkquad-rs)
+[![Build status](https://ci.appveyor.com/api/projects/status/lw1w7sgf5fnrg9fg/branch/master?svg=true)](https://ci.appveyor.com/project/Kogiasima/gkquad-rs/branch/master)
 [![Version](https://img.shields.io/crates/v/gkquad)](https://crates.io/crates/gkquad)
 [![docs](https://docs.rs/gkquad/badge.svg)](https://docs.rs/gkquad)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Kogia-sima/gkquad-rs/blob/master/LICENSE)
