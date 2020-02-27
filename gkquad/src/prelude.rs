@@ -4,4 +4,4 @@ pub use crate::single::{algorithm::*, integral, Integrand, Integrator};
 
 #[cfg(feature = "double")]
 #[cfg_attr(docsrs, doc(cfg(feature = "double")))]
-pub use crate::double::{algorithm::*, integral2, Integrand2, Integrator2};
+pub use crate::double::{algorithm::*, integral2, range::*, Integrand2, Integrator2};
