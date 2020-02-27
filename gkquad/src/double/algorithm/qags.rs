@@ -2,7 +2,7 @@ use super::super::common::{Integrand2, IntegrationConfig2, Range2};
 use super::Algorithm2;
 use crate::single::algorithm::{Algorithm as Algorithm1, QAGS};
 use crate::single::IntegrationConfig;
-use crate::single::WorkSpaceId;
+use crate::single::WorkSpace;
 use crate::IntegrationResult;
 
 pub struct QAGS2;
@@ -22,11 +22,12 @@ impl<F: Integrand2> Algorithm2<F> for QAGS2 {
     ) -> IntegrationResult {
         let config1 = IntegrationConfig {
             tolerance: config.tolerance.clone(),
-            limit: config.limit,
+            max_iters: config.max_iters,
             ..Default::default()
         };
 
-        let inner = QAGS::with_id(WorkSpaceId::Single);
+        let mut inner_ws = WorkSpace::new();
+        let mut inner = QAGS::with_workspace(&mut inner_ws);
         let mut error = None;
 
         match range {
@@ -37,12 +38,13 @@ impl<F: Integrand2> Algorithm2<F> for QAGS2 {
                 let mut integrand = |x: f64| -> f64 {
                     let mut integrand2 = |y: f64| f.apply((x, y));
                     let result = inner.integrate(&mut integrand2, yrange, &config1);
-                    error = result.err();
+                    if result.has_err() {
+                        error = result.err();
+                    }
                     result.estimate().unwrap_or(std::f64::NAN)
                 };
 
-                let mut result =
-                    QAGS::with_id(WorkSpaceId::Double).integrate(&mut integrand, xrange, &config1);
+                let mut result = QAGS::new().integrate(&mut integrand, xrange, &config1);
                 if error.is_some() {
                     result.error = error;
                 }
@@ -56,12 +58,13 @@ impl<F: Integrand2> Algorithm2<F> for QAGS2 {
                 let mut integrand = |x: f64| -> f64 {
                     let mut integrand2 = |y: f64| f.apply((x, y));
                     let result = inner.integrate(&mut integrand2, &yrange(x), &config1);
-                    error = result.err();
+                    if result.has_err() {
+                        error = result.err();
+                    }
                     result.estimate().unwrap_or(std::f64::NAN)
                 };
 
-                let mut result =
-                    QAGS::with_id(WorkSpaceId::Double).integrate(&mut integrand, xrange, &config1);
+                let mut result = QAGS::new().integrate(&mut integrand, xrange, &config1);
                 if error.is_some() {
                     result.error = error;
                 }
