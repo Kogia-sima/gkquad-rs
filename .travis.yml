@@ -1,0 +1,29 @@
+dist: bionic
+language: rust
+
+branches:
+  except:
+    - stable
+
+matrix:
+  fast_finish: true
+  include:
+    - os: linux
+      rust: stable
+      env: TARGET=x86_64-unknown-linux-gnu
+
+    - os: linux
+      rust: nightly
+
+    - os: osx
+      rust: stable
+      env: TARGET=x86_64-apple-darwin
+
+env:
+  global:
+    - RUST_BACKTRACE=1
+
+script:
+  - cd gkquad
+  - cargo test --no-default-features --features double
+  - cargo test --all-features
