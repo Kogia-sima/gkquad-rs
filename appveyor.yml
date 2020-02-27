@@ -1,0 +1,28 @@
+platform:
+  - x64
+
+environment:
+  matrix:
+    - RUST_VERSION: stable
+
+install:
+  # Install Rust.
+  - appveyor-retry appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
+  - rustup-init.exe -yv --default-toolchain %RUST_VERSION% --default-host x86_64-pc-windows-msvc
+  - set PATH=%USERPROFILE%\.cargo\bin;%PATH%
+  - rustc -vV
+  - cargo -vV
+
+build_script:
+  - cd gkquad
+  - cargo build
+
+test_script:
+  - cargo test --no-default-features --features double
+  - cargo test --all-features
+
+notifications:
+  - provider: Email
+    on_build_success: false
+    on_build_failure: false
+    on_build_status_changed: false
