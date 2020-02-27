@@ -1,9 +1,3 @@
-#![allow(
-    clippy::excessive_precision,
-    clippy::unreadable_literal,
-    clippy::uninit_assumed_init
-)]
-
 use super::common::{Integrand, Range};
 use super::qk_impl::qk;
 use super::util::Aligned;

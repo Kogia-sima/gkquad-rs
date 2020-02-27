@@ -15,7 +15,14 @@
 
 #![cfg_attr(docsrs, feature(doc_cfg, optin_builtin_traits))]
 #![cfg_attr(not(feature = "std"), no_std)]
-#![allow(deprecated)]
+#![allow(
+    deprecated,
+    clippy::float_cmp,
+    clippy::cognitive_complexity,
+    clippy::uninit_assumed_init,
+    clippy::excessive_precision,
+    clippy::unreadable_literal
+)]
 
 #[cfg(not(feature = "std"))]
 extern crate core as std;

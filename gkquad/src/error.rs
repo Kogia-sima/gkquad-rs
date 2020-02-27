@@ -244,7 +244,7 @@ impl IntegrationResult {
 
     /// Get the estimation of integral even if integration error occured.
     ///
-    /// # Notes
+    /// # Safety
     ///
     /// If integration error occured during computation, integration function
     /// will return the current estimation of integral anyway.
@@ -259,7 +259,7 @@ impl IntegrationResult {
 
     /// Get the estimated absolute error even if integration error has occured.
     ///
-    /// # Notes
+    /// # Safety
     ///
     /// If integration error occured during computation, integration function
     /// will return the current estimation of integral anyway.
@@ -273,9 +273,9 @@ impl IntegrationResult {
     /// Get the estimation of integral and absolute error even if integration
     /// error has occured.
     ///
-    /// # Notes
+    /// # Safety
     ///
-    /// See notes of `estimate_unchecked` method and `delta_unchecked` method.
+    /// See `Safety secion` of `estimate_unchecked` method and `delta_unchecked` method.
     #[inline]
     pub unsafe fn estimate_delta_unchecked(&self) -> (f64, f64) {
         (self.estimate, self.delta)

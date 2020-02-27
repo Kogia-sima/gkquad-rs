@@ -119,8 +119,7 @@ impl WorkSpace {
             let mut e1 = subranges[i1].delta;
             let mut i_max = i1;
 
-            for j in i + 1..nint {
-                let i2 = order[j];
+            for &i2 in order.iter().skip(i + 1) {
                 let e2 = subranges[i2].delta;
 
                 if e2 >= e1 {
@@ -287,55 +286,5 @@ impl Default for WorkSpace {
     #[inline(always)]
     fn default() -> WorkSpace {
         WorkSpace::new()
-    }
-}
-
-#[cfg(feature = "std")]
-#[path = ""]
-mod provider {
-    use super::WorkSpace;
-    use std::cell::RefCell;
-    use std::mem::{ManuallyDrop, MaybeUninit};
-    use std::ops::{Deref, DerefMut};
-
-    thread_local! {
-        static WORKSPACES: RefCell<Vec<WorkSpace>> = RefCell::new(Vec::new());
-    }
-
-    pub struct WorkSpaceHolder(ManuallyDrop<WorkSpace>);
-
-    impl Deref for WorkSpaceHolder {
-        type Target = WorkSpace;
-
-        #[inline]
-        fn deref(&self) -> &WorkSpace {
-            &self.0
-        }
-    }
-
-    impl DerefMut for WorkSpaceHolder {
-        #[inline]
-        fn deref_mut(&mut self) -> &mut WorkSpace {
-            &mut self.0
-        }
-    }
-
-    impl Drop for WorkSpaceHolder {
-        #[inline]
-        fn drop(&mut self) {
-            WORKSPACES.with(|v| unsafe {
-                let buffer = MaybeUninit::uninit();
-                let out = std::mem::replace(&mut *self.0, buffer.assume_init());
-                v.borrow_mut().push(out);
-            })
-        }
-    }
-
-    #[inline]
-    pub fn borrow_workspace() -> WorkSpaceHolder {
-        WORKSPACES.with(|v| {
-            let ws = v.borrow_mut().pop().unwrap_or_else(|| WorkSpace::new());
-            WorkSpaceHolder(ManuallyDrop::new(ws))
-        })
     }
 }

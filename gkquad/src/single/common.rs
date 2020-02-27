@@ -1,3 +1,5 @@
+#![allow(clippy::derive_hash_xor_eq)]
+
 use smallvec::SmallVec;
 use std::fmt::{self, Debug, Display};
 use std::hash::{Hash, Hasher};
@@ -35,6 +37,10 @@ impl Range {
     }
 
     /// Create a new `Range` object without NaN check
+    ///
+    /// # Safety
+    ///
+    /// Arguments must not be a NaN value, otherwise causes an undefined behaviour
     #[inline]
     pub unsafe fn new_unchecked(begin: f64, end: f64) -> Range {
         Range {

@@ -44,7 +44,7 @@ where
 
     debug_assert!(!xgk.is_empty());
     debug_assert!(xgk.len() == wg.len() * 2);
-    debug_assert!(buf.len() >= xgk.len() * 2 + 1);
+    debug_assert!(buf.len() > xgk.len() * 2);
 
     let n = K::CAPACITY;
     let center = 0.5 * (range.begin + range.end);
