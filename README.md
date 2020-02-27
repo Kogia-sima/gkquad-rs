@@ -23,7 +23,7 @@ If you want to use this crate in no\_std environment, you must disable the `std`
 
 ```toml
 [dependencies.gkquad]
-version = "0.0.2"
+version = "0.0.3"
 default-features = false
 features = ["single"]
 ```
