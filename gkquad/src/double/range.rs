@@ -1,9 +1,12 @@
+//! 2-dimentional range types
+
 use alloc::sync::Arc;
 use std::fmt::{self, Debug};
 use std::ops::RangeBounds;
 
 use crate::single::Range;
 
+/// Square range
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Square {
     pub xrange: Range,
@@ -70,6 +73,7 @@ impl From<Square> for DynamicX<'static> {
     }
 }
 
+/// Range of `y` varies based on `x` value
 #[derive(Clone)]
 pub struct DynamicY<'a> {
     pub xrange: Range,
@@ -108,12 +112,17 @@ impl From<Square> for DynamicY<'static> {
     }
 }
 
+/// 2-dimentional range type API
+///
+/// This is a marker trait, and does not implement anything. If you generalize
+/// function with `Range2`, use [IntoRange2](./trait.IntoRange2.html) trait instead.
 pub trait Range2 {}
 
 impl Range2 for Square {}
 impl<'a> Range2 for DynamicX<'a> {}
 impl<'a> Range2 for DynamicY<'a> {}
 
+/// Conversion into `Range2`
 pub trait IntoRange2 {
     type IntoRange: Range2;
 
