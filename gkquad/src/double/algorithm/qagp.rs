@@ -7,6 +7,9 @@ use crate::single::algorithm::{Algorithm, QAGP};
 use crate::single::{IntegrationConfig, Points, Range, WorkSpace};
 use crate::IntegrationResult;
 
+#[cfg(not(feature = "std"))]
+use crate::float::Float;
+
 pub struct QAGP2;
 
 impl QAGP2 {

@@ -9,6 +9,9 @@ use crate::single::workspace::{SubRangeInfo, WorkSpace};
 use crate::single::{qk17, qk25, QKResult};
 use crate::utils::CowMut;
 
+#[cfg(not(feature = "std"))]
+use crate::float::Float;
+
 #[derive(Clone)]
 #[deprecated(since = "0.0.3", note = "QAG algorithm is always worse than QAGS.")]
 pub struct QAG<'a> {

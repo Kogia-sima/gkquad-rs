@@ -3,6 +3,9 @@ use core::ops::{Deref, DerefMut};
 
 use crate::single::common::{Integrand, Range};
 
+#[cfg(not(feature = "std"))]
+use crate::float::Float;
+
 pub trait Array {
     type Item;
     const CAPACITY: usize;

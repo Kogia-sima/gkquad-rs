@@ -12,6 +12,9 @@ use crate::single::util::{
 use crate::single::workspace::{SubRangeInfo, WorkSpace};
 use crate::utils::CowMut;
 
+#[cfg(not(feature = "std"))]
+use crate::float::Float;
+
 #[derive(Clone)]
 pub struct QAGS<'a> {
     workspace: CowMut<'a, WorkSpace>,
