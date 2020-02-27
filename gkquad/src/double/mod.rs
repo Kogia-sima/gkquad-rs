@@ -4,6 +4,7 @@ pub mod algorithm;
 mod common;
 mod integral;
 mod integrator;
+pub mod range;
 
 pub use common::*;
 pub use integral::*;
