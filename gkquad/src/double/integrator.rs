@@ -1,17 +1,18 @@
 use super::algorithm::*;
-use super::common::{Integrand2, IntegrationConfig2, Points2, Range2};
+use super::common::{Integrand2, IntegrationConfig2, Points2};
+use super::range::IntoRange2;
 
 use crate::{IntegrationResult, Tolerance};
 
 /// 2-dimentional integration Executor
 #[derive(Clone, Debug, Default, PartialEq)]
-pub struct Integrator2<F: Integrand2, A: Algorithm2<F>> {
+pub struct Integrator2<F: Integrand2, A> {
     integrand: F,
     algorithm: A,
     config: IntegrationConfig2,
 }
 
-impl<F: Integrand2, A: Algorithm2<F>> Integrator2<F, A> {
+impl<F: Integrand2, A> Integrator2<F, A> {
     #[inline]
     pub fn with_algorithm(integrand: F, algorithm: A) -> Integrator2<F, A> {
         Self {
@@ -56,8 +57,12 @@ impl<F: Integrand2, A: Algorithm2<F>> Integrator2<F, A> {
     }
 
     #[inline]
-    pub fn run<'a, T: Into<Range2<'a>>>(&mut self, range: T) -> IntegrationResult {
+    pub fn run<'a, T>(&mut self, range: T) -> IntegrationResult
+    where
+        T: IntoRange2,
+        A: Algorithm2<F, T::IntoRange>,
+    {
         self.algorithm
-            .integrate(&mut self.integrand, &range.into(), &self.config)
+            .integrate(&mut self.integrand, &range.into_range(), &self.config)
     }
 }

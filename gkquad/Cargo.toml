@@ -33,6 +33,10 @@ bencher = "0.1.5"
 name = "single"
 harness = false
 
+[[example]]
+name = "sphere"
+required-features = ["double"]
+
 [[test]]
 name = "algorithms_double"
 path = "tests/algorithms_double.rs"
