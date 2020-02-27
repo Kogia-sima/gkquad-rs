@@ -40,6 +40,9 @@ mod common;
 mod error;
 mod utils;
 
+#[cfg(not(feature = "std"))]
+mod float;
+
 pub use common::*;
 pub use error::*;
 

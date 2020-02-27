@@ -2,6 +2,9 @@ use super::super::common::{Integrand, Range};
 use super::super::qk::QKResult;
 use super::super::util::{rescale_error, Array};
 
+#[cfg(not(feature = "std"))]
+use crate::float::Float;
+
 /// perform Gauss-Kronrod integration with custom points
 ///
 /// # Parameters
