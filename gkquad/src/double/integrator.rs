@@ -12,6 +12,16 @@ pub struct Integrator2<F: Integrand2, A> {
     config: IntegrationConfig2,
 }
 
+impl<F: Integrand2> Integrator2<F, AUTO2> {
+    pub fn new(integrand: F) -> Integrator2<F, AUTO2> {
+        Self {
+            integrand,
+            algorithm: AUTO2::new(),
+            config: IntegrationConfig2::default(),
+        }
+    }
+}
+
 impl<F: Integrand2, A> Integrator2<F, A> {
     #[inline]
     pub fn with_algorithm(integrand: F, algorithm: A) -> Integrator2<F, A> {

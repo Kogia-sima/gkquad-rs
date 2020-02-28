@@ -25,7 +25,7 @@ pub fn integral2_with_config<'a, F, R>(
 where
     F: Integrand2,
     R: IntoRange2,
-    QAGS2: Algorithm2<F, R::IntoRange>,
+    AUTO2: Algorithm2<F, R::IntoRange>,
 {
-    QAGS2::new().integrate(&mut f, &r.into_range(), config)
+    AUTO2::new().integrate(&mut f, &r.into_range(), config)
 }
