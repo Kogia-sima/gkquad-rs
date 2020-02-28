@@ -32,6 +32,16 @@ impl<F: Integrand2, A> Integrator2<F, A> {
         }
     }
 
+    /// Set algorithm
+    #[inline]
+    pub fn algorithm<B>(self, algorithm: B) -> Integrator2<F, B> {
+        Integrator2 {
+            integrand: self.integrand,
+            algorithm,
+            config: self.config,
+        }
+    }
+
     /// Set tolerance
     #[inline]
     pub fn tolerance(mut self, t: Tolerance) -> Self {
