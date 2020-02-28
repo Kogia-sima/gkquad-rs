@@ -63,8 +63,8 @@ impl<'a> Debug for DynamicX<'a> {
 }
 
 impl From<Rectangle> for DynamicX<'static> {
-    fn from(square: Rectangle) -> DynamicX<'static> {
-        let Rectangle { xrange, yrange } = square;
+    fn from(rect: Rectangle) -> DynamicX<'static> {
+        let Rectangle { xrange, yrange } = rect;
         Self {
             xrange: Arc::new(move |_| xrange.clone()),
             yrange,
@@ -102,8 +102,8 @@ impl<'a> Debug for DynamicY<'a> {
 }
 
 impl From<Rectangle> for DynamicY<'static> {
-    fn from(square: Rectangle) -> DynamicY<'static> {
-        let Rectangle { xrange, yrange } = square;
+    fn from(rect: Rectangle) -> DynamicY<'static> {
+        let Rectangle { xrange, yrange } = rect;
         Self {
             xrange,
             yrange: Arc::new(move |_| yrange.clone()),

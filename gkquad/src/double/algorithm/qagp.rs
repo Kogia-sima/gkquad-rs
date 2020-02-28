@@ -22,11 +22,11 @@ impl<F: Integrand2> Algorithm2<F, Rectangle> for QAGP2 {
     fn integrate(
         &mut self,
         f: &mut F,
-        square: &Rectangle,
+        range: &Rectangle,
         config: &IntegrationConfig2,
     ) -> IntegrationResult {
-        let yrange = |_: f64| Cow::Borrowed(&square.yrange);
-        integrate_impl(f, &square.xrange, yrange, config)
+        let yrange = |_: f64| Cow::Borrowed(&range.yrange);
+        integrate_impl(f, &range.xrange, yrange, config)
     }
 }
 
@@ -56,11 +56,11 @@ impl<'a, F: Integrand2> Algorithm2<F, DynamicY<'a>> for QAGP2 {
     fn integrate(
         &mut self,
         f: &mut F,
-        square: &DynamicY<'a>,
+        range: &DynamicY<'a>,
         config: &IntegrationConfig2,
     ) -> IntegrationResult {
-        let yrange = |x: f64| Cow::Owned((square.yrange)(x));
-        integrate_impl(f, &square.xrange, yrange, config)
+        let yrange = |x: f64| Cow::Owned((range.yrange)(x));
+        integrate_impl(f, &range.xrange, yrange, config)
     }
 }
 

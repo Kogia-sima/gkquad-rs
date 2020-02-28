@@ -18,10 +18,10 @@ impl<F: Integrand2> Algorithm2<F, Rectangle> for QAGS2 {
     fn integrate(
         &mut self,
         f: &mut F,
-        square: &Rectangle,
+        range: &Rectangle,
         config: &IntegrationConfig2,
     ) -> IntegrationResult {
-        self.integrate(f, &DynamicY::from(square.clone()), config)
+        self.integrate(f, &DynamicY::from(range.clone()), config)
     }
 }
 
