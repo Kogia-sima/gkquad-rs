@@ -1,5 +1,5 @@
 use alloc::borrow::Cow;
-use std::cell::UnsafeCell;
+use core::cell::UnsafeCell;
 
 use crate::error::{IntegrationResult, RuntimeError::*};
 use crate::single::algorithm::Algorithm;
@@ -11,6 +11,9 @@ use crate::single::util::{
 };
 use crate::single::workspace::{SubRangeInfo, WorkSpace};
 use crate::utils::CowMut;
+
+#[cfg(not(feature = "std"))]
+use crate::float::Float;
 
 #[derive(Clone)]
 pub struct QAGS<'a> {
@@ -346,7 +349,7 @@ fn initial_integral(
             );
         }
 
-        let round_off = 100. * std::f64::EPSILON * result0.absvalue;
+        let round_off = 100. * core::f64::EPSILON * result0.absvalue;
         if result0.delta <= round_off && result0.delta > tolerance {
             // 精度の限界によりこれ以上誤差を減らすことは不可能
             return (

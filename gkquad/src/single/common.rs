@@ -1,10 +1,10 @@
 #![allow(clippy::derive_hash_xor_eq)]
 
+use core::fmt::{self, Debug, Display};
+use core::hash::{Hash, Hasher};
+use core::marker::PhantomData;
+use core::ops::{Bound, RangeBounds};
 use smallvec::SmallVec;
-use std::fmt::{self, Debug, Display};
-use std::hash::{Hash, Hasher};
-use std::marker::PhantomData;
-use std::ops::{Bound, RangeBounds};
 
 use crate::Tolerance;
 
@@ -83,12 +83,12 @@ impl<R: RangeBounds<f64>> From<R> for Range {
     fn from(r: R) -> Range {
         let a = match r.start_bound() {
             Bound::Excluded(&x) | Bound::Included(&x) => x,
-            Bound::Unbounded => std::f64::NEG_INFINITY,
+            Bound::Unbounded => core::f64::NEG_INFINITY,
         };
 
         let b = match r.end_bound() {
             Bound::Excluded(&x) | Bound::Included(&x) => x,
-            Bound::Unbounded => std::f64::INFINITY,
+            Bound::Unbounded => core::f64::INFINITY,
         };
 
         Range::new(a, b).expect("cannot create Range object from Range which contains NaN value.")

@@ -16,7 +16,7 @@
 //! If you want to calculate more complicated integral, you can use `Integrator` object.
 //!
 //! ```
-//! use std::f64::{INFINITY, NEG_INFINITY};
+//! use core::f64::{INFINITY, NEG_INFINITY};
 //!
 //! use gkquad::single::Integrator;
 //! use gkquad::single::algorithm::QAGP;

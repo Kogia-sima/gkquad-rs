@@ -1,7 +1,10 @@
-use std::mem::MaybeUninit;
-use std::ops::{Deref, DerefMut};
+use core::mem::MaybeUninit;
+use core::ops::{Deref, DerefMut};
 
 use crate::single::common::{Integrand, Range};
+
+#[cfg(not(feature = "std"))]
+use crate::float::Float;
 
 pub trait Array {
     type Item;
@@ -125,8 +128,8 @@ pub fn rescale_error(mut err: f64, result_abs: f64, result_asc: f64) -> f64 {
         }
     }
 
-    if result_abs > std::f64::MIN_POSITIVE / (50.0 * std::f64::EPSILON) {
-        let min_err = 50.0 * std::f64::EPSILON * result_abs;
+    if result_abs > core::f64::MIN_POSITIVE / (50.0 * core::f64::EPSILON) {
+        let min_err = 50.0 * core::f64::EPSILON * result_abs;
 
         if min_err > err {
             err = min_err;
@@ -156,9 +159,9 @@ pub fn bisect(range: &Range) -> (Range, Range) {
 
 #[inline]
 pub fn transform_point(x: f64) -> f64 {
-    if x == std::f64::NEG_INFINITY {
+    if x == core::f64::NEG_INFINITY {
         -1.0
-    } else if x == std::f64::INFINITY {
+    } else if x == core::f64::INFINITY {
         1.0
     } else {
         x / (1.0 + x.abs())
@@ -198,7 +201,7 @@ pub fn insert_sort<F: FnMut(f64, f64) -> bool>(s: &mut [f64], is_less: &mut F) {
             }
 
             let count = ((sp as usize) - (insert_pos as usize)) / 8;
-            std::ptr::copy(insert_pos, insert_pos.add(1), count);
+            core::ptr::copy(insert_pos, insert_pos.add(1), count);
             *insert_pos = target;
 
             sp = sp.add(1);

@@ -1,6 +1,6 @@
 [package]
 name = "gkquad"
-version = "0.0.3"
+version = "0.0.4"
 authors = ["Kogia-sima <orcinus4627@gmail.com>"]
 license = "MIT"
 description = "Numerical integration library for Rust"

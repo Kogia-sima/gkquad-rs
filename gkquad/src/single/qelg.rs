@@ -6,6 +6,9 @@
 //#     double res3la[3];
 //#   };
 
+#[cfg(not(feature = "std"))]
+use crate::float::Float;
+
 pub struct ExtrapolationTable {
     /// rlist2\[n\] contains the new element in the first
     /// column of the epsilon table
@@ -267,7 +270,7 @@ impl ExtrapolationTable {
             //# table->n = n_final + 1;
 
             if n_orig != n_final {
-                std::ptr::copy(
+                core::ptr::copy(
                     epstab.as_ptr().add(n_orig - n_final),
                     epstab.as_mut_ptr(),
                     n_final + 1,

@@ -25,7 +25,7 @@
 )]
 
 #[cfg(not(feature = "std"))]
-extern crate core as std;
+extern crate core;
 
 extern crate alloc;
 
@@ -39,6 +39,9 @@ compile_error!("`simd` feature flag requires x86 or x86_64 architecture.");
 mod common;
 mod error;
 mod utils;
+
+#[cfg(not(feature = "std"))]
+mod float;
 
 pub use common::*;
 pub use error::*;

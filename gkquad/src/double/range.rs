@@ -1,32 +1,32 @@
 //! 2-dimentional range types
 
 use alloc::sync::Arc;
-use std::fmt::{self, Debug};
-use std::ops::RangeBounds;
+use core::fmt::{self, Debug};
+use core::ops::RangeBounds;
 
 use crate::single::Range;
 
-/// Square range
+/// Rectangle range
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub struct Square {
+pub struct Rectangle {
     pub xrange: Range,
     pub yrange: Range,
 }
 
-impl Square {
-    pub fn new(x1: f64, x2: f64, y1: f64, y2: f64) -> Option<Square> {
+impl Rectangle {
+    pub fn new(x1: f64, x2: f64, y1: f64, y2: f64) -> Option<Rectangle> {
         let xrange = Range::new(x1, x2)?;
         let yrange = Range::new(y1, y2)?;
         if !(x1.is_finite() && x2.is_finite() && y1.is_finite() && y2.is_finite()) {
             panic!("Infinite interval in 2-dimension is not already supported.");
         }
-        Some(Square { xrange, yrange })
+        Some(Rectangle { xrange, yrange })
     }
 }
 
-impl<R1: RangeBounds<f64>, R2: RangeBounds<f64>> From<(R1, R2)> for Square {
-    fn from(r: (R1, R2)) -> Square {
-        Square {
+impl<R1: RangeBounds<f64>, R2: RangeBounds<f64>> From<(R1, R2)> for Rectangle {
+    fn from(r: (R1, R2)) -> Rectangle {
+        Rectangle {
             xrange: r.0.into(),
             yrange: r.1.into(),
         }
@@ -63,9 +63,9 @@ impl<'a> Debug for DynamicX<'a> {
     }
 }
 
-impl From<Square> for DynamicX<'static> {
-    fn from(square: Square) -> DynamicX<'static> {
-        let Square { xrange, yrange } = square;
+impl From<Rectangle> for DynamicX<'static> {
+    fn from(square: Rectangle) -> DynamicX<'static> {
+        let Rectangle { xrange, yrange } = square;
         Self {
             xrange: Arc::new(move |_| xrange.clone()),
             yrange,
@@ -102,9 +102,9 @@ impl<'a> Debug for DynamicY<'a> {
     }
 }
 
-impl From<Square> for DynamicY<'static> {
-    fn from(square: Square) -> DynamicY<'static> {
-        let Square { xrange, yrange } = square;
+impl From<Rectangle> for DynamicY<'static> {
+    fn from(square: Rectangle) -> DynamicY<'static> {
+        let Rectangle { xrange, yrange } = square;
         Self {
             xrange,
             yrange: Arc::new(move |_| yrange.clone()),
@@ -118,7 +118,7 @@ impl From<Square> for DynamicY<'static> {
 /// function with `Range2`, use [IntoRange2](./trait.IntoRange2.html) trait instead.
 pub trait Range2 {}
 
-impl Range2 for Square {}
+impl Range2 for Rectangle {}
 impl<'a> Range2 for DynamicX<'a> {}
 impl<'a> Range2 for DynamicY<'a> {}
 
@@ -138,11 +138,11 @@ impl<T: Range2> IntoRange2 for T {
     }
 }
 
-impl<'a> IntoRange2 for &'a Square {
-    type IntoRange = Square;
+impl<'a> IntoRange2 for &'a Rectangle {
+    type IntoRange = Rectangle;
 
     #[inline]
-    fn into_range(self) -> Square {
+    fn into_range(self) -> Rectangle {
         self.clone()
     }
 }
@@ -166,9 +166,9 @@ impl<'a, 'b> IntoRange2 for &'a DynamicY<'b> {
 }
 
 impl<R1: RangeBounds<f64>, R2: RangeBounds<f64>> IntoRange2 for (R1, R2) {
-    type IntoRange = Square;
+    type IntoRange = Rectangle;
 
-    fn into_range(self) -> Square {
-        Square::from(self)
+    fn into_range(self) -> Rectangle {
+        Rectangle::from(self)
     }
 }

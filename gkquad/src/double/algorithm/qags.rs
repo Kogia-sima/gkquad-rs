@@ -1,5 +1,5 @@
 use super::super::common::{Integrand2, IntegrationConfig2};
-use super::super::range::{DynamicY, Square};
+use super::super::range::{DynamicY, Rectangle};
 use super::Algorithm2;
 use crate::single::algorithm::{Algorithm as Algorithm1, QAGS};
 use crate::single::IntegrationConfig;
@@ -14,11 +14,11 @@ impl QAGS2 {
     }
 }
 
-impl<F: Integrand2> Algorithm2<F, Square> for QAGS2 {
+impl<F: Integrand2> Algorithm2<F, Rectangle> for QAGS2 {
     fn integrate(
         &mut self,
         f: &mut F,
-        square: &Square,
+        square: &Rectangle,
         config: &IntegrationConfig2,
     ) -> IntegrationResult {
         let config1 = IntegrationConfig {
@@ -37,7 +37,7 @@ impl<F: Integrand2> Algorithm2<F, Square> for QAGS2 {
             if result.has_err() {
                 error = result.err();
             }
-            result.estimate().unwrap_or(std::f64::NAN)
+            result.estimate().unwrap_or(core::f64::NAN)
         };
 
         let mut result = QAGS::new().integrate(&mut integrand, &square.xrange, &config1);
@@ -72,7 +72,7 @@ impl<'a, F: Integrand2> Algorithm2<F, DynamicY<'a>> for QAGS2 {
             if result.has_err() {
                 error = result.err();
             }
-            result.estimate().unwrap_or(std::f64::NAN)
+            result.estimate().unwrap_or(core::f64::NAN)
         };
 
         let mut result = QAGS::new().integrate(&mut integrand, &range.xrange, &config1);

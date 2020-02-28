@@ -8,7 +8,7 @@ use crate::{IntegrationResult, Tolerance};
 /// This object is useful when you want to re-use the configuration.
 ///
 /// ```
-/// use std::cell::Cell;
+/// use core::cell::Cell;
 ///
 /// use gkquad::Tolerance;
 /// use gkquad::single::Integrator;
