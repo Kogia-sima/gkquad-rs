@@ -37,7 +37,6 @@ mod integral;
 mod integrator;
 mod qelg;
 mod qk;
-mod qk_impl;
 mod util;
 mod workspace;
 
