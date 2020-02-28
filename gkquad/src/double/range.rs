@@ -33,9 +33,8 @@ impl<R1: RangeBounds<f64>, R2: RangeBounds<f64>> From<(R1, R2)> for Rectangle {
     }
 }
 
-// TODO: support DynamicX for default algorithms
+/// Range of `x` varies based on `y` value
 #[derive(Clone)]
-#[doc(hidden)]
 pub struct DynamicX<'a> {
     pub xrange: Arc<dyn Fn(f64) -> Range + Send + Sync + 'a>,
     pub yrange: Range,
