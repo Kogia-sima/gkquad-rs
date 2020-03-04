@@ -1,7 +1,7 @@
 use super::algorithm::*;
 use super::common::{Integrand, IntegrationConfig, Points, Range};
 
-use crate::{IntegrationResult, Tolerance};
+use crate::common::{IntegrationResult, Tolerance};
 
 /// Integration Executor
 ///

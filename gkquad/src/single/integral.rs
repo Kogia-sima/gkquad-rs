@@ -1,7 +1,7 @@
 use super::algorithm::*;
 use super::common::{Integrand, IntegrationConfig, Range};
 
-use crate::IntegrationResult;
+use crate::common::IntegrationResult;
 
 /// Performs integration using `QAGS` algorithm,
 /// which achieves great performance for many kinds of functions.
