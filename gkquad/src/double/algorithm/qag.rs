@@ -1,10 +1,10 @@
 use super::super::common::{Integrand2, IntegrationConfig2};
 use super::super::range::{DynamicX, DynamicY, Rectangle};
 use super::Algorithm2;
+use crate::common::IntegrationResult;
 use crate::single::algorithm::{Algorithm, QAG};
 use crate::single::IntegrationConfig;
 use crate::single::WorkSpace;
-use crate::IntegrationResult;
 
 pub struct QAG2;
 
@@ -62,10 +62,15 @@ impl<'a, F: Integrand2> Algorithm2<F, DynamicY<'a>> for QAG2 {
         let mut integrand = |x: f64| -> f64 {
             let mut integrand2 = |y: f64| f.apply((x, y));
             let result = inner.integrate(&mut integrand2, &(range.yrange)(x), &config1);
-            if result.has_err() {
-                error = result.err();
+
+            unsafe {
+                if result.has_err() {
+                    error = result.err();
+                    std::f64::NAN
+                } else {
+                    result.unwrap_unchecked().estimate
+                }
             }
-            result.estimate().unwrap_or(core::f64::NAN)
         };
 
         let mut result = QAG::new().integrate(&mut integrand, &range.xrange, &config1);

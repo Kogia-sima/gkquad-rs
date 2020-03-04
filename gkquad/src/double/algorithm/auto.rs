@@ -1,7 +1,7 @@
 use super::super::common::{Integrand2, IntegrationConfig2};
 use super::super::range::{DynamicX, DynamicY, Rectangle};
 use super::{Algorithm2, QAGP2, QAGS2};
-use crate::IntegrationResult;
+use crate::common::IntegrationResult;
 
 pub struct AUTO2;
 

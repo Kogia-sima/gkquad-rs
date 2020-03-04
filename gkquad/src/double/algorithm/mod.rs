@@ -2,7 +2,7 @@
 
 use super::common::{Integrand2, IntegrationConfig2};
 use super::range::Range2;
-use crate::IntegrationResult;
+use crate::common::IntegrationResult;
 
 pub trait Algorithm2<F: Integrand2, R: Range2> {
     fn integrate(&mut self, f: &mut F, range: &R, config: &IntegrationConfig2)

@@ -2,7 +2,7 @@ use super::algorithm::*;
 use super::common::{Integrand2, IntegrationConfig2, Points2};
 use super::range::IntoRange2;
 
-use crate::{IntegrationResult, Tolerance};
+use crate::common::{IntegrationResult, Tolerance};
 
 /// 2-dimentional integration Executor
 #[derive(Clone, Debug, Default, PartialEq)]
