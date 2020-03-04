@@ -63,15 +63,19 @@ impl<'a, F: Integrand2> Algorithm2<F, DynamicY<'a>> for QAG2 {
 
         let mut integrand = |x: f64| -> f64 {
             let mut integrand2 = |y: f64| f.apply((x, y));
-            config1.max_evals = config.max_evals - nevals;
+            config1.max_evals = if error.is_some() {
+                0
+            } else {
+                config.max_evals - nevals
+            };
             let result = inner.integrate(&mut integrand2, &(range.yrange)(x), &config1);
 
             unsafe {
                 if result.has_err() {
                     if error.is_none() {
-                        error = result.err();
+                        error = result.error;
                     }
-                    nevals = config.max_evals;
+                    nevals += result.unwrap_unchecked().nevals;
                     std::f64::NAN
                 } else {
                     let result = result.unwrap_unchecked();
@@ -82,6 +86,7 @@ impl<'a, F: Integrand2> Algorithm2<F, DynamicY<'a>> for QAG2 {
         };
 
         let mut result = QAG::new().integrate(&mut integrand, &range.xrange, &config2);
+        result.value.nevals = nevals;
         if error.is_some() {
             result.error = error;
         }

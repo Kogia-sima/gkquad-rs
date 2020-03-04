@@ -106,15 +106,19 @@ where
 
     let mut integrand = |x: f64| -> f64 {
         let mut integrand2 = |y: f64| f.apply((x, y));
-        inner_config.max_evals = config.max_evals - nevals;
+        inner_config.max_evals = if error.is_some() {
+            0
+        } else {
+            config.max_evals - nevals
+        };
         let result = inner.integrate(&mut integrand2, &*yrange(x), &inner_config);
 
         unsafe {
             if result.has_err() {
                 if error.is_none() {
-                    error = result.err();
+                    error = result.error;
                 }
-                nevals = config.max_evals;
+                nevals += result.unwrap_unchecked().nevals;
                 std::f64::NAN
             } else {
                 let result = result.unwrap_unchecked();
@@ -125,6 +129,7 @@ where
     };
 
     let mut result = QAGP::new().integrate(&mut integrand, xrange, &outer_config);
+    result.value.nevals = nevals;
     if error.is_some() {
         result.error = error;
     }
