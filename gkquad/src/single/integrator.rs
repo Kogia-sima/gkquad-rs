@@ -18,10 +18,10 @@ use crate::common::{IntegrationResult, Tolerance};
 ///
 /// let mut integrator = Integrator::new(|x: f64| x.powi(m.get()))
 ///     .tolerance(Tolerance::Relative(1e-7))
-///     .max_iters(100);
+///     .max_evals(5000);
 ///
 /// while m.get() <= 10 {
-///     result *= integrator.run(0.0..1.0).estimate().unwrap();
+///     result *= integrator.run(0.0..1.0).unwrap().estimate;
 ///     
 ///     // increment the exponent
 ///     m.set(m.get() + 1);

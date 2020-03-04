@@ -9,8 +9,8 @@
 //!
 //! // calculate the integral over range (0.0, 1.0)
 //! let result = integral(|x: f64| x.sin() * (- x * x).exp(), 0.0..1.0)
-//!         .estimate()
-//!         .unwrap();
+//!         .unwrap()
+//!         .estimate;
 //! ```
 //!
 //! If you want to calculate more complicated integral, you can use `Integrator` object.
@@ -22,13 +22,13 @@
 //! use gkquad::single::algorithm::QAGP;
 //!
 //! // calculate the integral over range (-∞, ∞), with QAGP algorithm,
-//! // maximum iteration limit being 100, singular point on the origin of coordinate.
+//! // maximum evalution limit being 5000, singular point on the origin of coordinate.
 //! let result = Integrator::new(|x: f64| 1. - (-(x.abs() / 1.6).powf(-2.3)).exp())
-//!         .max_iters(100)
+//!         .max_evals(5000)
 //!         .points(&[0.])
 //!         .run(NEG_INFINITY..INFINITY)
-//!         .estimate()
-//!         .unwrap();
+//!         .unwrap()
+//!         .estimate;
 //! ```
 
 pub mod algorithm;

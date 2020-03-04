@@ -11,7 +11,7 @@ use crate::common::IntegrationResult;
 /// ```
 /// use gkquad::single::integral;
 ///
-/// let result = integral(|x: f64| x.sqrt(), 1.0..2.0).estimate();
+/// let result = integral(|x: f64| x.sqrt(), 1.0..2.0).unwrap();
 /// ```
 #[inline]
 pub fn integral<F: Integrand, I: Into<Range>>(mut f: F, range: I) -> IntegrationResult {
