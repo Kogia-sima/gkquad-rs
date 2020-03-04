@@ -53,8 +53,8 @@ impl<F: Integrand2, A> Integrator2<F, A> {
 
     /// Set maximum number of subranges
     #[inline]
-    pub fn max_iters(mut self, max_iters: usize) -> Self {
-        self.config.max_iters = max_iters;
+    pub fn max_calls(mut self, max_calls: usize) -> Self {
+        self.config.max_calls = max_calls;
         self
     }
 
