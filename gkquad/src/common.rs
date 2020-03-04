@@ -48,18 +48,18 @@ impl Default for Tolerance {
     }
 }
 
-/// `MaybeIncomplete` is a type that holds both partial result (value) and failure
+/// `ValueWithError` is a type that holds both partial result (value) and failure
 /// (error).
 ///
 /// It is quite similar to `std::result::Result` type, but you can always
 /// extract the partial result by calling `unwrap_unchecked()` method.
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
-pub struct MaybeIncomplete<T, E> {
+pub struct ValueWithError<T, E> {
     pub(crate) value: T,
     pub(crate) error: Option<E>,
 }
 
-impl<T, E> MaybeIncomplete<T, E> {
+impl<T, E> ValueWithError<T, E> {
     #[inline]
     pub fn new(value: T) -> Self {
         Self { value, error: None }
@@ -92,16 +92,16 @@ impl<T, E> MaybeIncomplete<T, E> {
     }
 
     #[inline]
-    pub fn as_ref(&self) -> MaybeIncomplete<&T, &E> {
-        MaybeIncomplete {
+    pub fn as_ref(&self) -> ValueWithError<&T, &E> {
+        ValueWithError {
             value: &self.value,
             error: self.error.as_ref(),
         }
     }
 
     #[inline]
-    pub fn as_mut(&mut self) -> MaybeIncomplete<&mut T, &mut E> {
-        MaybeIncomplete {
+    pub fn as_mut(&mut self) -> ValueWithError<&mut T, &mut E> {
+        ValueWithError {
             value: &mut self.value,
             error: self.error.as_mut(),
         }
@@ -130,7 +130,7 @@ impl<T, E> MaybeIncomplete<T, E> {
 
     #[inline]
     pub fn unwrap_err(self) -> E {
-        self.expect_err("called `MaybeIncomplete::unwrap_err() but it does not contains an error")
+        self.expect_err("called `ValueWithError::unwrap_err() but it does not contains an error")
     }
 
     #[inline]
@@ -139,10 +139,10 @@ impl<T, E> MaybeIncomplete<T, E> {
     }
 }
 
-impl<T, E: Debug> MaybeIncomplete<T, E> {
+impl<T, E: Debug> ValueWithError<T, E> {
     #[inline]
     pub fn unwrap(self) -> T {
-        self.expect("called `MaybeIncomplete::unwrap()` but it contains an error")
+        self.expect("called `ValueWithError::unwrap()` but it contains an error")
     }
 
     pub fn expect(self, msg: &str) -> T {
@@ -171,4 +171,4 @@ impl Default for Solution {
     }
 }
 
-pub type IntegrationResult = MaybeIncomplete<Solution, RuntimeError>;
+pub type IntegrationResult = ValueWithError<Solution, RuntimeError>;
