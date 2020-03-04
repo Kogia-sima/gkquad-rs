@@ -8,8 +8,8 @@ fn main() {
     println!(
         "2D: {}",
         2.0 * integral(|x: f64| (1.0 - x * x).sqrt(), -1.0..1.0)
-            .estimate()
             .unwrap()
+            .estimate
     );
 
     let range = DynamicY::new(-1.0, 1.0, |x| {
@@ -21,7 +21,7 @@ fn main() {
     println!(
         "3D: {}",
         2.0 * integral2(|x: f64, y: f64| (1.0 - x * x - y * y).sqrt(), range)
-            .estimate()
             .unwrap()
+            .estimate
     );
 }

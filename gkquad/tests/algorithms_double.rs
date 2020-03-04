@@ -32,11 +32,11 @@ fn test_algorithm<A, R>(
         .points(pts);
 
     let result = integrator.run(r);
-    unsafe {
-        assert_eq!(result.err(), expect.error);
-        assert_rel!(result.estimate_unchecked(), expect.value, 1e-15);
-        assert_rel!(result.delta_unchecked(), expect.delta, 1e-7);
-    }
+    assert_eq!(result.as_ref().err(), expect.error.as_ref());
+
+    let result = unsafe { result.unwrap_unchecked() };
+    assert_rel!(result.estimate, expect.value, 1e-15);
+    assert_rel!(result.delta, expect.delta, 1e-7);
 }
 
 #[test]

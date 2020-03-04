@@ -18,7 +18,7 @@ fn main() {
         let mut product = 1.0;
 
         for _ in 0..10 {
-            let estimate = integrator.run(0.0..1.0).estimate().unwrap();
+            let estimate = integrator.run(0.0..1.0).unwrap().estimate;
             product *= estimate;
             m.set(m.get() + 1);
         }

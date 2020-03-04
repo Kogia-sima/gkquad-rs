@@ -29,28 +29,27 @@ fn test_algorithm<A: Algorithm<fn(f64) -> f64> + AlgorithmWithWorkSpace>(
         .tolerance(tol)
         .points(pts);
     let result = integrator.run(a..b);
-    unsafe {
-        assert_eq!(result.err(), expect.error);
-        assert_rel!(result.estimate_unchecked(), expect.value, 1e-15);
-        assert_rel!(result.delta_unchecked(), expect.delta, 1e-7);
+    assert_eq!(result.as_ref().err(), expect.error.as_ref());
 
-        if cfg!(feature = "std") && !expect.order.is_empty() {
-            let ws = integrator.get_algorithm().workspace();
-            assert_eq!(&ws.order, &expect.order);
-        }
+    let result = unsafe { result.unwrap_unchecked() };
+    assert_rel!(result.estimate, expect.value, 1e-15);
+    assert_rel!(result.delta, expect.delta, 1e-7);
+
+    if cfg!(feature = "std") && !expect.order.is_empty() {
+        let ws = integrator.get_algorithm().workspace();
+        assert_eq!(&ws.order, &expect.order);
     }
 
     let result = integrator.run(b..a);
+    assert_eq!(result.as_ref().err(), expect.error.as_ref());
 
-    unsafe {
-        assert_eq!(result.err(), expect.error);
-        assert_rel!(result.estimate_unchecked(), -expect.value, 1e-15);
-        assert_rel!(result.delta_unchecked(), expect.delta, 1e-7);
+    let result = unsafe { result.unwrap_unchecked() };
+    assert_rel!(result.estimate, -expect.value, 1e-15);
+    assert_rel!(result.delta, expect.delta, 1e-7);
 
-        if cfg!(feature = "std") && !expect.order.is_empty() && pts.is_empty() {
-            let ws = integrator.get_algorithm().workspace();
-            assert_eq!(&ws.order, &expect.order);
-        }
+    if cfg!(feature = "std") && !expect.order.is_empty() && pts.is_empty() {
+        let ws = integrator.get_algorithm().workspace();
+        assert_eq!(&ws.order, &expect.order);
     }
 }
 
