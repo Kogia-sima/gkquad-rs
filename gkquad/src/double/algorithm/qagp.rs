@@ -45,7 +45,7 @@ impl<'a, F: Integrand2> Algorithm2<F, DynamicX<'a>> for QAGP2 {
         };
         let config = IntegrationConfig2 {
             tolerance: config.tolerance.clone(),
-            max_calls: config.max_calls,
+            max_evals: config.max_evals,
             points: config.points.iter().map(|&(x, y)| (y, x)).collect(),
         };
         self.integrate(&mut g, &range, &config)
@@ -78,13 +78,13 @@ where
 {
     let mut inner_config = IntegrationConfig {
         tolerance: config.tolerance.clone(),
-        max_calls: config.max_calls,
+        max_evals: config.max_evals,
         points: Points::with_capacity(config.points.len()),
     };
 
     let mut outer_config = IntegrationConfig {
         tolerance: config.tolerance.clone(),
-        max_calls: config.max_calls,
+        max_evals: config.max_evals,
         points: Points::with_capacity(config.points.len()),
     };
 

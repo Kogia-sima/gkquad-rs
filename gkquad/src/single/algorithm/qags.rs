@@ -91,7 +91,7 @@ fn integrate_impl(
     let mut disallow_extrapolation = false;
     let mut nevals = 0usize;
 
-    if config.max_calls < 17 {
+    if config.max_evals < 17 {
         return IntegrationResult::with_error(Solution::default(), InsufficientIteration);
     }
 
@@ -103,7 +103,7 @@ fn integrate_impl(
     let result0 = result0.unwrap();
 
     ws.clear();
-    ws.reserve((config.max_calls - nevals) / 50 + 1);
+    ws.reserve((config.max_evals - nevals) / 50 + 1);
 
     ws.push(SubRangeInfo::new(
         range.clone(),
@@ -122,7 +122,7 @@ fn integrate_impl(
     // 現在の計算結果を保存
     let mut res_ext = result0.estimate;
     let mut err_ext = core::f64::MAX;
-    let max_iters = (config.max_calls - nevals) / 50;
+    let max_iters = (config.max_evals - nevals) / 50;
 
     for iteration in 1..=max_iters {
         // Bisect the subrange with the largest error estimate
@@ -204,7 +204,7 @@ fn integrate_impl(
         }
 
         // 最終ループでは補外を行う必要がないため即座にreturnする
-        if iteration >= config.max_calls - 1 {
+        if iteration >= config.max_evals - 1 {
             error = Some(InsufficientIteration);
             break;
         }
@@ -365,7 +365,7 @@ fn initial_integral(
             );
         }
 
-        if config.max_calls < 42 + i * 25 {
+        if config.max_evals < 42 + i * 25 {
             return (
                 IntegrationResult::with_error(solution, InsufficientIteration),
                 0.0,

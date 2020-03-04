@@ -83,12 +83,12 @@ fn integrate_impl(
     let nint = pts.len() - 1; // number of ranges
     let mut nevals = 0usize;
 
-    if config.max_calls < nint * 25 {
+    if config.max_evals < nint * 25 {
         return IntegrationResult::with_error(Solution::default(), InsufficientIteration);
     }
 
     ws.clear();
-    ws.reserve(nint + (config.max_calls - nint * 25) / 50);
+    ws.reserve(nint + (config.max_evals - nint * 25) / 50);
 
     let (mut reseps, mut abseps, mut correc) = (0.0, 0.0, 0.0);
     let mut ktmin = 0;
@@ -164,7 +164,7 @@ fn integrate_impl(
         return finish(result0.estimate, result0.delta, nevals, Some(RoundoffError));
     } else if result0.delta <= tolerance && result0.delta != result0.asc || result0.delta == 0.0 {
         return finish(result0.estimate, result0.delta, nevals, None);
-    } else if nevals == config.max_calls {
+    } else if nevals == config.max_evals {
         return finish(
             result0.estimate,
             result0.delta,
@@ -183,7 +183,7 @@ fn integrate_impl(
     let mut err_ext = core::f64::MAX;
     let mut error_over_large_ranges = deltasum;
     let mut ertest = tolerance;
-    let max_iters = nint + (config.max_calls - nevals) / 50;
+    let max_iters = nint + (config.max_evals - nevals) / 50;
 
     for iteration in nint..=max_iters {
         let info = ws.get();

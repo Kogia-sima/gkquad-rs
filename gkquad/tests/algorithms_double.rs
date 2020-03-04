@@ -28,7 +28,7 @@ fn test_algorithm<A, R>(
 {
     let mut integrator = Integrator2::with_algorithm(f, algorithm)
         .tolerance(tol)
-        .max_calls(2000)
+        .max_evals(2000)
         .points(pts);
 
     let result = integrator.run(r);

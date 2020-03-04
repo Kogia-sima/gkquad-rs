@@ -76,8 +76,8 @@ impl<F: Integrand, A: Algorithm<F>> Integrator<F, A> {
 
     /// Set maximum number of subranges
     #[inline]
-    pub fn max_calls(mut self, max_calls: usize) -> Self {
-        self.config.max_calls = max_calls;
+    pub fn max_evals(mut self, max_evals: usize) -> Self {
+        self.config.max_evals = max_evals;
         self
     }
 

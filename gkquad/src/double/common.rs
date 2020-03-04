@@ -15,7 +15,7 @@ pub struct IntegrationConfig2 {
     /// the tolerance to be satisfied
     pub tolerance: Tolerance,
     /// maximum number of subdivisions
-    pub max_calls: usize,
+    pub max_evals: usize,
     /// specify singular points
     pub points: Points2,
 }
@@ -25,7 +25,7 @@ impl Default for IntegrationConfig2 {
     fn default() -> Self {
         Self {
             tolerance: Tolerance::default(),
-            max_calls: 50,
+            max_evals: 2000,
             points: Points2::new(),
         }
     }

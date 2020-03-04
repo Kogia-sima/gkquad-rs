@@ -51,7 +51,7 @@ impl<'a, F: Integrand2> Algorithm2<F, DynamicY<'a>> for QAGS2 {
     ) -> IntegrationResult {
         let config1 = IntegrationConfig {
             tolerance: config.tolerance.clone(),
-            max_calls: config.max_calls,
+            max_evals: config.max_evals,
             ..Default::default()
         };
 

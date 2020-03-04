@@ -79,7 +79,7 @@ fn integrate_impl(
     let (mut roundoff_type1, mut roundoff_type2) = (0_i32, 0_i32);
     let mut error = None;
 
-    if config.max_calls < 17 {
+    if config.max_evals < 17 {
         return IntegrationResult::with_error(Solution::default(), InsufficientIteration);
     }
 
@@ -101,7 +101,7 @@ fn integrate_impl(
     let mut nevals = result0.nevals;
 
     ws.clear();
-    ws.reserve((config.max_calls - nevals) / 50 + 1);
+    ws.reserve((config.max_evals - nevals) / 50 + 1);
 
     ws.push(SubRangeInfo::new(
         range.clone(),
@@ -110,7 +110,7 @@ fn integrate_impl(
         0,
     ));
 
-    let max_iters = (config.max_calls - nevals) / 50;
+    let max_iters = (config.max_evals - nevals) / 50;
     for _ in 1..=max_iters {
         // 最も誤差が大きい部分区間を取り出す
         let info = ws.get();
@@ -222,7 +222,7 @@ fn initial_integral(
             return (IntegrationResult::with_error(solution, RoundoffError), true);
         }
 
-        if config.max_calls < 42 + i * 25 {
+        if config.max_evals < 42 + i * 25 {
             return (
                 IntegrationResult::with_error(solution, InsufficientIteration),
                 true,
