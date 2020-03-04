@@ -80,9 +80,14 @@ fn integrate_impl(
 ) -> IntegrationResult {
     let pts = make_sorted_points(range, &config.points, transform);
     let nint = pts.len() - 1; // number of ranges
+    let mut num_calls = nint * 25;
+
+    if config.max_calls < num_calls {
+        return IntegrationResult::new(0., core::f64::MAX, Some(InsufficientIteration));
+    }
 
     ws.clear();
-    ws.reserve(usize::max(config.max_iters, pts.len()));
+    ws.reserve(nint + (config.max_calls - nint * 25) / 50);
 
     let (mut reseps, mut abseps, mut correc) = (0.0, 0.0, 0.0);
     let mut ktmin = 0;
@@ -156,7 +161,7 @@ fn integrate_impl(
         return IntegrationResult::new(result0.estimate, result0.delta, Some(RoundoffError));
     } else if result0.delta <= tolerance && result0.delta != result0.asc || result0.delta == 0.0 {
         return IntegrationResult::new(result0.estimate, result0.delta, None);
-    } else if config.max_iters == 1 {
+    } else if num_calls == config.max_calls {
         return IntegrationResult::new(
             result0.estimate,
             result0.delta,
@@ -174,8 +179,9 @@ fn integrate_impl(
     let mut err_ext = core::f64::MAX;
     let mut error_over_large_ranges = deltasum;
     let mut ertest = tolerance;
+    let max_iters = nint + (config.max_calls - num_calls) / 50;
 
-    for iteration in nint..=config.max_iters {
+    for iteration in nint..=max_iters {
         let info = ws.get();
 
         let current_level = info.level + 1;
@@ -183,6 +189,7 @@ fn integrate_impl(
 
         let result1 = qk25(&r1);
         let result2 = qk25(&r2);
+        num_calls += 50;
 
         if result1.estimate.is_nan() || result2.estimate.is_nan() {
             error = Some(NanValueEncountered);
@@ -250,7 +257,7 @@ fn integrate_impl(
             break;
         }
 
-        if iteration >= config.max_iters - 1 {
+        if iteration >= max_iters - 1 {
             error = Some(InsufficientIteration);
             break;
         }

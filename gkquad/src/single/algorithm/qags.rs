@@ -88,14 +88,19 @@ fn integrate_impl(
 
     let mut extrapolate = false;
     let mut disallow_extrapolation = false;
+    let mut num_calls = 0usize;
 
-    let (result0, absvalue, finished) = initial_integral(qk17, qk25, range, config);
+    if config.max_calls < 17 {
+        return IntegrationResult::new(0.0, core::f64::MAX, Some(InsufficientIteration));
+    }
+
+    let (result0, absvalue, finished) = initial_integral(qk17, qk25, range, config, &mut num_calls);
     if finished {
         return result0;
     }
 
     ws.clear();
-    ws.reserve(config.max_iters);
+    ws.reserve((config.max_calls - num_calls) / 50 + 1);
 
     ws.push(SubRangeInfo::new(
         range.clone(),
@@ -114,8 +119,10 @@ fn integrate_impl(
     // 現在の計算結果を保存
     let mut res_ext = result0.estimate;
     let mut err_ext = core::f64::MAX;
+    let max_iters = (config.max_calls - num_calls) / 50;
+    dbg!(num_calls, max_iters);
 
-    for iteration in 2..=config.max_iters {
+    for iteration in 1..=max_iters {
         // Bisect the subrange with the largest error estimate
         let info = ws.get();
         let current_level = info.level + 1;
@@ -193,7 +200,7 @@ fn integrate_impl(
         }
 
         // 最終ループでは補外を行う必要がないため即座にreturnする
-        if iteration >= config.max_iters - 1 {
+        if iteration >= config.max_calls - 1 {
             error = Some(InsufficientIteration);
             break;
         }
@@ -312,11 +319,14 @@ fn initial_integral(
     qk25: &dyn Fn(&Range) -> QKResult,
     range: &Range,
     config: &IntegrationConfig,
+    num_calls: &mut usize,
 ) -> (IntegrationResult, f64, bool) {
     for i in 0..2 {
         let result0 = if i == 0 {
+            *num_calls += 17;
             qk17(&range)
         } else if i == 1 {
+            *num_calls += 25;
             qk25(&range)
         } else {
             unreachable!();
@@ -337,16 +347,6 @@ fn initial_integral(
                 0.,
                 true,
             );
-        } else if config.max_iters == 1 {
-            return (
-                IntegrationResult::new(
-                    result0.estimate,
-                    result0.delta,
-                    Some(InsufficientIteration),
-                ),
-                0.,
-                true,
-            );
         }
 
         let round_off = 100. * core::f64::EPSILON * result0.absvalue;
@@ -354,6 +354,18 @@ fn initial_integral(
             // 精度の限界によりこれ以上誤差を減らすことは不可能
             return (
                 IntegrationResult::new(result0.estimate, result0.delta, Some(RoundoffError)),
+                0.,
+                true,
+            );
+        }
+
+        if config.max_calls < 42 + i * 25 {
+            return (
+                IntegrationResult::new(
+                    result0.estimate,
+                    result0.delta,
+                    Some(InsufficientIteration),
+                ),
                 0.,
                 true,
             );
