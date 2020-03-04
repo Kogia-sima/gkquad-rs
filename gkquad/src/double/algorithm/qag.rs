@@ -76,7 +76,7 @@ impl<'a, F: Integrand2> Algorithm2<F, DynamicY<'a>> for QAG2 {
                         error = result.error;
                     }
                     nevals += result.unwrap_unchecked().nevals;
-                    std::f64::NAN
+                    core::f64::NAN
                 } else {
                     let result = result.unwrap_unchecked();
                     nevals += result.nevals;

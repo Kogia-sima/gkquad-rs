@@ -119,7 +119,7 @@ where
                     error = result.error;
                 }
                 nevals += result.unwrap_unchecked().nevals;
-                std::f64::NAN
+                core::f64::NAN
             } else {
                 let result = result.unwrap_unchecked();
                 nevals += result.nevals;

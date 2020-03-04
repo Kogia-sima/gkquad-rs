@@ -1,5 +1,5 @@
 use super::error::RuntimeError;
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 /// Specify the tolerance which must be satisfied after calculation
 ///
