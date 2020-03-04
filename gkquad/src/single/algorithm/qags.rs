@@ -89,7 +89,6 @@ fn integrate_impl(
 
     let mut extrapolate = false;
     let mut disallow_extrapolation = false;
-    let mut nevals = 0usize;
 
     if config.max_evals < 17 {
         return IntegrationResult::with_error(Solution::default(), InsufficientIteration);
@@ -101,6 +100,7 @@ fn integrate_impl(
     }
 
     let result0 = result0.unwrap();
+    let mut nevals = result0.nevals;
 
     ws.clear();
     ws.reserve((config.max_evals - nevals) / 50 + 1);
