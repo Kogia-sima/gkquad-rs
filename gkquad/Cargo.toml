@@ -33,6 +33,11 @@ bencher = "0.1.5"
 name = "single"
 harness = false
 
+[[bench]]
+name = "double"
+required-features = ["double"]
+harness = false
+
 [[example]]
 name = "sphere"
 required-features = ["double"]
