@@ -7,7 +7,7 @@
 
 use super::common::{Integrand, IntegrationConfig, Range};
 use super::workspace::WorkSpace;
-use crate::error::IntegrationResult;
+use crate::common::IntegrationResult;
 
 /// 1-dimentional integration algorithm API
 ///

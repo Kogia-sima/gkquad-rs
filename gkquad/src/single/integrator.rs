@@ -1,7 +1,7 @@
 use super::algorithm::*;
 use super::common::{Integrand, IntegrationConfig, Points, Range};
 
-use crate::{IntegrationResult, Tolerance};
+use crate::common::{IntegrationResult, Tolerance};
 
 /// Integration Executor
 ///
@@ -18,10 +18,10 @@ use crate::{IntegrationResult, Tolerance};
 ///
 /// let mut integrator = Integrator::new(|x: f64| x.powi(m.get()))
 ///     .tolerance(Tolerance::Relative(1e-7))
-///     .max_iters(100);
+///     .max_evals(5000);
 ///
 /// while m.get() <= 10 {
-///     result *= integrator.run(0.0..1.0).estimate().unwrap();
+///     result *= integrator.run(0.0..1.0).unwrap().estimate;
 ///     
 ///     // increment the exponent
 ///     m.set(m.get() + 1);
@@ -76,8 +76,8 @@ impl<F: Integrand, A: Algorithm<F>> Integrator<F, A> {
 
     /// Set maximum number of subranges
     #[inline]
-    pub fn max_iters(mut self, max_iters: usize) -> Self {
-        self.config.max_iters = max_iters;
+    pub fn max_evals(mut self, max_evals: usize) -> Self {
+        self.config.max_evals = max_evals;
         self
     }
 

@@ -1,7 +1,7 @@
 use super::algorithm::*;
 use super::common::{Integrand, IntegrationConfig, Range};
 
-use crate::IntegrationResult;
+use crate::common::IntegrationResult;
 
 /// Performs integration using `QAGS` algorithm,
 /// which achieves great performance for many kinds of functions.
@@ -11,7 +11,7 @@ use crate::IntegrationResult;
 /// ```
 /// use gkquad::single::integral;
 ///
-/// let result = integral(|x: f64| x.sqrt(), 1.0..2.0).estimate();
+/// let result = integral(|x: f64| x.sqrt(), 1.0..2.0).unwrap();
 /// ```
 #[inline]
 pub fn integral<F: Integrand, I: Into<Range>>(mut f: F, range: I) -> IntegrationResult {

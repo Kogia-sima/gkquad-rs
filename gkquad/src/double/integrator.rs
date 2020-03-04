@@ -2,7 +2,7 @@ use super::algorithm::*;
 use super::common::{Integrand2, IntegrationConfig2, Points2};
 use super::range::IntoRange2;
 
-use crate::{IntegrationResult, Tolerance};
+use crate::common::{IntegrationResult, Tolerance};
 
 /// 2-dimentional integration Executor
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -53,8 +53,8 @@ impl<F: Integrand2, A> Integrator2<F, A> {
 
     /// Set maximum number of subranges
     #[inline]
-    pub fn max_iters(mut self, max_iters: usize) -> Self {
-        self.config.max_iters = max_iters;
+    pub fn max_evals(mut self, max_evals: usize) -> Self {
+        self.config.max_evals = max_evals;
         self
     }
 

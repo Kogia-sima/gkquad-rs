@@ -14,7 +14,7 @@ fn simple(b: &mut Bencher) {
     let mut integrator = Integrator::new(|x: f64| x * x);
     b.iter(|| {
         let range = black_box(0.0..1.0);
-        let result = integrator.run(range).estimate().unwrap();
+        let result = integrator.run(range).unwrap().estimate;
         assert!((result - 1.0 / 3.0).abs() <= 1.49e-8);
     });
 }
@@ -26,7 +26,7 @@ fn singular_points(b: &mut Bencher) {
 
     b.iter(|| {
         let range = black_box(-1.0..1.0);
-        let result = integrator.run(range).estimate().unwrap();
+        let result = integrator.run(range).unwrap().estimate;
         assert!(result.abs() <= 1.49e-8);
     });
 }
@@ -36,7 +36,7 @@ fn infinite_range(b: &mut Bencher) {
 
     b.iter(|| {
         let range = black_box(NEG_INFINITY..INFINITY);
-        let result = integrator.run(range).estimate().unwrap();
+        let result = integrator.run(range).unwrap().estimate;
         assert!((result - PI).abs() <= 1.49e-8);
     });
 }

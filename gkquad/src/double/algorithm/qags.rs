@@ -1,10 +1,10 @@
 use super::super::common::{Integrand2, IntegrationConfig2};
 use super::super::range::{DynamicX, DynamicY, Rectangle};
 use super::Algorithm2;
+use crate::common::IntegrationResult;
 use crate::single::algorithm::{Algorithm as Algorithm1, QAGS};
 use crate::single::IntegrationConfig;
 use crate::single::WorkSpace;
-use crate::IntegrationResult;
 
 pub struct QAGS2;
 
@@ -49,26 +49,44 @@ impl<'a, F: Integrand2> Algorithm2<F, DynamicY<'a>> for QAGS2 {
         range: &DynamicY<'a>,
         config: &IntegrationConfig2,
     ) -> IntegrationResult {
-        let config1 = IntegrationConfig {
+        let mut config1 = IntegrationConfig {
             tolerance: config.tolerance.clone(),
-            max_iters: config.max_iters,
+            max_evals: config.max_evals / 17,
             ..Default::default()
         };
+        let config2 = config1.clone();
 
         let mut inner_ws = WorkSpace::new();
         let mut inner = QAGS::with_workspace(&mut inner_ws);
         let mut error = None;
+        let mut nevals = 0usize;
 
         let mut integrand = |x: f64| -> f64 {
             let mut integrand2 = |y: f64| f.apply((x, y));
+            config1.max_evals = if error.is_some() {
+                0
+            } else {
+                config.max_evals - nevals
+            };
             let result = inner.integrate(&mut integrand2, &(range.yrange)(x), &config1);
-            if result.has_err() {
-                error = result.err();
+
+            unsafe {
+                if result.has_err() {
+                    if error.is_none() {
+                        error = result.error;
+                    }
+                    nevals += result.unwrap_unchecked().nevals;
+                    std::f64::NAN
+                } else {
+                    let result = result.unwrap_unchecked();
+                    nevals += result.nevals;
+                    result.estimate
+                }
             }
-            result.estimate().unwrap_or(core::f64::NAN)
         };
 
-        let mut result = QAGS::new().integrate(&mut integrand, &range.xrange, &config1);
+        let mut result = QAGS::new().integrate(&mut integrand, &range.xrange, &config2);
+        result.value.nevals = nevals;
         if error.is_some() {
             result.error = error;
         }

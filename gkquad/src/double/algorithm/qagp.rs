@@ -3,9 +3,9 @@ use alloc::borrow::Cow;
 use super::super::common::{Integrand2, IntegrationConfig2};
 use super::super::range::{DynamicX, DynamicY, Rectangle};
 use super::Algorithm2;
+use crate::common::IntegrationResult;
 use crate::single::algorithm::{Algorithm, QAGP};
 use crate::single::{IntegrationConfig, Points, Range, WorkSpace};
-use crate::IntegrationResult;
 
 #[cfg(not(feature = "std"))]
 use crate::float::Float;
@@ -45,7 +45,7 @@ impl<'a, F: Integrand2> Algorithm2<F, DynamicX<'a>> for QAGP2 {
         };
         let config = IntegrationConfig2 {
             tolerance: config.tolerance.clone(),
-            max_iters: config.max_iters,
+            max_evals: config.max_evals,
             points: config.points.iter().map(|&(x, y)| (y, x)).collect(),
         };
         self.integrate(&mut g, &range, &config)
@@ -76,21 +76,23 @@ where
     F: Integrand2,
     G: Fn(f64) -> Cow<'a, Range>,
 {
+    // TODO: handle max_evals properly
     let mut inner_config = IntegrationConfig {
         tolerance: config.tolerance.clone(),
-        max_iters: config.max_iters,
+        max_evals: 0,
         points: Points::with_capacity(config.points.len()),
     };
 
     let mut outer_config = IntegrationConfig {
         tolerance: config.tolerance.clone(),
-        max_iters: config.max_iters,
+        max_evals: config.max_evals / 17,
         points: Points::with_capacity(config.points.len()),
     };
 
     let mut inner_ws = WorkSpace::new();
     let mut inner = QAGP::with_workspace(&mut inner_ws);
     let mut error = None;
+    let mut nevals = 0usize;
 
     let xtransform = !xrange.begin.is_finite() || !xrange.end.is_finite();
     config.points.iter().for_each(|&(x, y)| {
@@ -104,15 +106,30 @@ where
 
     let mut integrand = |x: f64| -> f64 {
         let mut integrand2 = |y: f64| f.apply((x, y));
+        inner_config.max_evals = if error.is_some() {
+            0
+        } else {
+            config.max_evals - nevals
+        };
         let result = inner.integrate(&mut integrand2, &*yrange(x), &inner_config);
-        if result.has_err() {
-            error = result.err();
-        }
 
-        result.estimate().unwrap_or(core::f64::NAN)
+        unsafe {
+            if result.has_err() {
+                if error.is_none() {
+                    error = result.error;
+                }
+                nevals += result.unwrap_unchecked().nevals;
+                std::f64::NAN
+            } else {
+                let result = result.unwrap_unchecked();
+                nevals += result.nevals;
+                result.estimate
+            }
+        }
     };
 
     let mut result = QAGP::new().integrate(&mut integrand, xrange, &outer_config);
+    result.value.nevals = nevals;
     if error.is_some() {
         result.error = error;
     }

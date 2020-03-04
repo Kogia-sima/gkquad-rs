@@ -1,4 +1,4 @@
-pub use crate::{IntegrationResult, RuntimeError, Tolerance};
+pub use crate::{common::IntegrationResult, RuntimeError, Tolerance};
 
 pub use crate::single::{algorithm::*, integral, Integrand, Integrator};
 

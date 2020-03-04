@@ -1,4 +1,4 @@
-use crate::error::IntegrationResult;
+use crate::common::IntegrationResult;
 use crate::single::algorithm::*;
 use crate::single::common::{Integrand, IntegrationConfig, Range};
 

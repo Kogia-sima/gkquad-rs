@@ -1,7 +1,8 @@
 use alloc::borrow::Cow;
 use core::cell::UnsafeCell;
 
-use crate::error::{IntegrationResult, RuntimeError::*};
+use crate::common::{IntegrationResult, Solution};
+use crate::error::RuntimeError::{self, *};
 use crate::single::algorithm::Algorithm;
 use crate::single::common::{Integrand, IntegrationConfig, Points, Range};
 use crate::single::qelg::ExtrapolationTable;
@@ -80,9 +81,14 @@ fn integrate_impl(
 ) -> IntegrationResult {
     let pts = make_sorted_points(range, &config.points, transform);
     let nint = pts.len() - 1; // number of ranges
+    let mut nevals = 0usize;
+
+    if config.max_evals < nint * 25 {
+        return IntegrationResult::with_error(Solution::default(), InsufficientIteration);
+    }
 
     ws.clear();
-    ws.reserve(usize::max(config.max_iters, pts.len()));
+    ws.reserve(nint + (config.max_evals - nint * 25) / 50);
 
     let (mut reseps, mut abseps, mut correc) = (0.0, 0.0, 0.0);
     let mut ktmin = 0;
@@ -108,11 +114,13 @@ fn integrate_impl(
 
         let range = unsafe { Range::new_unchecked(w[0], w[1]) };
         let result1 = qk25(&range);
+        nevals += 25;
 
         if result1.estimate.is_nan() {
-            return IntegrationResult::new(
+            return finish(
                 result0.estimate,
                 result0.delta,
+                nevals,
                 Some(NanValueEncountered),
             );
         }
@@ -153,13 +161,14 @@ fn integrate_impl(
     let round_off = 100. * core::f64::EPSILON * result0.absvalue;
 
     if result0.delta <= round_off && result0.delta > tolerance {
-        return IntegrationResult::new(result0.estimate, result0.delta, Some(RoundoffError));
+        return finish(result0.estimate, result0.delta, nevals, Some(RoundoffError));
     } else if result0.delta <= tolerance && result0.delta != result0.asc || result0.delta == 0.0 {
-        return IntegrationResult::new(result0.estimate, result0.delta, None);
-    } else if config.max_iters == 1 {
-        return IntegrationResult::new(
+        return finish(result0.estimate, result0.delta, nevals, None);
+    } else if nevals == config.max_evals {
+        return finish(
             result0.estimate,
             result0.delta,
+            nevals,
             Some(InsufficientIteration),
         );
     }
@@ -174,8 +183,9 @@ fn integrate_impl(
     let mut err_ext = core::f64::MAX;
     let mut error_over_large_ranges = deltasum;
     let mut ertest = tolerance;
+    let max_iters = nint + (config.max_evals - nevals) / 50;
 
-    for iteration in nint..=config.max_iters {
+    for iteration in nint..=max_iters {
         let info = ws.get();
 
         let current_level = info.level + 1;
@@ -183,6 +193,7 @@ fn integrate_impl(
 
         let result1 = qk25(&r1);
         let result2 = qk25(&r2);
+        nevals += 50;
 
         if result1.estimate.is_nan() || result2.estimate.is_nan() {
             error = Some(NanValueEncountered);
@@ -233,9 +244,10 @@ fn integrate_impl(
         }
 
         if deltasum <= tolerance {
-            return IntegrationResult::new(
+            return finish(
                 ws.sum_results() - info.estimate + result1.estimate + result2.estimate,
                 deltasum,
+                nevals,
                 error,
             );
         }
@@ -250,7 +262,7 @@ fn integrate_impl(
             break;
         }
 
-        if iteration >= config.max_iters - 1 {
+        if iteration >= max_iters - 1 {
             error = Some(InsufficientIteration);
             break;
         }
@@ -327,7 +339,7 @@ fn integrate_impl(
     }
 
     if err_ext == core::f64::MAX {
-        return IntegrationResult::new(ws.sum_results(), deltasum, error);
+        return finish(ws.sum_results(), deltasum, nevals, error);
     }
     if error.is_some() || error2 {
         if error2 {
@@ -340,18 +352,18 @@ fn integrate_impl(
 
         if res_ext != 0. && area != 0. {
             if err_ext / res_ext.abs() > deltasum / area.abs() {
-                return IntegrationResult::new(ws.sum_results(), deltasum, error);
+                return finish(ws.sum_results(), deltasum, nevals, error);
             }
         } else if err_ext > deltasum {
-            return IntegrationResult::new(ws.sum_results(), deltasum, error);
+            return finish(ws.sum_results(), deltasum, nevals, error);
         } else if area == 0.0 {
-            return IntegrationResult::new(res_ext, err_ext, error);
+            return finish(res_ext, err_ext, nevals, error);
         }
     }
 
     let positive_integrand = test_positivity(result0.estimate, result0.absvalue);
     if !positive_integrand && f64::max(res_ext.abs(), area.abs()) < 0.01 * result0.absvalue {
-        return IntegrationResult::new(res_ext, err_ext, error);
+        return finish(res_ext, err_ext, nevals, error);
     }
 
     let ratio = res_ext / area;
@@ -359,7 +371,7 @@ fn integrate_impl(
         error = Some(Divergent);
     }
 
-    IntegrationResult::new(res_ext, err_ext, error)
+    finish(res_ext, err_ext, nevals, error)
 }
 
 fn make_sorted_points(range: &Range, pts: &[f64], transform: bool) -> Points {
@@ -389,9 +401,28 @@ fn make_sorted_points(range: &Range, pts: &[f64], transform: bool) -> Points {
     pts2
 }
 
+#[inline]
 fn add_qkresult(result1: &mut QKResult, result2: &QKResult) {
     result1.estimate += result2.estimate;
     result1.delta += result2.delta;
     result1.absvalue += result2.absvalue;
     result1.asc += result2.asc;
+}
+
+#[inline]
+#[must_use]
+fn finish(
+    estimate: f64,
+    delta: f64,
+    nevals: usize,
+    error: Option<RuntimeError>,
+) -> IntegrationResult {
+    IntegrationResult {
+        value: Solution {
+            estimate,
+            delta,
+            nevals,
+        },
+        error,
+    }
 }

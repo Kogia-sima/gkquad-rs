@@ -1,7 +1,8 @@
 use alloc::borrow::Cow;
 use core::cell::UnsafeCell;
 
-use crate::error::{IntegrationResult, RuntimeError::*};
+use crate::common::{IntegrationResult, Solution};
+use crate::error::RuntimeError::{self, *};
 use crate::single::algorithm::Algorithm;
 use crate::single::common::{Integrand, IntegrationConfig, Range};
 use crate::single::util::{bisect, subrange_too_small, transform_range, IntegrandWrapper};
@@ -78,11 +79,17 @@ fn integrate_impl(
     let (mut roundoff_type1, mut roundoff_type2) = (0_i32, 0_i32);
     let mut error = None;
 
+    if config.max_evals < 17 {
+        return IntegrationResult::with_error(Solution::default(), InsufficientIteration);
+    }
+
     // initial integral
     let (result0, finished) = initial_integral(qk17, qk25, range, config);
     if finished {
         return result0;
     }
+
+    let result0 = result0.unwrap();
 
     // sum of the integral estimates for each range
     let mut area = result0.estimate;
@@ -90,8 +97,11 @@ fn integrate_impl(
     // sum of the errors for each range
     let mut deltasum = result0.delta;
 
+    // what times the integrand was evaluated
+    let mut nevals = result0.nevals;
+
     ws.clear();
-    ws.reserve(config.max_iters);
+    ws.reserve((config.max_evals - nevals) / 50 + 1);
 
     ws.push(SubRangeInfo::new(
         range.clone(),
@@ -100,7 +110,8 @@ fn integrate_impl(
         0,
     ));
 
-    for _ in 1..config.max_iters {
+    let max_iters = (config.max_evals - nevals) / 50;
+    for _ in 1..=max_iters {
         // 最も誤差が大きい部分区間を取り出す
         let info = ws.get();
         let current_level = info.level + 1;
@@ -111,6 +122,7 @@ fn integrate_impl(
         // 各部分区間でGauss-Kronrod積分
         let result1 = qk25(&r1);
         let result2 = qk25(&r2);
+        nevals += 50;
 
         if result1.estimate.is_nan() || result2.estimate.is_nan() {
             error = Some(NanValueEncountered);
@@ -145,9 +157,10 @@ fn integrate_impl(
             }
 
             if error.is_some() {
-                return IntegrationResult::new(
+                return finish(
                     ws.sum_results() - info.estimate + result1.estimate + result2.estimate,
                     deltasum,
+                    nevals,
                     error,
                 );
             }
@@ -165,7 +178,7 @@ fn integrate_impl(
     }
 
     // 再度結果を足し合わせて正確な推定値を得る
-    IntegrationResult::new(ws.sum_results(), deltasum, error)
+    finish(ws.sum_results(), deltasum, nevals, error)
 }
 
 // initial integral
@@ -175,55 +188,69 @@ fn initial_integral(
     range: &Range,
     config: &IntegrationConfig,
 ) -> (IntegrationResult, bool) {
+    let mut solution = Solution::default();
+
     for i in 0..2 {
         let result0 = if i == 0 {
+            solution.nevals += 17;
             qk17(&range)
         } else if i == 1 {
+            solution.nevals += 25;
             qk25(&range)
         } else {
             unreachable!();
         };
 
+        solution.estimate = result0.estimate;
+        solution.delta = result0.delta;
+
         if result0.estimate.is_nan() {
             return (
-                IntegrationResult::new(result0.estimate, result0.delta, Some(NanValueEncountered)),
+                IntegrationResult::with_error(solution, NanValueEncountered),
                 true,
             );
         }
 
         let tolerance = config.tolerance.to_abs(result0.estimate.abs());
         if result0.delta <= tolerance && result0.delta != result0.asc || result0.delta == 0.0 {
-            return (
-                IntegrationResult::new(result0.estimate, result0.delta, None),
-                true,
-            );
-        } else if config.max_iters == 1 {
-            return (
-                IntegrationResult::new(
-                    result0.estimate,
-                    result0.delta,
-                    Some(InsufficientIteration),
-                ),
-                true,
-            );
+            return (IntegrationResult::new(solution), true);
         }
 
         let round_off = 50. * core::f64::EPSILON * result0.absvalue;
         if result0.delta <= round_off && result0.delta > tolerance {
             // 精度の限界によりこれ以上誤差を減らすことは不可能
+            return (IntegrationResult::with_error(solution, RoundoffError), true);
+        }
+
+        if config.max_evals < 42 + i * 25 {
             return (
-                IntegrationResult::new(result0.estimate, result0.delta, Some(RoundoffError)),
+                IntegrationResult::with_error(solution, InsufficientIteration),
                 true,
             );
         }
 
-        if i == 1 || result0.delta > tolerance * 1024. {
-            return (
-                IntegrationResult::new(result0.estimate, result0.delta, None),
-                false,
-            );
+        if i == 0 && result0.delta > tolerance * 1024. {
+            break;
         }
     }
 
-    unreachable!();
+    return (IntegrationResult::new(solution), false);
+}
+
+#[inline]
+#[must_use]
+fn finish(
+    estimate: f64,
+    delta: f64,
+    nevals: usize,
+    error: Option<RuntimeError>,
+) -> IntegrationResult {
+    IntegrationResult {
+        value: Solution {
+            estimate,
+            delta,
+            nevals,
+        },
+        error,
+    }
 }
