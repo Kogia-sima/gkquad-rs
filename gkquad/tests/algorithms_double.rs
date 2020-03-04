@@ -28,7 +28,7 @@ fn test_algorithm<A, R>(
 {
     let mut integrator = Integrator2::with_algorithm(f, algorithm)
         .tolerance(tol)
-        .max_evals(2000)
+        .max_evals(100000)
         .points(pts);
 
     let result = integrator.run(r);
@@ -86,7 +86,7 @@ fn qags_g2() {
 #[test]
 fn qags_g3() {
     let expect = Expect {
-        value: 2.6179938779915196e-01,
+        value: 2.617993877991505e-01,
         delta: 2.906557081673861E-15,
         error: None,
     };

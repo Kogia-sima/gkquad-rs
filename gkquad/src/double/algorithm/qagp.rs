@@ -76,21 +76,23 @@ where
     F: Integrand2,
     G: Fn(f64) -> Cow<'a, Range>,
 {
+    // TODO: handle max_evals properly
     let mut inner_config = IntegrationConfig {
         tolerance: config.tolerance.clone(),
-        max_evals: config.max_evals,
+        max_evals: 0,
         points: Points::with_capacity(config.points.len()),
     };
 
     let mut outer_config = IntegrationConfig {
         tolerance: config.tolerance.clone(),
-        max_evals: config.max_evals,
+        max_evals: config.max_evals / 17,
         points: Points::with_capacity(config.points.len()),
     };
 
     let mut inner_ws = WorkSpace::new();
     let mut inner = QAGP::with_workspace(&mut inner_ws);
     let mut error = None;
+    let mut nevals = 0usize;
 
     let xtransform = !xrange.begin.is_finite() || !xrange.end.is_finite();
     config.points.iter().for_each(|&(x, y)| {
@@ -104,14 +106,20 @@ where
 
     let mut integrand = |x: f64| -> f64 {
         let mut integrand2 = |y: f64| f.apply((x, y));
+        inner_config.max_evals = config.max_evals - nevals;
         let result = inner.integrate(&mut integrand2, &*yrange(x), &inner_config);
 
         unsafe {
             if result.has_err() {
-                error = result.err();
+                if error.is_none() {
+                    error = result.err();
+                }
+                nevals = config.max_evals;
                 std::f64::NAN
             } else {
-                result.unwrap_unchecked().estimate
+                let result = result.unwrap_unchecked();
+                nevals += result.nevals;
+                result.estimate
             }
         }
     };

@@ -49,31 +49,40 @@ impl<'a, F: Integrand2> Algorithm2<F, DynamicY<'a>> for QAGS2 {
         range: &DynamicY<'a>,
         config: &IntegrationConfig2,
     ) -> IntegrationResult {
-        let config1 = IntegrationConfig {
+        let mut config1 = IntegrationConfig {
             tolerance: config.tolerance.clone(),
-            max_evals: config.max_evals,
+            max_evals: config.max_evals / 17,
             ..Default::default()
         };
+        let config2 = config1.clone();
 
         let mut inner_ws = WorkSpace::new();
         let mut inner = QAGS::with_workspace(&mut inner_ws);
         let mut error = None;
+        let mut nevals = 0usize;
 
         let mut integrand = |x: f64| -> f64 {
+            dbg!(nevals);
             let mut integrand2 = |y: f64| f.apply((x, y));
+            config1.max_evals = config.max_evals - nevals;
             let result = inner.integrate(&mut integrand2, &(range.yrange)(x), &config1);
 
             unsafe {
                 if result.has_err() {
-                    error = result.err();
+                    if error.is_none() {
+                        error = result.err();
+                    }
+                    nevals = config.max_evals;
                     std::f64::NAN
                 } else {
-                    result.unwrap_unchecked().estimate
+                    let result = result.unwrap_unchecked();
+                    nevals += result.nevals;
+                    result.estimate
                 }
             }
         };
 
-        let mut result = QAGS::new().integrate(&mut integrand, &range.xrange, &config1);
+        let mut result = QAGS::new().integrate(&mut integrand, &range.xrange, &config2);
         if error.is_some() {
             result.error = error;
         }

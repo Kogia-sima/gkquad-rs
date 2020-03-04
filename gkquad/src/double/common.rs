@@ -25,7 +25,7 @@ impl Default for IntegrationConfig2 {
     fn default() -> Self {
         Self {
             tolerance: Tolerance::default(),
-            max_evals: 2000,
+            max_evals: 100000,
             points: Points2::new(),
         }
     }
