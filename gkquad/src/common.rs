@@ -137,6 +137,14 @@ impl<T, E> ValueWithError<T, E> {
     pub fn expect_err(self, msg: &str) -> E {
         self.error.expect(msg)
     }
+
+    #[inline]
+    pub fn into_result(self) -> Result<T, E> {
+        match self.error {
+            Some(e) => Err(e),
+            None => Ok(self.value),
+        }
+    }
 }
 
 impl<T, E: Debug> ValueWithError<T, E> {
