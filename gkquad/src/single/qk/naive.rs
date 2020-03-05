@@ -27,6 +27,7 @@ use crate::float::Float;
 /// # TODO
 ///
 /// - SIMD implementation
+#[inline(always)]
 pub unsafe fn qk<F, K, G>(
     f: &mut F,
     range: &Range,
@@ -100,4 +101,17 @@ where
         absvalue: result_abs,
         asc: result_asc,
     }
+}
+
+#[inline(always)]
+pub unsafe fn qk17<F: Integrand>(
+    f: &mut F,
+    range: &Range,
+    xgk: &[f64; 8],
+    wg: &[f64; 4],
+    wgk: &[f64; 8],
+    wck: f64,
+    buf: &mut [f64; 17],
+) -> QKResult {
+    qk(f, range, xgk, wg, wgk, wck, buf)
 }

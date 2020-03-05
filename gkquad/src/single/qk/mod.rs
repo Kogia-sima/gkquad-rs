@@ -1,12 +1,12 @@
 #[cfg(all(feature = "simd", target_feature = "avx"))]
 mod avx;
 #[cfg(all(feature = "simd", target_feature = "avx"))]
-pub use avx::qk;
+pub use avx::{qk, qk17 as qk17_};
 
 #[cfg(not(all(feature = "simd", target_feature = "avx")))]
 mod naive;
 #[cfg(not(all(feature = "simd", target_feature = "avx")))]
-pub use naive::qk;
+pub use naive::{qk, qk17 as qk17_};
 
 use super::common::{Integrand, Range};
 use super::util::Aligned;
@@ -25,16 +25,14 @@ pub struct QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 17-point kronrod rule
-#[inline]
 pub fn qk17<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
     unsafe {
         let mut fv = Aligned::<[f64; 17]>::uninit();
-        qk(f, r, &*XGK17, &*WG17, &*WGK17, WCK17, &mut *fv)
+        qk17_(f, r, &*XGK17, &*WG17, &*WGK17, WCK17, &mut *fv)
     }
 }
 
 /// Performs Gauss-Kronrod integration with 25-point kronrod rule
-#[inline]
 pub fn qk25<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
     unsafe {
         let mut fv = Aligned::<[f64; 25]>::uninit();
@@ -43,7 +41,6 @@ pub fn qk25<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 33-point kronrod rule
-#[inline]
 pub fn qk33<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
     unsafe {
         let mut fv = Aligned::<[f64; 33]>::uninit();
@@ -52,7 +49,6 @@ pub fn qk33<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 41-point kronrod rule
-#[inline]
 pub fn qk41<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
     unsafe {
         let mut fv = Aligned::<[f64; 41]>::uninit();
@@ -61,7 +57,6 @@ pub fn qk41<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 49-point kronrod rule
-#[inline]
 pub fn qk49<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
     unsafe {
         let mut fv = Aligned::<[f64; 49]>::uninit();
@@ -70,7 +65,6 @@ pub fn qk49<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 57-point kronrod rule
-#[inline]
 pub fn qk57<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
     unsafe {
         let mut fv = Aligned::<[f64; 57]>::uninit();

@@ -34,26 +34,20 @@ features = ["single"]
 
 Here is the benchmark measured on the Intel Core(TM) i5 @ 1.60GHz (without turbo boost)
 
-```console
-$ cargo bench
+#### 1-dimentional integration
 
-     Running /tmp/gkquad-rs/target/release/deps/double-2edb6abee89fc9f4
+```
+test infinite_range  ... bench:         467 ns/iter (+/- 13)
+test simple          ... bench:          88 ns/iter (+/- 1)
+test singular_points ... bench:       1,416 ns/iter (+/- 12)
+```
 
-running 3 tests
-test infinite_range  ... bench:     167,634 ns/iter (+/- 250)
-test simple          ... bench:       2,314 ns/iter (+/- 8)
-test singular_points ... bench:      92,265 ns/iter (+/- 431)
+#### 2-dimentional integration
 
-test result: ok. 0 passed; 0 failed; 0 ignored; 3 measured
-
-     Running /tmp/gkquad-rs/target/release/deps/single-3b52efd7f739cf4b
-
-running 3 tests
-test infinite_range  ... bench:         524 ns/iter (+/- 10)
-test simple          ... bench:          96 ns/iter (+/- 1)
-test singular_points ... bench:       1,516 ns/iter (+/- 2)
-
-test result: ok. 0 passed; 0 failed; 0 ignored; 3 measured
+```
+test infinite_range  ... bench:     165,486 ns/iter (+/- 1,535)
+test simple          ... bench:       1,761 ns/iter (+/- 11)
+test singular_points ... bench:      88,945 ns/iter (+/- 3,548)
 ```
 
 Source code can be found [here](https://github.com/Kogia-sima/gkquad-rs/blob/master/gkquad/benches).

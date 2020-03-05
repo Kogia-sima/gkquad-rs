@@ -88,6 +88,7 @@ impl<'a, F: Integrand + 'a> Integrand for IntegrandWrapper<'a, F> {
         }
     }
 
+    #[inline]
     fn apply_to_slice(&mut self, s: &mut [f64]) {
         if self.transform {
             s.iter_mut().for_each(|x| {
