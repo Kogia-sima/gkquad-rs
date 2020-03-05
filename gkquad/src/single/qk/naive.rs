@@ -102,3 +102,16 @@ where
         asc: result_asc,
     }
 }
+
+#[inline(always)]
+pub unsafe fn qk17<F: Integrand>(
+    f: &mut F,
+    range: &Range,
+    xgk: &[f64; 8],
+    wg: &[f64; 4],
+    wgk: &[f64; 8],
+    wck: f64,
+    buf: &mut [f64; 17],
+) -> QKResult {
+    qk(f, range, xgk, wg, wgk, wck, buf)
+}
