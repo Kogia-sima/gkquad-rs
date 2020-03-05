@@ -27,6 +27,7 @@ use crate::float::Float;
 /// # TODO
 ///
 /// - SIMD implementation
+#[inline(always)]
 pub unsafe fn qk<F, K, G>(
     f: &mut F,
     range: &Range,

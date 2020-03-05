@@ -25,7 +25,6 @@ pub struct QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 17-point kronrod rule
-#[inline]
 pub fn qk17<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
     unsafe {
         let mut fv = Aligned::<[f64; 17]>::uninit();
@@ -34,7 +33,6 @@ pub fn qk17<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 25-point kronrod rule
-#[inline]
 pub fn qk25<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
     unsafe {
         let mut fv = Aligned::<[f64; 25]>::uninit();
@@ -43,7 +41,6 @@ pub fn qk25<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 33-point kronrod rule
-#[inline]
 pub fn qk33<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
     unsafe {
         let mut fv = Aligned::<[f64; 33]>::uninit();
@@ -52,7 +49,6 @@ pub fn qk33<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 41-point kronrod rule
-#[inline]
 pub fn qk41<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
     unsafe {
         let mut fv = Aligned::<[f64; 41]>::uninit();
@@ -61,7 +57,6 @@ pub fn qk41<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 49-point kronrod rule
-#[inline]
 pub fn qk49<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
     unsafe {
         let mut fv = Aligned::<[f64; 49]>::uninit();
@@ -70,7 +65,6 @@ pub fn qk49<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
 }
 
 /// Performs Gauss-Kronrod integration with 57-point kronrod rule
-#[inline]
 pub fn qk57<F: Integrand>(f: &mut F, r: &Range) -> QKResult {
     unsafe {
         let mut fv = Aligned::<[f64; 57]>::uninit();
