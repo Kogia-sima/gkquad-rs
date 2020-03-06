@@ -275,12 +275,6 @@ impl WorkSpace {
     pub fn sum_results(self: &WorkSpace) -> f64 {
         self.subranges.iter().map(|s| s.estimate).sum()
     }
-
-    pub fn release(&mut self) {
-        self.clear();
-        self.subranges.shrink_to_fit();
-        self.order.shrink_to_fit();
-    }
 }
 
 impl Default for WorkSpace {
