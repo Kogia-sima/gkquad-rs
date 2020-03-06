@@ -7,7 +7,7 @@ use bencher::{black_box, Bencher};
 use std::f64::consts::PI;
 use std::f64::{INFINITY, NEG_INFINITY};
 
-use gkquad::single::{integral, Integrator};
+use gkquad::single::Integrator;
 use gkquad::Tolerance;
 
 fn simple(b: &mut Bencher) {
