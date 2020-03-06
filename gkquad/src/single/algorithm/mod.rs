@@ -6,7 +6,6 @@
 //! * [Netlib quadpack library](http://www.netlib.org/quadpack/)
 
 use super::common::{Integrand, IntegrationConfig, Range};
-use super::workspace::WorkSpace;
 use crate::common::IntegrationResult;
 
 /// 1-dimentional integration algorithm API
@@ -21,11 +20,6 @@ pub trait Algorithm<F: Integrand> {
         range: &Range,
         config: &IntegrationConfig,
     ) -> IntegrationResult;
-}
-
-#[doc(hidden)]
-pub trait AlgorithmWithWorkSpace {
-    fn workspace(&self) -> &WorkSpace;
 }
 
 macro_rules! extra_traits {

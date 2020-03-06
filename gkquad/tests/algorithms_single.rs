@@ -5,9 +5,34 @@ mod common;
 use common::functions::*;
 
 use gkquad::single::algorithm::*;
-use gkquad::single::Integrator;
+use gkquad::single::{Integrator, WorkSpace};
 use gkquad::RuntimeError;
 use gkquad::Tolerance::{self, *};
+
+trait AlgorithmWithWorkSpace {
+    fn with_workspace(ws: &mut WorkSpace) -> Self;
+}
+
+impl AlgorithmWithWorkSpace for QAG<'_> {
+    fn with_workspace(ws: &mut WorkSpace) -> Self {
+        let ws = unsafe { std::mem::transmute(ws) };
+        Self::with_workspace(ws)
+    }
+}
+
+impl AlgorithmWithWorkSpace for QAGS<'_> {
+    fn with_workspace(ws: &mut WorkSpace) -> Self {
+        let ws = unsafe { std::mem::transmute(ws) };
+        Self::with_workspace(ws)
+    }
+}
+
+impl AlgorithmWithWorkSpace for QAGP<'_> {
+    fn with_workspace(ws: &mut WorkSpace) -> Self {
+        let ws = unsafe { std::mem::transmute(ws) };
+        Self::with_workspace(ws)
+    }
+}
 
 struct Expect<'a> {
     value: f64,
@@ -22,10 +47,11 @@ fn test_algorithm<A: Algorithm<fn(f64) -> f64> + AlgorithmWithWorkSpace>(
     a: f64,
     b: f64,
     pts: &[f64],
-    algorithm: A,
     tol: Tolerance,
     expect: Expect,
 ) {
+    let mut ws = WorkSpace::with_capacity(50);
+    let algorithm = A::with_workspace(&mut ws);
     let mut integrator = Integrator::with_algorithm(f, algorithm)
         .tolerance(tol)
         .points(pts);
@@ -38,7 +64,6 @@ fn test_algorithm<A: Algorithm<fn(f64) -> f64> + AlgorithmWithWorkSpace>(
     assert_eq!(result.nevals, expect.nevals);
 
     if cfg!(feature = "std") && !expect.order.is_empty() {
-        let ws = integrator.get_algorithm().workspace();
         assert_eq!(&ws.order, &expect.order);
     }
 
@@ -51,7 +76,6 @@ fn test_algorithm<A: Algorithm<fn(f64) -> f64> + AlgorithmWithWorkSpace>(
     assert_eq!(result.nevals, expect.nevals);
 
     if cfg!(feature = "std") && !expect.order.is_empty() && pts.is_empty() {
-        let ws = integrator.get_algorithm().workspace();
         assert_eq!(&ws.order, &expect.order);
     }
 }
@@ -66,7 +90,7 @@ fn qag_f1_15pt() {
         nevals: 317,
         error: None,
     };
-    test_algorithm(f1, 0.0, 1.0, &[], QAG::new(), Relative(1e-10), expect);
+    test_algorithm::<QAG>(f1, 0.0, 1.0, &[], Relative(1e-10), expect);
 }
 
 #[test]
@@ -78,7 +102,7 @@ fn qag_f1() {
         nevals: 317,
         error: None,
     };
-    test_algorithm(f1, 0.0, 1.0, &[], QAG::new(), Absolute(1e-14), expect);
+    test_algorithm::<QAG>(f1, 0.0, 1.0, &[], Absolute(1e-14), expect);
 }
 
 #[test]
@@ -94,7 +118,7 @@ fn qag_f2_15pt() {
         nevals: 1967,
         error: Some(RuntimeError::InsufficientIteration),
     };
-    test_algorithm(f2, 0.0, 1.0, &[], QAG::new(), Absolute(1e-2), expect);
+    test_algorithm::<QAG>(f2, 0.0, 1.0, &[], Absolute(1e-2), expect);
 }
 
 #[test]
@@ -106,7 +130,7 @@ fn qag_f3() {
         nevals: 367,
         error: Some(RuntimeError::RoundoffError),
     };
-    test_algorithm(f3, 0.3, 2.71, &[], QAG::new(), Absolute(1e-14), expect);
+    test_algorithm::<QAG>(f3, 0.3, 2.71, &[], Absolute(1e-14), expect);
 }
 
 #[test]
@@ -118,7 +142,7 @@ fn qags_f1() {
         nevals: 167,
         error: None,
     };
-    test_algorithm(f1, 0.0, 1.0, &[], QAGS::new(), Relative(1e-10), expect);
+    test_algorithm::<QAGS>(f1, 0.0, 1.0, &[], Relative(1e-10), expect);
 }
 
 #[test]
@@ -130,7 +154,7 @@ fn qags_f2() {
         nevals: 767,
         error: None,
     };
-    test_algorithm(f2, 0.0, 1.0, &[], QAGS::new(), Absolute(1e-10), expect);
+    test_algorithm::<QAGS>(f2, 0.0, 1.0, &[], Absolute(1e-10), expect);
 }
 
 #[test]
@@ -142,7 +166,7 @@ fn qags_f3() {
         nevals: 42,
         error: None,
     };
-    test_algorithm(f3, 0.3, 2.71, &[], QAGS::new(), Absolute(1e-10), expect);
+    test_algorithm::<QAGS>(f3, 0.3, 2.71, &[], Absolute(1e-10), expect);
 }
 
 #[test]
@@ -154,7 +178,7 @@ fn qags_f4() {
         nevals: 367,
         error: None,
     };
-    test_algorithm(f4, 1.0, 1000.0, &[], QAGS::new(), Absolute(1e-7), expect);
+    test_algorithm::<QAGS>(f4, 1.0, 1000.0, &[], Absolute(1e-7), expect);
 }
 
 #[test]
@@ -166,7 +190,7 @@ fn qagp_f5() {
         nevals: 475,
         error: None,
     };
-    test_algorithm(f5, 0., 4., &[1., 2.], QAGP::new(), Relative(1e-3), expect);
+    test_algorithm::<QAGP>(f5, 0., 4., &[1., 2.], Relative(1e-3), expect);
 }
 
 #[test]
@@ -178,7 +202,7 @@ fn qagp_f6() {
         nevals: 550,
         error: Some(RuntimeError::Divergent),
     };
-    test_algorithm(f6, 0., 2., &[1.], QAGP::new(), Absolute(1e-10), expect);
+    test_algorithm::<QAGP>(f6, 0., 2., &[1.], Absolute(1e-10), expect);
 }
 
 #[test]
@@ -190,5 +214,5 @@ fn qagp_f7() {
         nevals: 250,
         error: None,
     };
-    test_algorithm(f7, -1., 1., &[0.], QAGP::new(), Absolute(1e-10), expect);
+    test_algorithm::<QAGP>(f7, -1., 1., &[0.], Absolute(1e-10), expect);
 }

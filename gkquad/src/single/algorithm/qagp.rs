@@ -39,13 +39,6 @@ impl<'a> QAGP<'a> {
     }
 }
 
-#[doc(hidden)]
-impl<'a> super::AlgorithmWithWorkSpace for QAGP<'a> {
-    fn workspace(&self) -> &WorkSpace {
-        &*self.workspace
-    }
-}
-
 impl<'a, F: Integrand> Algorithm<F> for QAGP<'a> {
     #[inline]
     fn integrate(

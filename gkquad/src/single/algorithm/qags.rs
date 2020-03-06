@@ -38,13 +38,6 @@ impl<'a> QAGS<'a> {
     }
 }
 
-#[doc(hidden)]
-impl<'a> super::AlgorithmWithWorkSpace for QAGS<'a> {
-    fn workspace(&self) -> &WorkSpace {
-        &*self.workspace
-    }
-}
-
 impl<'a, F: Integrand> Algorithm<F> for QAGS<'a> {
     fn integrate(
         &mut self,
