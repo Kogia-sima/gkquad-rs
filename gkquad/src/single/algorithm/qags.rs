@@ -318,6 +318,7 @@ fn integrate_impl(
 }
 
 // initial integral
+#[inline]
 fn initial_integral(
     qk17: &dyn Fn(&Range) -> QKResult,
     qk25: &dyn Fn(&Range) -> QKResult,

@@ -96,6 +96,7 @@ impl<R: RangeBounds<f64>> From<R> for Range {
 }
 
 impl<'a> From<&'a Range> for Range {
+    #[inline]
     fn from(other: &'a Range) -> Self {
         other.clone()
     }

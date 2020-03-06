@@ -10,7 +10,7 @@ pub struct AUTO {
 }
 
 impl AUTO {
-    #[inline(always)]
+    #[inline]
     pub fn new() -> Self {
         Self {
             qags: QAGS::new(),

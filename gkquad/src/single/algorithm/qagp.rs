@@ -374,6 +374,7 @@ fn integrate_impl(
     finish(res_ext, err_ext, nevals, error)
 }
 
+#[inline]
 fn make_sorted_points(range: &Range, pts: &[f64], transform: bool) -> Points {
     let (min, max) = if range.begin < range.end {
         (range.begin, range.end)

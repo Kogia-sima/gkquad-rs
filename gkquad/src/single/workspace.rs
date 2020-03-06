@@ -159,6 +159,7 @@ impl WorkSpace {
         debug_assert_eq!(self.subranges.len(), self.order.len());
     }
 
+    #[inline(always)]
     fn qpsrt(&mut self) {
         let last = self.size() - 1;
         let limit = self.capacity();
@@ -283,7 +284,7 @@ impl WorkSpace {
 }
 
 impl Default for WorkSpace {
-    #[inline(always)]
+    #[inline]
     fn default() -> WorkSpace {
         WorkSpace::new()
     }

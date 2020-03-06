@@ -220,6 +220,7 @@ pub struct Solution {
 }
 
 impl Default for Solution {
+    #[inline]
     fn default() -> Self {
         Self {
             estimate: 0.0,
