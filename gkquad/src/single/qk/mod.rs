@@ -1,12 +1,12 @@
 #[cfg(all(feature = "simd", target_feature = "avx"))]
 mod avx;
 #[cfg(all(feature = "simd", target_feature = "avx"))]
-pub use avx::{qk, qk17 as qk17_};
+use avx::{qk, qk17 as qk17_};
 
 #[cfg(not(all(feature = "simd", target_feature = "avx")))]
 mod naive;
 #[cfg(not(all(feature = "simd", target_feature = "avx")))]
-pub use naive::{qk, qk17 as qk17_};
+use naive::{qk, qk17 as qk17_};
 
 use super::common::{Integrand, Range};
 use super::util::Aligned;
