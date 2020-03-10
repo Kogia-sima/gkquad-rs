@@ -75,6 +75,7 @@ where
     debug_assert!(!xgk.is_empty());
     debug_assert!(xgk.len() == wg.len() * 2);
     debug_assert!(buf.len() >= xgk.len() * 2 + 1);
+    debug_assert!(range.begin.is_finite() && range.end.is_finite());
 
     let n = K::CAPACITY;
     let center = 0.5 * (range.begin + range.end);
@@ -165,6 +166,8 @@ pub unsafe fn qk17<F>(
 where
     F: Integrand,
 {
+    debug_assert!(range.begin.is_finite() && range.end.is_finite());
+
     let center = 0.5 * (range.begin + range.end);
     let half_length = 0.5 * (range.end - range.begin);
     let abs_half_length = half_length.abs();
