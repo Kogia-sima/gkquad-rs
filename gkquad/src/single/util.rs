@@ -71,12 +71,12 @@ impl<T: ?Sized> DerefMut for Aligned<T> {
     }
 }
 
-pub struct IntegrandWrapper<'a, F: Integrand + 'a> {
+pub struct IntegrandWrapper<'a, F: Integrand + ?Sized + 'a> {
     pub inner: &'a mut F,
     pub transform: bool,
 }
 
-impl<'a, F: Integrand + 'a> Integrand for IntegrandWrapper<'a, F> {
+impl<'a, F: Integrand + ?Sized + 'a> Integrand for IntegrandWrapper<'a, F> {
     #[inline]
     fn apply(&mut self, x: f64) -> f64 {
         if self.transform {

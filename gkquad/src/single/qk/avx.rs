@@ -64,7 +64,7 @@ pub unsafe fn qk<F, K, G>(
     buf: &mut [f64],
 ) -> QKResult
 where
-    F: Integrand,
+    F: Integrand + ?Sized,
     K: Array<Item = f64>,
     G: Array<Item = f64>,
 {
@@ -164,7 +164,7 @@ pub unsafe fn qk17<F>(
     buf: &mut [f64; 17],
 ) -> QKResult
 where
-    F: Integrand,
+    F: Integrand + ?Sized,
 {
     debug_assert!(range.begin.is_finite() && range.end.is_finite());
 

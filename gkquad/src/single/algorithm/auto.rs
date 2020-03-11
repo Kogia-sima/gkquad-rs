@@ -19,7 +19,7 @@ impl AUTO {
     }
 }
 
-impl<F: Integrand> Algorithm<F> for AUTO {
+impl<F: Integrand + ?Sized> Algorithm<F> for AUTO {
     fn integrate(
         &mut self,
         f: &mut F,

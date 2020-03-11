@@ -39,7 +39,7 @@ pub unsafe fn qk<F, K, G>(
     buf: &mut [f64],
 ) -> QKResult
 where
-    F: Integrand,
+    F: Integrand + ?Sized,
     K: Array<Item = f64>,
     G: Array<Item = f64>,
 {
@@ -106,7 +106,7 @@ where
 }
 
 #[inline(always)]
-pub unsafe fn qk17<F: Integrand>(
+pub unsafe fn qk17<F: Integrand + ?Sized>(
     f: &mut F,
     range: &Range,
     xgk: &[f64; 8],

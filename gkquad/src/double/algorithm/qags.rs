@@ -14,7 +14,7 @@ impl QAGS2 {
     }
 }
 
-impl<F: Integrand2> Algorithm2<F, Rectangle> for QAGS2 {
+impl<F: Integrand2 + ?Sized> Algorithm2<F, Rectangle> for QAGS2 {
     fn integrate(
         &mut self,
         f: &mut F,
@@ -25,7 +25,7 @@ impl<F: Integrand2> Algorithm2<F, Rectangle> for QAGS2 {
     }
 }
 
-impl<'a, F: Integrand2> Algorithm2<F, DynamicX<'a>> for QAGS2 {
+impl<'a, F: Integrand2 + ?Sized> Algorithm2<F, DynamicX<'a>> for QAGS2 {
     fn integrate(
         &mut self,
         f: &mut F,
@@ -42,7 +42,7 @@ impl<'a, F: Integrand2> Algorithm2<F, DynamicX<'a>> for QAGS2 {
     }
 }
 
-impl<'a, F: Integrand2> Algorithm2<F, DynamicY<'a>> for QAGS2 {
+impl<'a, F: Integrand2 + ?Sized> Algorithm2<F, DynamicY<'a>> for QAGS2 {
     fn integrate(
         &mut self,
         f: &mut F,

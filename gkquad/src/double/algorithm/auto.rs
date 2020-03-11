@@ -13,7 +13,7 @@ impl AUTO2 {
 
 macro_rules! impl_algorithm2 {
     ($range:ty) => {
-        impl<'a, F: Integrand2> Algorithm2<F, $range> for AUTO2 {
+        impl<'a, F: Integrand2 + ?Sized> Algorithm2<F, $range> for AUTO2 {
             fn integrate(
                 &mut self,
                 f: &mut F,

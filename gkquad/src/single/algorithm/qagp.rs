@@ -39,7 +39,7 @@ impl<'a> QAGP<'a> {
     }
 }
 
-impl<'a, F: Integrand> Algorithm<F> for QAGP<'a> {
+impl<'a, F: Integrand + ?Sized> Algorithm<F> for QAGP<'a> {
     #[inline]
     fn integrate(
         &mut self,

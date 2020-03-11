@@ -36,7 +36,7 @@ impl<'a> QAG<'a> {
     }
 }
 
-impl<'a, F: Integrand> Algorithm<F> for QAG<'a> {
+impl<'a, F: Integrand + ?Sized> Algorithm<F> for QAG<'a> {
     fn integrate(
         &mut self,
         f: &mut F,

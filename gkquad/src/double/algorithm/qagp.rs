@@ -18,7 +18,7 @@ impl QAGP2 {
     }
 }
 
-impl<F: Integrand2> Algorithm2<F, Rectangle> for QAGP2 {
+impl<F: Integrand2 + ?Sized> Algorithm2<F, Rectangle> for QAGP2 {
     fn integrate(
         &mut self,
         f: &mut F,
@@ -30,7 +30,7 @@ impl<F: Integrand2> Algorithm2<F, Rectangle> for QAGP2 {
     }
 }
 
-impl<'a, F: Integrand2> Algorithm2<F, DynamicX<'a>> for QAGP2 {
+impl<'a, F: Integrand2 + ?Sized> Algorithm2<F, DynamicX<'a>> for QAGP2 {
     fn integrate(
         &mut self,
         f: &mut F,
@@ -52,7 +52,7 @@ impl<'a, F: Integrand2> Algorithm2<F, DynamicX<'a>> for QAGP2 {
     }
 }
 
-impl<'a, F: Integrand2> Algorithm2<F, DynamicY<'a>> for QAGP2 {
+impl<'a, F: Integrand2 + ?Sized> Algorithm2<F, DynamicY<'a>> for QAGP2 {
     fn integrate(
         &mut self,
         f: &mut F,
@@ -73,7 +73,7 @@ fn integrate_impl<'a, F, G>(
     config: &IntegrationConfig2,
 ) -> IntegrationResult
 where
-    F: Integrand2,
+    F: Integrand2 + ?Sized,
     G: Fn(f64) -> Cow<'a, Range>,
 {
     // TODO: handle max_evals properly

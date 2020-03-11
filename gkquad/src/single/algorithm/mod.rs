@@ -13,7 +13,7 @@ use crate::common::IntegrationResult;
 /// # Notes
 ///
 /// This API is still unstable, and may changes dramatically in the future.
-pub trait Algorithm<F: Integrand> {
+pub trait Algorithm<F: Integrand + ?Sized> {
     fn integrate(
         &mut self,
         f: &mut F,
