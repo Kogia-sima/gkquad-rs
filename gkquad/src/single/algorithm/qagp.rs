@@ -83,7 +83,7 @@ fn integrate_impl(
     ws.clear();
     ws.reserve(nint + (config.max_evals - nint * 25) / 50);
 
-    let (mut reseps, mut abseps, mut correc) = (0.0, 0.0, 0.0);
+    let mut correc = 0.0;
     let mut ktmin = 0;
     let (mut roundoff_type1, mut roundoff_type2, mut roundoff_type3) = (0, 0, 0);
     let mut error = None;
@@ -204,6 +204,7 @@ fn integrate_impl(
         area += area12 - info.estimate;
         let tolerance = config.tolerance.to_abs(area.abs());
 
+        // roundoff check
         if result1.asc != result1.delta && result2.asc != result2.delta {
             if (info.estimate - area12).abs() <= 1e-5 * area12.abs() && error12 >= 0.99 * info.delta
             {
@@ -298,6 +299,8 @@ fn integrate_impl(
             continue;
         }
 
+        // temporary value for rex_ext and err_ext
+        let (mut reseps, mut abseps) = (0.0, 0.0);
         table.qelg(&mut reseps, &mut abseps);
         ktmin += 1;
 
@@ -305,6 +308,7 @@ fn integrate_impl(
             error = Some(RoundoffError);
         }
 
+        // 補外による誤差が減少した場合
         if abseps < err_ext {
             ktmin = 0;
             err_ext = abseps;
