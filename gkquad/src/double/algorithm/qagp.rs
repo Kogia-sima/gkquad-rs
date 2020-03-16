@@ -10,6 +10,7 @@ use crate::single::{IntegrationConfig, Points, Range, WorkSpace};
 #[cfg(not(feature = "std"))]
 use crate::float::Float;
 
+#[derive(Clone)]
 pub struct QAGP2;
 
 impl QAGP2 {

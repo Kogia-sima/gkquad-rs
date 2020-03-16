@@ -6,6 +6,7 @@ use crate::single::algorithm::{Algorithm as Algorithm1, QAGS};
 use crate::single::IntegrationConfig;
 use crate::single::WorkSpace;
 
+#[derive(Clone)]
 pub struct QAGS2;
 
 impl QAGS2 {

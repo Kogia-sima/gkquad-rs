@@ -3,6 +3,7 @@ use super::super::range::{DynamicX, DynamicY, Rectangle};
 use super::{Algorithm2, QAGP2, QAGS2};
 use crate::common::IntegrationResult;
 
+#[derive(Clone)]
 pub struct AUTO2;
 
 impl AUTO2 {
