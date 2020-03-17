@@ -100,9 +100,11 @@ where
 
     f.apply_to_slice(buf);
 
+    let f_center = *bufp.add(n << 1);
+    let tmp = f_center * wck;
     let mut result_gauss = _mm_setzero_pd();
-    let mut result_kronrod = _mm256_setzero_pd();
-    let mut result_abs = _mm256_setzero_pd();
+    let mut result_kronrod = _mm256_set_pd(tmp, 0., 0., 0.);
+    let mut result_abs = _mm256_set_pd(tmp.abs(), 0., 0., 0.);
 
     for j in (0..n).step_by(4) {
         let fval1 = _mm256_load_pd(bufp.add(j));
@@ -118,10 +120,8 @@ where
         result_gauss = fmadd128(wg, fsum_compact, result_gauss);
     }
 
-    let f_center = *bufp.add(n << 1);
-    let tmp = f_center * wck;
-    let mut result_kronrod = sum256(result_kronrod) + tmp;
-    let mut result_abs = sum256(result_abs) + tmp.abs();
+    let mut result_kronrod = sum256(result_kronrod);
+    let mut result_abs = sum256(result_abs);
     let result_gauss = _mm_cvtsd_f64(_mm_hadd_pd(result_gauss, result_gauss));
 
     let mean = result_kronrod * 0.5;
