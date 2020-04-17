@@ -1,9 +1,6 @@
-#[macro_use]
-extern crate bencher;
-
 extern crate gkquad;
 
-use bencher::{black_box, Bencher};
+use smbench::*;
 use std::f64::consts::PI;
 use std::f64::{INFINITY, NEG_INFINITY};
 
@@ -41,5 +38,6 @@ fn infinite_range(b: &mut Bencher) {
     });
 }
 
-benchmark_group!(benches, simple, singular_points, infinite_range);
-benchmark_main!(benches);
+smbench_trace_memory!();
+smbench_group!(benches, simple, singular_points, infinite_range);
+smbench_main!(benches);
