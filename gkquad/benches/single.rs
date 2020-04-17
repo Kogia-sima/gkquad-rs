@@ -7,7 +7,7 @@ use std::f64::{INFINITY, NEG_INFINITY};
 use gkquad::single::Integrator;
 use gkquad::Tolerance;
 
-fn simple(b: &mut Bencher) {
+pub fn simple(b: &mut Bencher) {
     let mut integrator = Integrator::new(|x: f64| x * x);
     b.iter(|| {
         let range = black_box(0.0..1.0);
@@ -16,7 +16,7 @@ fn simple(b: &mut Bencher) {
     });
 }
 
-fn singular_points(b: &mut Bencher) {
+pub fn singular_points(b: &mut Bencher) {
     let mut integrator = Integrator::new(|x: f64| x.recip())
         .points(&[0.])
         .tolerance(Tolerance::Absolute(1.49e-8));
@@ -28,7 +28,7 @@ fn singular_points(b: &mut Bencher) {
     });
 }
 
-fn infinite_range(b: &mut Bencher) {
+pub fn infinite_range(b: &mut Bencher) {
     let mut integrator = Integrator::new(|x: f64| (1.0 + x * x).recip());
 
     b.iter(|| {
@@ -38,6 +38,4 @@ fn infinite_range(b: &mut Bencher) {
     });
 }
 
-smbench_trace_memory!();
-smbench_group!(benches, simple, singular_points, infinite_range);
-smbench_main!(benches);
+smbench_group!(single, simple, singular_points, infinite_range);

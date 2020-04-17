@@ -40,6 +40,4 @@ fn infinite_range(b: &mut Bencher) {
     });
 }
 
-smbench_trace_memory!();
-smbench_group!(benches, simple, singular_points, infinite_range);
-smbench_main!(benches);
+smbench_group!(double, simple, singular_points, infinite_range);

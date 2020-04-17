@@ -32,12 +32,7 @@ default-features = false
 features = ["argparse", "sysinfo"]
 
 [[bench]]
-name = "single"
-harness = false
-
-[[bench]]
-name = "double"
-required-features = ["double"]
+name = "benchmark"
 harness = false
 
 [[example]]

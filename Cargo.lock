@@ -31,7 +31,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "smbench"
 version = "0.1.0"
-source = "git+https://github.com/Kogia-sima/smbench#f44ca051aa17707d5b7b19ee1163ee640dc6a025"
+source = "git+https://github.com/Kogia-sima/smbench#76d25c2c63712d7a78530251dbfd55aa7440751b"
 dependencies = [
  "argparse 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "order-stat 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
