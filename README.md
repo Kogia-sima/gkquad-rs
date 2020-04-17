@@ -32,32 +32,26 @@ features = ["single"]
 
 ## Performance
 
-Here is the benchmark measured on the Intel Core(TM) i5 @ 1.60GHz (without turbo boost)
-
-#### 1-dimentional integration
-
 ```
 OS Type: linux
 CPU Architecture: x86_64
 CPU Model Name: Intel(R) Core(TM) i5-8265U CPU @ 1.60GHz
+Intel Turbo Boost Technology: disabled
 SMBench Version: 0.1.0
 
-simple:          88.420 ns [88.362 ns, 88.479 ns]    0 B (0 allocs)
-singular_points: 1.3792 us [1.3790 us, 1.3794 us]   1 KB (2 allocs)
-infinite_range:  500.75 ns [500.65 ns, 500.85 ns]   1 KB (2 allocs)
-```
+# single (gkquad/benches/single.rs)
+Benchmark              Time                  95% CI         Allocation
+----------------------------------------------------------------------
+simple            88.351 ns  [88.223 ns, 88.479 ns]     0 B (0 allocs)
+singular_points   1.3804 us  [1.3799 us, 1.3810 us]    1 KB (2 allocs)
+infinite_range    500.17 ns  [499.87 ns, 500.47 ns]    1 KB (2 allocs)
 
-#### 2-dimentional integration
-
-```
-OS Type: linux
-CPU Architecture: x86_64
-CPU Model Name: Intel(R) Core(TM) i5-8265U CPU @ 1.60GHz
-SMBench Version: 0.1.0
-
-simple:          1.7229 us [1.7227 us, 1.7232 us]   32 B (1 allocs)
-singular_points: 88.261 us [88.248 us, 88.274 us] 101 KB (4 allocs)
-infinite_range:  166.71 us [166.68 us, 166.75 us] 101 KB (5 allocs)
+# double (gkquad/benches/double.rs)
+Benchmark              Time                  95% CI         Allocation
+----------------------------------------------------------------------
+simple            1.7205 us  [1.7197 us, 1.7213 us]    32 B (1 allocs)
+singular_points   88.415 us  [88.354 us, 88.476 us]  101 KB (4 allocs)
+infinite_range    167.16 us  [166.76 us, 167.55 us]  101 KB (5 allocs)
 ```
 
 Source code can be found [here](https://github.com/Kogia-sima/gkquad-rs/blob/master/gkquad/benches).
